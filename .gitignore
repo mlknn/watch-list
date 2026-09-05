@@ -43,3 +43,6 @@ next-env.d.ts
 /data/*.bak
 /data/*.tmp
 *.tsbuildinfo
+
+# Local account database, credentials and exports
+/data/

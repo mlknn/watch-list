@@ -1,3 +1,15 @@
+# Latest local setup
+
+The Desktop installation now has working local account signup, a local verification inbox, password reset, and the requested admin login with Pro access. `LOCAL_AUTH_ENABLED=true` is set in the ignored `.env.local`. No password is stored in source control. The admin password is hashed in ignored local data. This mode is only for the loopback app; it is not a replacement for actual email verification on a public service.
+
+Pro pricing is **$2.99 USD per month**. Create a Stripe recurring monthly Price for **299 cents, USD, interval_count 1** and put its ID in `STRIPE_PRO_PRICE_ID`. The server checks these values before checkout. There is no free “activate Pro” route; the seeded local admin has an administrative entitlement.
+
+Run both SQL migrations, in filename order, when configuring Supabase. `202609050002_advanced.sql` adds protected admin entitlement and advanced positions. Do not copy local bootstrap credentials into a deployed database. Disable local mode and configure Supabase/OAuth/SMTP for launch. Local accounts require an explicit migration strategy rather than an automatic password transfer.
+
+Local storage is `data/accounts.pg` with an automatic JSON watchlist export at `data/watchlists-export.json`. Original lists are also kept in `data/watchlists.json` and have been copied to the local admin account. Stop the server before copying the whole data folder for backup. Local share links work on this computer; external sharing requires deployment.
+
+Advanced charts show currently entered holdings from their purchase dates, with invested capital separated from market value. Enter quantities and costs on today’s split-adjusted basis. Sold positions, dividends, fees, tax and historic quantity changes are not reconstructed. Use position notes for your investment thesis; export CSV for an offline record.
+
 # Setup checklist for the next session
 
 The application code is ready for configuration and testing with your accounts. GitHub, public deployment, domain registration, OAuth credentials, Supabase and Stripe provisioning were intentionally deferred. None of those services has been created, connected or charged on your behalf.
@@ -81,3 +93,13 @@ Before public launch, verify email delivery, Google/Apple sign-in, owner/non-own
 ## What remains intentionally unverified
 
 Live Google/Apple/SMTP flows, live Supabase project configuration, and Stripe Checkout/webhook delivery have not been exercised because no external credentials are configured. The repository includes executable Postgres-migration/RLS tests using PGlite and unit tests for the billing entitlement rules. PGlite tests do not substitute for testing a real Supabase project and Stripe test mode. WebMCP is optional and feature-detected; it has not been validated in a signed-in browser context.
+
+## Validation for this local update
+
+33 automated tests pass, including local signup/verification/reset, hashed passwords, ownership, Pro limits and portfolio calculations. Production build and TypeScript checks pass. HTTP checks exercise the actual local admin login, holding creation, charts, sharing and revocation. Browser interaction testing was not performed. The optional lint command still reports scaffold and source-rule findings and is not a passing gate.
+
+Password policy: the app now accepts 6–256 characters for signup and password reset. Set Supabase Auth’s minimum password length to 6 when connecting the hosted project so its policy matches the local app. Existing passwords remain valid.
+
+Update: Basic and Pro both include advanced watchlists and portfolio performance. Basic remains 1 list / 10 stocks; Pro remains $2.99/month for 10 lists / 50 stocks each. Quantities, purchase costs and purchase dates are fixed once saved. Existing rows without quantities allow owner-only one-time setup. Apply all three SQL migrations in filename order for hosted Supabase. Shared watchlist and portfolio routes are public read-only capabilities; no login is required. Localhost links cannot be opened from other computers until deployment.
+
+Latest pricing and presentation: Pro is $2.99 USD/month or $30 USD/year (annual billing; $2.50/month equivalent). Configure STRIPE_PRO_MONTHLY_PRICE_ID for 299 cents/month and STRIPE_PRO_YEARLY_PRICE_ID for 3000 cents/year. Both signed subscription price IDs grant Pro; Checkout validates the selected price and interval. The welcome page models $1,000 each in NVDA, MU, TSLA, AAPL, MSFT, and AMZN since September 3, 2021; its displayed return is calculated, not hard-coded. Watchlist charts now open through the top performance button, including shared views.

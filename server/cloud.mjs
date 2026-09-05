@@ -1,10 +1,14 @@
+import {localMode,localDatabase,exportLocalData} from './local-db.mjs';
+import {localUser} from './local-auth.mjs';
 import { createClient } from '@supabase/supabase-js';
 import { randomBytes } from 'node:crypto';
 import { AppError, getQuote, normalizeTicker } from './quotes.mjs';
 
-export const authConfigured = () => !!(process.env.SUPABASE_URL && process.env.SUPABASE_PUBLISHABLE_KEY && process.env.SUPABASE_SERVICE_ROLE_KEY);
+export const authConfigured = () => localMode() || !!(process.env.SUPABASE_URL && process.env.SUPABASE_PUBLISHABLE_KEY && process.env.SUPABASE_SERVICE_ROLE_KEY);
 export const origin = () => (process.env.APP_URL || 'http://127.0.0.1:4317').replace(/\/$/, '');
+/** @returns {any} */
 export function database() {
+  if(localMode())return localDatabase();
   if (!authConfigured()) throw new AppError('Accounts are not connected yet. Please try again after setup is complete.',503);
   return createClient(process.env.SUPABASE_URL,process.env.SUPABASE_SERVICE_ROLE_KEY,{auth:{persistSession:false,autoRefreshToken:false}});
 }
@@ -20,6 +24,7 @@ export function dbResult(result) {
   return result.data;
 }
 export async function requireUser(request) {
+  if(localMode())return {db:localDatabase(),user:await localUser(request)};
   const bearer=request.headers.get('authorization');
   if(!bearer?.startsWith('Bearer ')) throw new AppError('Please sign in to continue.',401);
   const db=database();
@@ -34,7 +39,7 @@ export async function rate(db,key,max=60,seconds=60) {
   if(!dbResult(await db.rpc('wl_rate',{p_key:key,p_max:max,p_seconds:seconds}))) throw new AppError('Too many updates. Please wait a moment and try again.',429);
 }
 export function planFor(profile, now=Date.now()) {
-  const pro=profile.subscription_status==='active'&&Date.parse(profile.pro_until)>now;
+  const pro=profile.is_admin===true||(profile.subscription_status==='active'&&Date.parse(profile.pro_until)>now);
   return {id:pro?'pro':'free',maxLists:pro?10:1,maxStocks:pro?50:10,pageSize:25,trialEndsAt:profile.trial_ends_at,expired:!pro&&!!profile.trial_ends_at&&Date.parse(profile.trial_ends_at)<=now};
 }
 export async function ownerList(db,userId,listId) {
@@ -62,7 +67,7 @@ export function stockView(stock,cached) {
   const fresh=cached?.quote;
   const comparable=fresh && fresh.currency===base.currency && Date.parse(fresh.quoteTime)>=Date.parse(base.quoteTime);
   const current=comparable?fresh:base;
-  return {id:stock.id,symbol:stock.symbol,companyName:base.companyName,currency:base.currency,exchange:base.exchange,addedAt:stock.added_at,addedPrice:base.price,initialQuoteTime:base.quoteTime,currentPrice:current.price,quoteTime:current.quoteTime,checkedAt:current.checkedAt,quoteError:cached?.error || (fresh&&!comparable?'Latest quote could not be compared. Starting quote is shown.':null)};
+  return {quantity:stock.quantity===null||stock.quantity===undefined?null:Number(stock.quantity),costPerShare:stock.cost_per_share===null||stock.cost_per_share===undefined?null:Number(stock.cost_per_share),acquiredAt:stock.acquired_at||null,notes:stock.notes||'',id:stock.id,symbol:stock.symbol,companyName:base.companyName,currency:base.currency,exchange:base.exchange,addedAt:stock.added_at,addedPrice:base.price,initialQuoteTime:base.quoteTime,currentPrice:current.price,quoteTime:current.quoteTime,checkedAt:current.checkedAt,quoteError:cached?.error || (fresh&&!comparable?'Latest quote could not be compared. Starting quote is shown.':null)};
 }
 export async function listViews(db,lists,refresh=false) {
   if(!lists.length)return [];
@@ -71,17 +76,17 @@ export async function listViews(db,lists,refresh=false) {
   if(refresh){let i=0;await Promise.all(Array.from({length:Math.min(4,symbols.length)},async()=>{while(i<symbols.length){try{await cachedQuote(db,symbols[i++]);}catch{/* Preserve baseline when provider is unavailable. */}}}));}
   const quotes=symbols.length?dbResult(await db.from('wl_quotes').select('*').in('symbol',symbols)):[];
   const lookup=new Map(quotes.map(q=>[q.symbol,q]));
-  return lists.map(l=>({id:l.id,name:l.name,createdAt:l.created_at,shareToken:l.share_token,role:'admin',stocks:stocks.filter(s=>s.watchlist_id===l.id).map(s=>stockView(s,lookup.get(s.symbol)))}));
+  return lists.map(l=>({id:l.id,name:l.name,mode:l.mode||'basic',createdAt:l.created_at,shareToken:l.share_token,role:'admin',stocks:stocks.filter(s=>s.watchlist_id===l.id).map(s=>stockView(s,lookup.get(s.symbol)))}));
 }
 export async function accountState(db,user,refresh=false) {
   const profile=dbResult(await db.from('wl_profiles').select('*').eq('id',user.id).single());
   const lists=dbResult(await db.from('wl_watchlists').select('*').eq('owner_id',user.id).order('created_at').order('id'));
-  return {version:2,updatedAt:new Date().toISOString(),user:{id:user.id,name:profile.display_name,email:user.email,country:profile.country_code,hasBilling:!!profile.stripe_customer_id},plan:planFor(profile),watchlists:await listViews(db,lists,refresh)};
+  return {version:2,updatedAt:new Date().toISOString(),user:{id:user.id,name:profile.display_name,email:user.email,isAdmin:profile.is_admin===true,local:localMode(),country:profile.country_code,hasBilling:!!profile.stripe_customer_id},plan:planFor(profile),watchlists:await listViews(db,lists,refresh)};
 }
 export async function accountAction(db,user,input) {
   if(!input||typeof input!=='object'||Array.isArray(input))throw new AppError('Invalid request.');
   if(input.action==='refresh')return accountState(db,user,true);
-  const allowed=['createList','renameList','deleteList','addStock','removeStock','shareList','revokeShare'];
+  const allowed=['createList','renameList','deleteList','addStock','removeStock','shareList','revokeShare','convertList','initializePosition'];
   if(!allowed.includes(input.action))throw new AppError('Unknown action.');
   if(input.action!=='createList')await ownerList(db,user.id,input.listId);
   let quote=null;
@@ -90,7 +95,8 @@ export async function accountAction(db,user,input) {
     if(result.error)throw new AppError('A current quote is unavailable. Please try adding this stock again shortly.',502);
     quote=result.quote;
   }
-  dbResult(await db.rpc('wl_account_action',{p_user:user.id,p_action:input.action,p_list:input.listId||null,p_name:input.name||null,p_symbol:quote?.symbol||null,p_quote:quote,p_stock:input.stockId||null,p_token:input.action==='shareList'?randomBytes(32).toString('base64url'):null}));
+  dbResult(await db.rpc('wl_advanced_action',{p_user:user.id,p_action:input.action,p_list:input.listId||null,p_name:input.name||null,p_symbol:quote?.symbol||null,p_quote:quote,p_stock:input.stockId||null,p_token:input.action==='shareList'?randomBytes(32).toString('base64url'):null,p_mode:'advanced',p_quantity:input.quantity??null,p_cost:input.costPerShare??quote?.price??null,p_acquired:input.acquiredAt||new Date().toISOString(),p_notes:input.notes||''}));
+  if(localMode())await exportLocalData();
   return accountState(db,user);
 }
 export async function sharedState(token) {

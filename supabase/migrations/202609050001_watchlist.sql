@@ -100,7 +100,17 @@ begin
   update public.wl_profiles set country_code=p_country where id=p_user;
 end $$;
 create function public.wl_community() returns jsonb language sql stable security definer set search_path='' as $$
- select jsonb_build_object('users',(select count(*) from public.wl_profiles),'countries',coalesce((select jsonb_agg(jsonb_build_object('code',country_code,'users',n)) from (select country_code,count(*) n from public.wl_profiles where country_code is not null group by country_code having count(*)>=3) c),'[]'::jsonb));
+ select jsonb_build_object(
+   'users', (select count(*) from public.wl_profiles),
+   'countries', coalesce(
+     (select jsonb_agg(jsonb_build_object('code', country_code, 'users', n) order by country_code)
+      from (select country_code, count(*) n
+            from public.wl_profiles
+            where country_code is not null
+            group by country_code) c),
+     '[]'::jsonb
+   )
+ );
 $$;
 create function public.wl_rate(p_key text,p_max integer,p_seconds integer) returns boolean language plpgsql security definer set search_path='' as $$
 declare v_hits integer;

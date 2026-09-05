@@ -86,3 +86,16 @@ Hovering or focusing a stock name/ticker loads an intraday preview; clicking ope
 The details page includes overview, statistics, company description, price history with pagination, a full-chart dialog, and add-to-watchlist for verified users. Company fundamentals are requested separately through the open-source yahoo-finance2 library so a delayed fundamentals response does not block the chart. Missing data is marked unavailable, not inferred. After-hours prices appear only when provided. Daily/historical bars use unadjusted closes; stock splits can therefore create discontinuities. Detail-page price change compares with the previous close, while watchlist change compares with the immutable price at add.
 
 Chart requests are cached for one minute per symbol/range and fundamentals for five minutes, with bounded cache sizes, fetch timeouts and in-flight deduplication. These public routes contain only market data, not account information. Add CDN-level rate limits before a high-traffic public launch. The charts use Recharts and the existing Shadcn chart/hover primitives. No provider data is fabricated when a request fails.
+
+
+## Local account service and advanced portfolios
+
+`server/local-auth.mjs` provides loopback-only local signup, simulated verification/reset delivery, scrypt password hashes, expiring single-use tokens and HttpOnly cookie sessions. Persisted rate limits restrict login attempts. The local admin seed contains only a salted password hash and is ignored by Git. This does not verify ownership of email addresses and is disabled for a public APP_URL.
+
+`server/local-db.mjs` uses filesystem-backed PGlite with the same SQL migrations and ownership/plan RPCs as Supabase. It exports private watchlist JSON after changes; the password/session tables are excluded from the JSON export. Node filesystem storage is documented by [PGlite](https://pglite.dev/docs/filesystems).
+
+`server/portfolio.mjs` fetches historical bars with bounded concurrency and aggregates quantities from entered acquisition dates. It keeps invested capital separate from market value, omits unknown positions explicitly and refuses incomplete provider history instead of inventing totals. It models current holdings only, not a brokerage transaction ledger. Advanced positions are USD-only to avoid summing currencies without an exchange-rate model.
+
+`server/showcase.mjs` fetches actual dated daily closes for TSLA/MU/NVDA, compares them with current quotes, and caches the result for 60 seconds. Source dates and split-adjustment methodology are visible in the welcome card.
+
+Stripe pricing is fixed to USD 299 cents per month and validated before starting Checkout. Reference: [Stripe product and price setup](https://docs.stripe.com/products-prices/manage-prices?dashboard-or-api=api).

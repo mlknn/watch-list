@@ -1,0 +1,26 @@
+import {test,before,after} from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {localAuth,localUser,passwordHash,passwordMatches} from '../server/local-auth.mjs';
+import {localPg,localDatabase} from '../server/local-db.mjs';
+let directory;const request=cookie=>new Request('http://127.0.0.1:4317/api/local-auth',{headers:cookie?{cookie}:undefined});
+before(async()=>{directory=await mkdtemp(join(tmpdir(),'watchlist-auth-'));process.env.LOCAL_DATA_DIR=directory;process.env.LOCAL_AUTH_ENABLED='true';process.env.APP_URL='http://127.0.0.1:4317';});
+after(async()=>{await (await localPg()).close();await rm(directory,{recursive:true,force:true});});
+test('local signup requires single-use verification and creates an isolated Basic account',async()=>{
+ const input={action:'signup',name:'Local Member',email:'member@example.com',password:'Test12'};
+ await assert.rejects(localAuth(request(),{...input,password:'short'}),/between 6 and 256/);
+ const result=await localAuth(request(),input);assert.ok(result.payload.localDelivery.url);await assert.rejects(localAuth(request(),{...input,action:'login'}),e=>e.status===403);
+ const token=result.payload.localDelivery.url.split('token=')[1];const verified=await localAuth(request(),{action:'verify',token});assert.match(verified.cookie,/HttpOnly/);assert.match(verified.cookie,/SameSite=Strict/);
+ await assert.rejects(localAuth(request(),{action:'verify',token}),/already used/);
+ const user=await localUser(request(verified.cookie));assert.equal(user.email,input.email);
+ const profile=await localDatabase().from('wl_profiles').select('*').eq('id',user.id).single();assert.equal(profile.data.is_admin,false);assert.equal(profile.data.subscription_status,'free');
+ await assert.rejects(localAuth(request(),{...input,action:'login',password:'wrong'}),e=>e.status===401);
+ const reset=await localAuth(request(),{action:'reset',email:input.email});await localAuth(request(),{action:'updatePassword',token:reset.payload.localDelivery.url.split('token=')[1],password:'New456'});
+ await assert.rejects(localUser(request(verified.cookie)),e=>e.status===401);
+ const login=await localAuth(request(),{action:'login',email:input.email,password:'New456'});assert.ok(login.cookie);
+ await localAuth(request(login.cookie),{action:'logout'});await assert.rejects(localUser(request(login.cookie)),e=>e.status===401);
+});
+test('local authentication refuses remote hosts',async()=>{await assert.rejects(localAuth(new Request('https://example.com/api/local-auth'),{action:'login'}),e=>e.status===403);});
+test('passwords have unique salted hashes and constant-length comparisons',async()=>{const a=await passwordHash('test'),b=await passwordHash('test');assert.notEqual(a,b);assert.equal(await passwordMatches('test',a),true);assert.equal(await passwordMatches('other',a),false);});
