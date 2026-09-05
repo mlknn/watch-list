@@ -1,0 +1,12 @@
+'use client';
+import {useId} from 'react';
+import {Area,AreaChart,CartesianGrid,ReferenceLine,Tooltip,XAxis,YAxis} from 'recharts';
+import {ChartContainer} from '@/components/ui/chart';
+import {type MarketChart} from '@/lib/market';
+import {price} from '@/lib/watchlist';
+export function PriceChart({data,compact=false}:{data:MarketChart;compact?:boolean}){
+  const id=useId().replace(/[^a-zA-Z0-9]/g,'');const base=data.range==='1d'?data.quote.previousClose:data.points[0]?.price;const up=data.points.length>0&&data.points.at(-1)!.price>=(base??data.points[0].price);const color=up?'#238362':'#be4d59';
+  const label=(value:number)=>new Date(value).toLocaleString(undefined,{timeZone:data.timezone,...(data.range==='1d'?{hour:'numeric',minute:'2-digit'}:{month:'short',day:'numeric',...(data.range==='5y'||data.range==='max'?{year:'2-digit'}:{})})});
+  if(data.points.length<2)return <div className={compact?'mini-chart-empty':'chart-empty'}>Not enough trading data to draw this chart.</div>;
+  return <ChartContainer config={{price:{label:'Price',color}}} className={compact?'mini-price-chart':'detail-price-chart'} aria-label={`${data.symbol} price chart, ${data.sessionDate||data.range}, ${data.currency}`}><AreaChart accessibilityLayer data={data.points} margin={{top:12,right:compact?0:8,bottom:0,left:0}}><defs><linearGradient id={'price-fill-'+id} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={color} stopOpacity={.23}/><stop offset="100%" stopColor={color} stopOpacity={.015}/></linearGradient></defs>{!compact&&<CartesianGrid vertical={false} stroke="#e7edf3"/>}<XAxis hide={compact} dataKey="time" tickFormatter={label} minTickGap={45} tickLine={false} axisLine={false} tickMargin={12}/><YAxis hide={compact} orientation="right" domain={['auto','auto']} tickFormatter={v=>Number(v).toFixed(data.quote.price<1?4:2)} width={62} tickLine={false} axisLine={false}/>{data.range==='1d'&&base!==null&&base!==undefined&&!compact&&<ReferenceLine y={base} stroke="#9ba8ba" strokeDasharray="3 4"/>}{!compact&&<Tooltip labelFormatter={value=>label(Number(value))} formatter={value=>[price(Number(value),data.currency),'Price']} contentStyle={{border:'1px solid #e1e7ef',borderRadius:9,fontSize:13}}/>}<Area type="linear" dataKey="price" stroke={color} strokeWidth={compact?1.8:2} fill={`url(#price-fill-${id})`} isAnimationActive={false} dot={false} connectNulls={false}/></AreaChart></ChartContainer>;
+}

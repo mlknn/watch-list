@@ -1,0 +1,10 @@
+import {readFileSync,writeFileSync} from 'node:fs';
+import {feature} from 'topojson-client';
+import {geoNaturalEarth1,geoPath,geoCentroid} from 'd3-geo';
+const atlas=JSON.parse(readFileSync('node_modules/world-atlas/countries-110m.json','utf8'));
+const countries=JSON.parse(readFileSync('node_modules/world-countries/countries.json','utf8'));
+const features=feature(atlas,atlas.objects.countries).features.filter(f=>f.id!=='010');
+const projection=geoNaturalEarth1().fitExtent([[10,10],[890,425]],{type:'FeatureCollection',features});
+const path=geoPath(projection);
+writeFileSync('lib/world-map.json',JSON.stringify(features.map(f=>{const country=countries.find(c=>Number(c.ccn3)===Number(f.id));const center=projection(country?.latlng?[country.latlng[1],country.latlng[0]]:geoCentroid(f));return {code:country?.cca2||'',name:country?.name.common||f.properties.name,path:path(f),x:center[0],y:center[1]};})));
+writeFileSync('lib/countries.json',JSON.stringify(countries.filter(c=>c.cca2!=='AQ').map(c=>({code:c.cca2,name:c.name.common})).sort((a,b)=>a.name.localeCompare(b.name))));

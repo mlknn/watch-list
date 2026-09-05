@@ -1,0 +1,5 @@
+'use client';
+import {useEffect,useState} from 'react';
+import {authClient} from '@/lib/auth-client';
+import {PublicNav} from '@/components/product/nav';
+export default function Callback(){const [error,setError]=useState('');useEffect(()=>{void(async()=>{try{const params=new URLSearchParams(window.location.search);if(params.has('error'))throw new Error(params.get('error_description')||'Sign-in was canceled.');const client=await authClient();const {data,error}=await client.auth.getUser();if(error||!data.user)throw new Error('This link expired or was opened in a different browser. Sign in or request another link.');if(!data.user.email_confirmed_at)throw new Error('Please verify your email first.');window.location.replace('/dashboard');}catch(e){setError((e as Error).message);}})();},[]);return <><PublicNav/><main className="message-page"><h1>{error?'Could not complete sign-in':'Finishing sign-in…'}</h1><p role="status">{error||'Your watchlists are just a moment away.'}</p>{error&&<a className="solid-link" href="/login">Back to sign in</a>}</main></>;}
