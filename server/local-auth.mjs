@@ -2,7 +2,7 @@ import {randomBytes,randomUUID,createHash,scrypt as derive,timingSafeEqual} from
 import {promisify} from 'node:util';
 import {readFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
-import {localPg,localMode} from './local-db.mjs';
+import {localPg,localMode,persistLocalDatabase} from './local-db.mjs';
 import {AppError} from './quotes.mjs';
 const scrypt=promisify(derive),hash=t=>createHash('sha256').update(t).digest('hex');
 export async function passwordHash(password){const salt=randomBytes(16).toString('hex');return salt+':'+Buffer.from(await scrypt(password,salt,64)).toString('hex');}
@@ -19,7 +19,8 @@ const cookieToken=request=>(request.headers.get('cookie')||'').split(';').map(s=
 export async function localUser(request){localRequest(request);const token=cookieToken(request);if(!/^[\w-]{43}$/.test(token))throw new AppError('Please sign in to continue.',401);const pg=await localPg();const u=(await pg.query('select u.* from local_sessions s join local_users u on u.id=s.user_id where token_hash=$1 and expires_at>now()',[hash(token)])).rows[0];if(!u||!u.verified_at)throw new AppError('Your session expired. Please sign in again.',401);return userView(u);}
 const sessionCookie=token=>`wl_session=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${token?604800:0}`;
 async function session(pg,user){const token=randomBytes(32).toString('base64url');await pg.query("insert into local_sessions values($1,$2,now()+interval '7 days')",[hash(token),user.id]);return {payload:{user:userView(user)},cookie:sessionCookie(token)};}
-export async function localAuth(request,input){
+export async function localAuth(request,input){const result=await runLocalAuth(request,input);if(input.action!=='session')await persistLocalDatabase();return result;}
+async function runLocalAuth(request,input){
  localRequest(request);await seedLocalAdmin();const pg=await localPg();
  const allowed=(await pg.query("select wl_rate('local-auth',120,60) ok")).rows[0].ok;if(!allowed)throw new AppError('Too many attempts. Try again in a minute.',429);
  const {action}=input;const email=String(input.email||'').trim().toLowerCase();const password=String(input.password||'');

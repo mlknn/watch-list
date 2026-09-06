@@ -7,10 +7,12 @@ export function localMode(){
   return process.env.LOCAL_AUTH_ENABLED==='true'&&['127.0.0.1','localhost','[::1]'].includes(host);
 }
 const root=()=>resolve(process.env.LOCAL_DATA_DIR||'data');
-let pending;
+const state=globalThis[Symbol.for('watch-list.local-db')]??={pending:null,closing:false};
+export async function closeLocalDatabase(){if(state.closing)return;state.closing=true;try{const pg=await state.pending;if(pg&&!pg.closed)await pg.close();}finally{state.pending=null;state.closing=false;}}
+if(!state.handlers){state.handlers=true;for(const signal of ['SIGINT','SIGTERM'])process.once(signal,()=>{void closeLocalDatabase().finally(()=>process.exit(0));});}
 export async function localPg(){
  if(!localMode())throw new AppError('Local accounts are disabled.',404);
- return pending??=(async()=>{
+ return state.pending??=(async()=>{
   await mkdir(root(),{recursive:true,mode:0o700});
   const pg=new PGlite(join(root(),'accounts.pg'));await pg.waitReady;
   await pg.exec(`create table if not exists public.local_migrations(name text primary key);`);
@@ -23,7 +25,7 @@ export async function localPg(){
    create table if not exists local_sessions(token_hash text primary key,user_id uuid references local_users(id) on delete cascade,expires_at timestamptz not null);
    create table if not exists local_tokens(token_hash text primary key,user_id uuid references local_users(id) on delete cascade,kind text not null,expires_at timestamptz not null);`);
   return pg;
- })().catch(e=>{pending=null;throw e;});
+ })().catch(e=>{state.pending=null;throw e;});
 }
 const identifier=s=>{if(!/^[a-z_][a-z0-9_]*$/.test(s))throw Error('Invalid database identifier');return '"'+s+'"';};
 const clean=value=>JSON.parse(JSON.stringify(value));
@@ -51,4 +53,8 @@ class Query{
 }
 export const localDatabase=()=>({from:table=>new Query(table),rpc:async(name,args={})=>{try{const pg=await localPg();const entries=Object.entries(args);const sql=`select ${identifier(name)}(${entries.map(([k],i)=>identifier(k)+' => $'+(i+1)).join(',')}) as result`;const data=(await pg.query(sql,entries.map(([,v])=>v&&typeof v==='object'?JSON.stringify(v):v))).rows[0].result;return {data:clean(data??null),error:null};}catch(e){return {data:null,error:{code:e.code,message:e.message}};}}});
 let exportQueue=Promise.resolve();
-export function exportLocalData(){exportQueue=exportQueue.catch(()=>{}).then(async()=>{const pg=await localPg();const [lists,stocks]=await Promise.all(['wl_watchlists','wl_stocks'].map(t=>pg.query('select * from '+t)));const data={version:3,exportedAt:new Date().toISOString(),watchlists:lists.rows.map(l=>({...l,stocks:stocks.rows.filter(s=>s.watchlist_id===l.id)}))};const target=join(root(),'watchlists-export.json');await writeFile(target+'.tmp',JSON.stringify(data,null,2),{mode:0o600});await rename(target+'.tmp',target);});return exportQueue;}
+export function exportLocalData(){exportQueue=exportQueue.catch(()=>{}).then(async()=>{await persistLocalDatabase();const pg=await localPg();const [lists,stocks]=await Promise.all(['wl_watchlists','wl_stocks'].map(t=>pg.query('select * from '+t)));const data={version:3,exportedAt:new Date().toISOString(),watchlists:lists.rows.map(l=>({...l,stocks:stocks.rows.filter(s=>s.watchlist_id===l.id)}))};const target=join(root(),'watchlists-export.json');await writeFile(target+'.tmp',JSON.stringify(data,null,2),{mode:0o600});await rename(target+'.tmp',target);});return exportQueue;}
+
+// Keep a private logical snapshot as well as flushing PostgreSQL pages to disk.
+let snapshotQueue=Promise.resolve();
+export function persistLocalDatabase(){snapshotQueue=snapshotQueue.catch(()=>{}).then(async()=>{const pg=await localPg();await pg.exec('checkpoint');const tables=['auth.users','public.local_users','public.local_sessions','public.local_tokens','public.wl_profiles','public.wl_watchlists','public.wl_stocks','public.wl_quotes','public.wl_stripe_events','public.wl_rate_limits'];const snapshot={version:1,savedAt:new Date().toISOString(),tables:{}};await pg.transaction(async tx=>{for(const table of tables)snapshot.tables[table]=(await tx.query('select * from '+table)).rows;});const target=join(root(),'accounts-recovery.json');await writeFile(target+'.tmp',JSON.stringify(snapshot),{mode:0o600});await rename(target+'.tmp',target);});return snapshotQueue;}
