@@ -7,7 +7,7 @@ export function config(){return configPromise??=fetch('/api/config',{cache:'no-s
 export function authClient(){return clientPromise??=config().then(c=>{if(!c.authReady)throw new Error('Sign-up is not available yet. Account setup is still in progress.');return createClient(c.supabaseUrl,c.supabaseKey,{auth:{flowType:'pkce',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});}).catch(e=>{clientPromise=null;throw e;});}
 export async function apiFetch(path:string,init:RequestInit={}){
   const settings=await config();
-  if(settings.localMode){const response=await fetch(path,{...init,credentials:'same-origin',cache:'no-store'});if(response.status===401)window.location.assign('/login');return response;}
+  if(settings.localMode){const response=await fetch(path,{...init,credentials:'same-origin',cache:'no-store'});if(response.status===401){invalidateAccess();window.location.assign('/login');}return response;}
   const client=await authClient();const {data,error}=await client.auth.getSession();
   if(error||!data.session){window.location.assign('/login');throw new Error('Please sign in to continue.');}
   const headers=new Headers(init.headers);headers.set('Authorization','Bearer '+data.session.access_token);
@@ -20,4 +20,5 @@ export async function apiJson<T>(path:string,input?:unknown):Promise<T>{
   const result=await response.json() as T&{error?:string};if(!response.ok)throw new Error(result.error||'Request failed.');return result;
 }
 export async function localAuth(input:unknown){const response=await fetch('/api/local-auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input),credentials:'same-origin'});const data=await response.json() as {error?:string;localDelivery?:{url:string;label:string};user?:{id:string}};if(!response.ok)throw new Error(data.error||'Account request failed.');return data;}
-export async function signOut(){if((await config()).localMode){await localAuth({action:'logout'});window.location.assign('/');return;}const client=await authClient();const {error}=await client.auth.signOut();if(error)throw error;window.location.assign('/');}
+export function invalidateAccess(){window.dispatchEvent(new Event('watchlist:auth-change'));try{localStorage.setItem('watchlist:auth-change',String(Date.now())+Math.random());}catch{/* Same-tab invalidation still applies if storage is unavailable. */}}
+export async function signOut(){invalidateAccess();if((await config()).localMode){await localAuth({action:'logout'});invalidateAccess();window.location.assign('/');return;}const client=await authClient();const {error}=await client.auth.signOut();if(error)throw error;invalidateAccess();window.location.assign('/');}
