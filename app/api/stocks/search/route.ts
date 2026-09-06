@@ -1,53 +1,16 @@
 import {json} from '@/server/http.mjs';
-
-const normalizeSuggestion = (item: any) => {
-  const symbol = typeof item?.symbol === 'string' ? item.symbol.trim().toUpperCase() : '';
-  const name = typeof item?.longname === 'string'
-    ? item.longname
-    : typeof item?.shortname === 'string'
-      ? item.shortname
-      : typeof item?.name === 'string'
-        ? item.name
-        : '';
-
-  if (!symbol || !name) return null;
-
-  return { symbol, name };
-};
-
-export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const query = (url.searchParams.get('q') || '').trim();
-  const limit = Number(url.searchParams.get('limit') || '8');
-
-  if (!query) return json([]);
-
-  try {
-    const endpoint = new URL('https://query1.finance.yahoo.com/v1/finance/search');
-    endpoint.searchParams.set('q', query);
-    endpoint.searchParams.set('quotesCount', String(Math.max(5, Math.min(limit || 8, 10))));
-    endpoint.searchParams.set('newsCount', '0');
-    endpoint.searchParams.set('enableFuzzyQuery', 'true');
-    endpoint.searchParams.set('quotesQueryId', 'tickers');
-
-    const response = await fetch(endpoint, {
-      headers: { 'User-Agent': 'Mozilla/5.0', Accept: 'application/json' },
-      signal: AbortSignal.timeout(8000),
-    });
-
-    if (!response.ok) return json([]);
-
-    const payload = await response.json();
-    const suggestions = Array.isArray(payload?.quotes)
-      ? payload.quotes
-          .map(normalizeSuggestion)
-          .filter(Boolean)
-          .filter((item: any) => !/\s+\b(ETF|Index|Fund|Trust)\b/i.test(item.name))
-          .slice(0, Math.max(1, limit || 8))
-      : [];
-
-    return json(suggestions);
-  } catch {
-    return json([]);
-  }
+import {getTickerSuggestions,rankStockSuggestions} from '@/lib/stock-search.mjs';
+const cache=new Map<string,{at:number;items:{symbol:string;name:string}[]}>();
+export async function GET(request:Request){
+ const url=new URL(request.url),query=(url.searchParams.get('q')||'').trim(),limit=Math.min(12,Math.max(1,Number(url.searchParams.get('limit'))||8));
+ if(!query)return json([]);if(query.length>80)return json({error:'Keep searches under 80 characters.'},400);
+ const local=getTickerSuggestions(query,12),key=query.toLowerCase(),saved=cache.get(key);
+ if(saved&&Date.now()-saved.at<300000)return json(rankStockSuggestions(query,[...local,...saved.items],limit));
+ try{const endpoint=new URL('https://query1.finance.yahoo.com/v1/finance/search');endpoint.searchParams.set('q',query);endpoint.searchParams.set('quotesCount','12');endpoint.searchParams.set('newsCount','0');
+ const response=await fetch(endpoint,{headers:{'User-Agent':'Mozilla/5.0',Accept:'application/json'},signal:AbortSignal.timeout(2500)});
+ if(!response.ok)return json(local.slice(0,limit));const data=await response.json() as {quotes?:{symbol?:string;longname?:string;shortname?:string;quoteType?:string}[]};
+ const items=(data.quotes||[]).filter(s=>s.quoteType==='EQUITY'&&typeof s.symbol==='string'&&/^[A-Z0-9^][A-Z0-9.^=-]{0,24}$/.test(s.symbol)).map(s=>({symbol:s.symbol!,name:s.longname||s.shortname||s.symbol!}));
+ cache.set(key,{at:Date.now(),items});if(cache.size>200)cache.delete(cache.keys().next().value!);
+ return json(rankStockSuggestions(query,[...local,...items],limit));
+ }catch{return json(local.slice(0,limit));}
 }

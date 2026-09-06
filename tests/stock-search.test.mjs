@@ -16,3 +16,9 @@ test('stock suggestions match ticker and company names', () => {
   const byTicker = getTickerSuggestions('ms');
   assert.ok(byTicker.some(item => item.symbol === 'MSFT'));
 });
+
+test('one letter suggests company and ticker prefixes including Tesla and T-Mobile',()=>{const items=getTickerSuggestions('t',8);assert.ok(items.some(s=>s.symbol==='TSLA'));assert.ok(items.some(s=>s.symbol==='TMUS'));assert.equal(items[0].symbol,'T');});
+test('full company name resolves to its ticker before stock creation',async()=>{const {resolveStockInput}=await import('../lib/stock-search.mjs');assert.equal(await resolveStockInput('Tesla'),'TSLA');assert.equal(await resolveStockInput('Apple Inc.'),'AAPL');assert.equal(await resolveStockInput('tsla'),'TSLA');await assert.rejects(resolveStockInput('not an actual company'),/Choose a company/);});
+test('search ranking deduplicates entries, prioritizes exact matches, and bounds results',async()=>{const {rankStockSuggestions}=await import('../lib/stock-search.mjs');const entries=[{symbol:'TSLA',name:'Tesla Inc.'},{symbol:'TSLA',name:'Tesla'},{symbol:'TMUS',name:'T-Mobile US'}];assert.equal(rankStockSuggestions('tesla',entries).length,1);assert.equal(rankStockSuggestions('t',entries,1).length,1);assert.deepEqual(rankStockSuggestions('',entries),[]);});
+
+test('primary catalog listing stays ahead of duplicate overseas company listings',async()=>{const {rankStockSuggestions}=await import('../lib/stock-search.mjs');const items=rankStockSuggestions('Tesla',[...getTickerSuggestions('Tesla'),{symbol:'TL0.F',name:'Tesla, Inc.'},{symbol:'TSLA01.BK',name:'Tesla, Inc.'}]);assert.equal(items[0].symbol,'TSLA');});
