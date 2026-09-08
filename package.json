@@ -12,7 +12,9 @@
     "lint": "oxlint",
     "format": "oxfmt",
     "test": "node --test tests/*.test.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:staging": "node scripts/build-staging.mjs",
+    "deploy:staging": "wrangler deploy --config dist-staging/server/wrangler.json"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",

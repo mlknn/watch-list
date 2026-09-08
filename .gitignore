@@ -46,3 +46,7 @@ next-env.d.ts
 
 # Local account database, credentials and exports
 /data/
+
+# Cloudflare local secrets and generated staging artifacts
+.dev.vars*
+/dist-staging/
