@@ -1,6 +1,6 @@
 import {getQuote,AppError} from './quotes.mjs';
 export const SHOWCASE_START='2021-09-03';
-const examples=[{symbol:'NVDA',name:'Nvidia'},{symbol:'MU',name:'Micron Technology'},{symbol:'TSLA',name:'Tesla'},{symbol:'AAPL',name:'Apple'},{symbol:'MSFT',name:'Microsoft'},{symbol:'AMZN',name:'Amazon'}];
+const examples=[{symbol:'NVDA',name:'Nvidia'},{symbol:'UNH',name:'UnitedHealth Group'},{symbol:'NKE',name:'Nike'},{symbol:'WMT',name:'Walmart'},{symbol:'MA',name:'Mastercard'},{symbol:'HD',name:'Home Depot'},{symbol:'TSLA',name:'Tesla'},{symbol:'AAPL',name:'Apple'},{symbol:'MSFT',name:'Microsoft'},{symbol:'AMZN',name:'Amazon'}];
 const histories=new Map();let cached,pending;
 async function history(symbol){const old=histories.get(symbol);if(old&&Date.now()-old.at<6*3600000)return old.data;
  const start=Date.parse(SHOWCASE_START+'T00:00:00Z')/1000;

@@ -9,7 +9,7 @@ export async function GET(request:Request){
  try{const endpoint=new URL('https://query1.finance.yahoo.com/v1/finance/search');endpoint.searchParams.set('q',query);endpoint.searchParams.set('quotesCount','12');endpoint.searchParams.set('newsCount','0');
  const response=await fetch(endpoint,{headers:{'User-Agent':'Mozilla/5.0',Accept:'application/json'},signal:AbortSignal.timeout(2500)});
  if(!response.ok)return json(local.slice(0,limit));const data=await response.json() as {quotes?:{symbol?:string;longname?:string;shortname?:string;quoteType?:string}[]};
- const items=(data.quotes||[]).filter(s=>s.quoteType==='EQUITY'&&typeof s.symbol==='string'&&/^[A-Z0-9^][A-Z0-9.^=-]{0,24}$/.test(s.symbol)).map(s=>({symbol:s.symbol!,name:s.longname||s.shortname||s.symbol!}));
+ const items=(data.quotes||[]).filter(s=>['EQUITY','ETF'].includes(s.quoteType||'')&&typeof s.symbol==='string'&&/^[A-Z0-9^][A-Z0-9.^=-]{0,24}$/.test(s.symbol)).map(s=>({symbol:s.symbol!,name:s.longname||s.shortname||s.symbol!}));
  cache.set(key,{at:Date.now(),items});if(cache.size>200)cache.delete(cache.keys().next().value!);
  return json(rankStockSuggestions(query,[...local,...items],limit));
  }catch{return json(local.slice(0,limit));}
