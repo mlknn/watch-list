@@ -38,7 +38,17 @@ export async function checkout(db,user,cycle='monthly'){
   const existing=await stripe.checkout.sessions.list({customer,status:'open',limit:10});
   const open=existing.data.find(s=>s.mode==='subscription'&&s.metadata?.price_id===priceId&&s.url);
   if(open)return {url:open.url};
-  const session=await stripe.checkout.sessions.create({mode:'subscription',customer,client_reference_id:user.id,line_items:[{price:priceId,quantity:1}],success_url:origin()+'/account?checkout=success',cancel_url:origin()+'/pricing?checkout=canceled',metadata:{price_id:priceId},subscription_data:{metadata:{watchlist_user_id:user.id}}},{idempotencyKey:`watchlist-checkout:${user.id}:${priceId}:${Math.floor(Date.now()/600000)}`});
+  const session=await stripe.checkout.sessions.create({
+    ui_mode:'hosted_page',
+    billing_address_collection:'auto',
+    phone_number_collection:{enabled:false},
+    automatic_tax:{enabled:false},
+    allow_promotion_codes:false,
+    payment_method_collection:'always',
+    submit_type:'auto',
+    integration_identifier:'hosted_web_0001',
+    origin_context:'web',
+    mode:'subscription',customer,client_reference_id:user.id,line_items:[{price:priceId,quantity:1}],success_url:origin()+'/account?checkout=success',cancel_url:origin()+'/pricing?checkout=canceled',metadata:{price_id:priceId},subscription_data:{metadata:{watchlist_user_id:user.id}}},{idempotencyKey:`watchlist-checkout:${user.id}:${priceId}:${Math.floor(Date.now()/600000)}`});
   return {url:session.url};
 }
 export async function portal(db,user){
