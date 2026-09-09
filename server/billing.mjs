@@ -1,6 +1,13 @@
 import Stripe from 'stripe';
 import {AppError} from './quotes.mjs';
 import {dbResult,origin} from './cloud.mjs';
+const CHECKOUT_DESIGN='stockwatchlist-v2';
+export function checkoutPresentation(cycle){
+ return {
+  branding_settings:{display_name:'StockWatchlist',background_color:'#f6f8fc',button_color:'#3559df',border_style:'rounded',font_family:'inter',icon:{type:'url',url:origin()+'/apple-touch-icon.png'}},
+  custom_text:{submit:{message:'Pro includes 10 watchlists, 50 stocks or ETFs per list, earnings reports, and portfolio insights.'},after_submit:{message:cycle==='yearly'?'$30 billed yearly ($2.50/month equivalent). Renews annually. Cancel future renewals anytime in Account.':'$2.99 billed monthly. Renews monthly. Cancel future renewals anytime in Account.'}},
+ };
+}
 export function stripeClient(){if(!process.env.STRIPE_SECRET_KEY)throw new AppError('Billing is not available yet.',503);return new Stripe(process.env.STRIPE_SECRET_KEY,{httpClient:Stripe.createFetchHttpClient(),maxNetworkRetries:2});}
 export function priceIdFor(cycle='monthly'){if(!['monthly','yearly'].includes(cycle))throw new AppError('Choose monthly or yearly billing.');return cycle==='yearly'?process.env.STRIPE_PRO_YEARLY_PRICE_ID:process.env.STRIPE_PRO_MONTHLY_PRICE_ID||process.env.STRIPE_PRO_PRICE_ID;}
 export function billingReady(cycle='monthly'){return !!(process.env.STRIPE_SECRET_KEY&&priceIdFor(cycle)&&process.env.STRIPE_WEBHOOK_SECRET);}
@@ -36,10 +43,11 @@ export async function checkout(db,user,cycle='monthly'){
   const profile=dbResult(await db.from('wl_profiles').select('*').eq('id',user.id).single());
   if(profile.subscription_status==='active'&&Date.parse(profile.pro_until)>Date.now())throw new AppError('You already have Pro. Manage your subscription in your account.',409);
   const existing=await stripe.checkout.sessions.list({customer,status:'open',limit:10});
-  const open=existing.data.find(s=>s.mode==='subscription'&&s.metadata?.price_id===priceId&&s.url);
+  const open=existing.data.find(s=>s.mode==='subscription'&&s.metadata?.price_id===priceId&&s.metadata?.checkout_design===CHECKOUT_DESIGN&&s.url);
   if(open)return {url:open.url};
   const session=await stripe.checkout.sessions.create({
     ui_mode:'hosted_page',
+    ...checkoutPresentation(cycle),
     billing_address_collection:'auto',
     phone_number_collection:{enabled:false},
     automatic_tax:{enabled:false},
@@ -48,7 +56,7 @@ export async function checkout(db,user,cycle='monthly'){
     submit_type:'auto',
     integration_identifier:'hosted_web_0001',
     origin_context:'web',
-    mode:'subscription',customer,client_reference_id:user.id,line_items:[{price:priceId,quantity:1}],success_url:origin()+'/account?checkout=success',cancel_url:origin()+'/pricing?checkout=canceled',metadata:{price_id:priceId},subscription_data:{metadata:{watchlist_user_id:user.id}}},{idempotencyKey:`watchlist-checkout:${user.id}:${priceId}:${Math.floor(Date.now()/600000)}`});
+    mode:'subscription',customer,client_reference_id:user.id,line_items:[{price:priceId,quantity:1}],success_url:origin()+'/account?checkout=success',cancel_url:origin()+'/pricing?checkout=canceled',metadata:{price_id:priceId,checkout_design:CHECKOUT_DESIGN},subscription_data:{metadata:{watchlist_user_id:user.id}}},{idempotencyKey:`watchlist-checkout:${CHECKOUT_DESIGN}:${user.id}:${priceId}:${Math.floor(Date.now()/600000)}`});
   return {url:session.url};
 }
 export async function portal(db,user){
