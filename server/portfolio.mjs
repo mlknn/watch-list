@@ -28,9 +28,15 @@ export function aggregatePortfolio(stocks,charts,now=Date.now()){
  }
  return result;
 }
+export function dailyPortfolioPoints(points){
+ const days=new Map();
+ const date=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'});
+ for(const point of [...points].sort((a,b)=>a.time-b.time)){const day=date.format(point.time);days.set(day,{...point,time:Date.parse(day+'T12:00:00Z')});}
+ return [...days.values()];
+}
 export async function portfolioHistory(list,range){
  if(list.mode!=='advanced')throw new AppError('Choose an advanced watchlist.');if(!['1d','1mo','3mo','1y','5y','max'].includes(range))throw new AppError('Choose a supported time range.');
  const totals=portfolioTotals(list.stocks),holdings=list.stocks.filter(s=>s.quantity>0&&s.costPerShare>0);
  const charts=Array.from({length:holdings.length});let next=0;await Promise.all(Array.from({length:Math.min(4,holdings.length)},async()=>{while(next<holdings.length){const i=next++;charts[i]=await getChart(holdings[i].symbol,range);if(charts[i].currency!=='USD'||!charts[i].points.length)throw new AppError(`Complete history is unavailable for ${holdings[i].symbol}. Try another range.`,502);}}));
- return {range,currency:'USD',totals,points:aggregatePortfolio(holdings,charts),interval:CHART_RANGES[range].interval,asOf:new Date().toISOString(),method:'Current holdings only, from their entered purchase dates. Historical closes are split-adjusted; use quantities and costs on today’s split basis. Excludes sold positions, dividends, fees and tax. Value changes can include added capital.'};
+ return {range,currency:'USD',totals,points:dailyPortfolioPoints(aggregatePortfolio(holdings,charts)),interval:CHART_RANGES[range].interval,asOf:new Date().toISOString(),method:'Current holdings only, from their entered purchase dates. Historical closes are split-adjusted; use quantities and costs on today’s split basis. Excludes sold positions, dividends, fees and tax. Value changes can include added capital.'};
 }

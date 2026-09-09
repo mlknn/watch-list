@@ -5,14 +5,15 @@ let configPromise:Promise<Config>|null=null;
 let clientPromise:Promise<SupabaseClient>|null=null;
 export function config(){return configPromise??=fetch('/api/config',{cache:'no-store'}).then(async r=>{if(!r.ok)throw new Error('Could not connect. Please reload.');return await r.json() as Config;}).catch(e=>{configPromise=null;throw e;});}
 export function authClient(){return clientPromise??=config().then(c=>{if(!c.authReady)throw new Error('Sign-up is not available yet. Account setup is still in progress.');return createClient(c.supabaseUrl,c.supabaseKey,{auth:{flowType:'pkce',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});}).catch(e=>{clientPromise=null;throw e;});}
-export async function apiFetch(path:string,init:RequestInit={}){
+export async function apiFetch(path:string,init:RequestInit={},requireLogin=true){
   const settings=await config();
-  if(settings.localMode){const response=await fetch(path,{...init,credentials:'same-origin',cache:'no-store'});if(response.status===401){invalidateAccess();window.location.assign('/login');}return response;}
+  if(settings.localMode){const response=await fetch(path,{...init,credentials:'same-origin',cache:'no-store'});if(response.status===401&&requireLogin){invalidateAccess();window.location.assign('/login');}return response;}
+  if(!settings.authReady&&!requireLogin)return fetch(path,{...init,cache:'no-store'});
   const client=await authClient();const {data,error}=await client.auth.getSession();
-  if(error||!data.session){window.location.assign('/login');throw new Error('Please sign in to continue.');}
+  if(error||!data.session){if(!requireLogin)return fetch(path,{...init,cache:'no-store'});window.location.assign('/login');throw new Error('Please sign in to continue.');}
   const headers=new Headers(init.headers);headers.set('Authorization','Bearer '+data.session.access_token);
   const response=await fetch(path,{...init,headers,cache:'no-store'});
-  if(response.status===401){await client.auth.signOut({scope:'local'});window.location.assign('/login');}
+  if(response.status===401&&requireLogin){await client.auth.signOut({scope:'local'});window.location.assign('/login');}
   return response;
 }
 export async function apiJson<T>(path:string,input?:unknown):Promise<T>{

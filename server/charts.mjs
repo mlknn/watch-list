@@ -1,5 +1,5 @@
 import {AppError,normalizeTicker} from './quotes.mjs';
-export const CHART_RANGES={ '1d':{range:'5d',interval:'5m'},'5d':{range:'5d',interval:'15m'},'1mo':{range:'1mo',interval:'1d'},'3mo':{range:'3mo',interval:'1d'},'6mo':{range:'6mo',interval:'1d'},ytd:{range:'ytd',interval:'1d'},'1y':{range:'1y',interval:'1d'},'5y':{range:'5y',interval:'1wk'},max:{range:'max',interval:'1mo'} };
+export const CHART_RANGES={ '1d':{range:'5d',interval:'5m'},'5d':{range:'5d',interval:'1d'},'1mo':{range:'1mo',interval:'1d'},'3mo':{range:'3mo',interval:'1d'},'6mo':{range:'6mo',interval:'1d'},ytd:{range:'ytd',interval:'1d'},'1y':{range:'1y',interval:'1d'},'5y':{range:'5y',interval:'1d'},max:{range:'max',interval:'1d'} };
 const cache=new Map(),pending=new Map();
 const finite=v=>typeof v==='number'&&Number.isFinite(v)?v:null;
 export function normalizeChart(result,range){
