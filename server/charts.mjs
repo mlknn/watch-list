@@ -6,15 +6,17 @@ export function normalizeChart(result,range){
   const meta=result.meta;if(!meta||!finite(meta.regularMarketPrice)||!meta.currency)throw new AppError('The provider returned an incomplete quote.',502);
   let timezone=meta.exchangeTimezoneName||'America/New_York';
   try{new Intl.DateTimeFormat('en-US',{timeZone:timezone});}catch{timezone='UTC';}
-  const day=time=>new Intl.DateTimeFormat('en-CA',{timeZone:timezone,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(time*1000));
+  const dayFormatter=new Intl.DateTimeFormat('en-CA',{timeZone:timezone,year:'numeric',month:'2-digit',day:'2-digit'});
+  const day=time=>dayFormatter.format(time*1000);
   const bars=result.indicators?.quote?.[0]||{};
   const all=(result.timestamp||[]).map((time,index)=>({time:time*1000,price:finite(bars.close?.[index]),open:finite(bars.open?.[index]),high:finite(bars.high?.[index]),low:finite(bars.low?.[index]),volume:finite(bars.volume?.[index])})).filter(p=>p.price!==null&&p.price>0&&Number.isFinite(p.time)).sort((a,b)=>a.time-b.time);
   const latestDay=all.length?day(all.at(-1).time/1000):null;
-  const previousDayBars=all.filter(p=>day(p.time/1000)!==latestDay);
-  const previousClose=finite(meta.previousClose)??previousDayBars.at(-1)?.price??null;
-  const points=range==='1d'?all.filter(p=>day(p.time/1000)===latestDay):all;
+  let sessionStart=all.length;
+  while(sessionStart>0&&day(all[sessionStart-1].time/1000)===latestDay)sessionStart--;
+  const lastSession=all.slice(sessionStart);
+  const previousClose=finite(meta.previousClose)??all[sessionStart-1]?.price??null;
+  const points=range==='1d'?lastSession:all;
   const current=meta.regularMarketPrice;
-  const lastSession=all.filter(p=>day(p.time/1000)===latestDay);
   return {symbol:meta.symbol,companyName:meta.longName||meta.shortName||meta.symbol,currency:meta.currency,exchange:meta.fullExchangeName||meta.exchangeName||'',timezone,range,sessionDate:latestDay,interval:CHART_RANGES[range].interval,points,
     quote:{price:current,previousClose,change:previousClose===null?null:current-previousClose,changePercent:previousClose?((current-previousClose)/previousClose)*100:null,quoteTime:meta.regularMarketTime?new Date(meta.regularMarketTime*1000).toISOString():null,
       open:lastSession[0]?.open??null,dayLow:finite(meta.regularMarketDayLow),dayHigh:finite(meta.regularMarketDayHigh),fiftyTwoWeekLow:finite(meta.fiftyTwoWeekLow),fiftyTwoWeekHigh:finite(meta.fiftyTwoWeekHigh),volume:finite(meta.regularMarketVolume)},source:'Yahoo Finance',fetchedAt:new Date().toISOString()};
