@@ -12,6 +12,7 @@ import {Tabs,TabsList,TabsTrigger} from '@/components/ui/tabs';
 import {price} from '@/lib/watchlist';
 import {marketChart,type MarketChart} from '@/lib/market';
 import {chartPeriodStats} from '@/lib/chart-period.mjs';
+import {nyseSession,sectorAverage,tapeBreadth,tapeMovers,uniqueQuoted} from '@/lib/market-tape.mjs';
 import {resolveStockInput} from '@/lib/stock-search.mjs';
 import {apiJson} from '@/lib/auth-client';
 
@@ -20,6 +21,92 @@ type Board={fetchedAt:string;indices:(Row&{name:string})[];groups:{id:string;tit
 type FavoriteState={signedIn:boolean;ids:Set<string>;rows:Row[];toggle:(symbol:string)=>void};
 
 const Favorites=createContext<FavoriteState>({signedIn:false,ids:new Set(),rows:[],toggle:()=>{}});
+type Sort={key:'name'|'price'|'change';dir:1|-1};
+
+function dayPct(row:Row){return typeof row.chart?.quote.changePercent==='number'?row.chart.quote.changePercent:null;}
+function fmtPct(pct:number|null){return pct===null||pct===undefined?'—':`${pct>=0?'+':''}${pct.toFixed(2)}%`;}
+
+function SessionBadge(){
+  const [now,setNow]=useState(()=>new Date());
+  useEffect(()=>{const id=window.setInterval(()=>setNow(new Date()),30000);return()=>clearInterval(id);},[]);
+  const session=nyseSession(now);
+  const clock=new Intl.DateTimeFormat(undefined,{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}).format(now);
+  return <aside className={'market-session is-'+session.code} aria-live="polite">
+    <strong><span className="market-session-dot" aria-hidden="true"/>{session.label}</strong>
+    <span>{session.detail}</span>
+    <small>{clock} ET</small>
+  </aside>;
+}
+
+function TapeStrip({rows}:{rows:Row[]}){
+  const breadth=tapeBreadth(rows);
+  const {gainers,losers}=tapeMovers(rows,5);
+  if(!breadth.quoted)return null;
+  return <section className="market-tape" aria-label="Today on this tape">
+    <div className="market-breadth">
+      <div>
+        <p className="eyebrow">ON THIS TAPE</p>
+        <h2>Advance / decline</h2>
+        <p>{breadth.up} up · {breadth.down} down{breadth.flat?` · ${breadth.flat} unchanged`:''} among {breadth.quoted} names loaded so far.</p>
+      </div>
+      <div className="market-breadth-bar" aria-hidden="true"><span className="up" style={{flexGrow:Math.max(breadth.up,0.01)}}/><span className="down" style={{flexGrow:Math.max(breadth.down,0.01)}}/></div>
+    </div>
+    <div className="market-movers">
+      <div>
+        <p className="eyebrow">LEADERS</p>
+        <h3>Gainers</h3>
+        {gainers.map(row=><a key={'g-'+row.symbol} href={'/stocks/'+encodeURIComponent(row.symbol)}><CompanyIcon symbol={row.symbol}/><span>{row.symbol}</span><em className="up">{fmtPct(dayPct(row))}</em></a>)}
+      </div>
+      <div>
+        <p className="eyebrow">LAGGARDS</p>
+        <h3>Losers</h3>
+        {losers.map(row=><a key={'l-'+row.symbol} href={'/stocks/'+encodeURIComponent(row.symbol)}><CompanyIcon symbol={row.symbol}/><span>{row.symbol}</span><em className="down">{fmtPct(dayPct(row))}</em></a>)}
+      </div>
+    </div>
+  </section>;
+}
+
+function Heatmap({rows}:{rows:Row[]}){
+  const quoted=[...uniqueQuoted(rows)].sort((a,b)=>Math.abs(b.chart!.quote.changePercent!)-Math.abs(a.chart!.quote.changePercent!));
+  if(quoted.length<6)return null;
+  return <section className="market-heat-wrap" aria-label="Price heatmap">
+    <div className="market-group-copy">
+      <p className="eyebrow">ONE GLANCE</p>
+      <h2>Heatmap.</h2>
+      <p>Every loaded name, colored by today’s move. Darker cells swung more.</p>
+    </div>
+    <div className="market-heat">
+      {quoted.map(row=>{
+        const pct=row.chart!.quote.changePercent!;
+        const t=Math.min(Math.abs(pct)/5,1);
+        return <a key={row.symbol} className={'market-heat-cell '+(pct>=0?'up':'down')} href={'/stocks/'+encodeURIComponent(row.symbol)} style={{background:pct>=0?`rgba(35,131,98,${0.14+t*0.42})`:`rgba(190,77,89,${0.14+t*0.42})`}}>
+          <strong>{row.symbol}</strong>
+          <span>{fmtPct(pct)}</span>
+        </a>;
+      })}
+    </div>
+  </section>;
+}
+
+function sortRows(rows:Row[],sort:Sort|null){
+  if(!sort)return rows;
+  return [...rows].sort((a,b)=>{
+    let av:number|string|null=null;let bv:number|string|null=null;
+    if(sort.key==='name'){av=(a.chart?.companyName||a.symbol).toUpperCase();bv=(b.chart?.companyName||b.symbol).toUpperCase();}
+    if(sort.key==='price'){av=a.chart?.quote.price??null;bv=b.chart?.quote.price??null;}
+    if(sort.key==='change'){av=dayPct(a);bv=dayPct(b);}
+    if(av==null&&bv==null)return 0;
+    if(av==null)return 1;
+    if(bv==null)return -1;
+    if(typeof av==='string'&&typeof bv==='string')return av.localeCompare(bv)*sort.dir;
+    return ((av as number)-(bv as number))*sort.dir;
+  });
+}
+
+function SortHead({label,k,sort,onSort}:{label:string;k:Sort['key'];sort:Sort|null;onSort:(key:Sort['key'])=>void}){
+  const on=sort?.key===k;
+  return <button type="button" className={'market-sort'+(on?' is-on':'')} onClick={()=>onSort(k)}>{label}{on?(sort!.dir>0?' ↑':' ↓'):''}</button>;
+}
 
 function skeleton():Board{
   return {
@@ -155,6 +242,7 @@ export function MarketBoard(){
   const [data,setData]=useState<Board>(skeleton),[error,setError]=useState(''),[ready,setReady]=useState<Record<string,boolean>>({});
   const [signedIn,setSignedIn]=useState(false);
   const [favoriteRows,setFavoriteRows]=useState<Row[]>([]);
+  const [sorts,setSorts]=useState<Record<string,Sort|null>>({});
   useEffect(()=>{let alive=true;
     const loaded=new Set<string>();
     const queue=catalog.groups.map(group=>group.id);
@@ -214,6 +302,14 @@ export function MarketBoard(){
     }
   }
   const favoriteState:FavoriteState={signedIn,ids:new Set(favoriteRows.map(row=>row.symbol)),rows:favoriteRows,toggle};
+  const quotedRows=data.groups.flatMap(group=>group.stocks);
+  function cycleSort(id:string,key:Sort['key']){
+    setSorts(prev=>{
+      const cur=prev[id];
+      if(!cur||cur.key!==key)return {...prev,[id]:{key,dir:key==='name'?1:-1}};
+      return {...prev,[id]:{key,dir:cur.dir===1?-1:1}};
+    });
+  }
   return <Favorites.Provider value={favoriteState}><main className="market-page">
     <div className="page-heading market-heading">
       <div>
@@ -221,6 +317,7 @@ export function MarketBoard(){
         <h1>Today’s tape.</h1>
         <p className="intro">Look up any stock or ETF, open its chart and company details, then scroll the sectors. Earnings reports stay with Pro.</p>
       </div>
+      <SessionBadge/>
     </div>
     <form className="market-search" onSubmit={e=>void search(e)} role="search">
       <StockSearch value={query} onChange={v=>{setQuery(v);setSearchError('');}} inputRef={inputRef} onPick={symbol=>void openStock(symbol)}/>
@@ -230,23 +327,35 @@ export function MarketBoard(){
     {error&&<p className="error-banner" role="alert">{error}</p>}
     <>
       <IndexHero indices={data.indices}/>
+      <TapeStrip rows={quotedRows}/>
+      <Heatmap rows={quotedRows}/>
       <FavoritesBoard rows={favoriteRows}/>
       <nav className="market-sector-jump" aria-label="Industries">
-        {data.groups.map(group=><a key={group.id} href={'#'+group.id}>{group.title}</a>)}
+        {data.groups.map(group=>{
+          const avg=ready[group.id]?sectorAverage(group.stocks):null;
+          return <a key={group.id} href={'#'+group.id} className={avg==null?'':avg>=0?'is-up':'is-down'}>{group.title}{avg!==null&&<small>{fmtPct(avg)}</small>}</a>;
+        })}
       </nav>
-      {data.groups.map((group,index)=><section key={group.id} id={group.id} className="market-group">
-        <div className="market-group-copy">
-          <p className="eyebrow">{String(index+1).padStart(2,'0')}</p>
-          <h2>{group.title}</h2>
-          <p>{group.blurb}</p>
-        </div>
-        <div className="market-table" role="table" aria-label={group.title+' stocks'}>
-          <div className="market-table-head" role="row">
-            <span>Company</span><span>Price</span><span>Today</span><span></span>
+      {data.groups.map((group,index)=>{
+        const avg=ready[group.id]?sectorAverage(group.stocks):null;
+        const sort=sorts[group.id]||null;
+        return <section key={group.id} id={group.id} className="market-group">
+          <div className="market-group-copy">
+            <p className="eyebrow">{String(index+1).padStart(2,'0')}</p>
+            <h2>{group.title}{avg!==null&&<span className={avg>=0?'up':'down'}>{fmtPct(avg)}</span>}</h2>
+            <p>{group.blurb}</p>
           </div>
-          {group.stocks.map(row=><StockRow key={row.symbol} row={row} pending={!ready[group.id]}/>)}
-        </div>
-      </section>)}
+          <div className="market-table" role="table" aria-label={group.title+' stocks'}>
+            <div className="market-table-head" role="row">
+              <SortHead label="Company" k="name" sort={sort} onSort={key=>cycleSort(group.id,key)}/>
+              <SortHead label="Price" k="price" sort={sort} onSort={key=>cycleSort(group.id,key)}/>
+              <SortHead label="Today" k="change" sort={sort} onSort={key=>cycleSort(group.id,key)}/>
+              <span></span>
+            </div>
+            {sortRows(group.stocks,sort).map(row=><StockRow key={row.symbol} row={row} pending={!ready[group.id]}/>)}
+          </div>
+        </section>;
+      })}
       <p className="market-footnote">Yahoo Finance · Quotes may be delayed{data.fetchedAt?` · Updated ${new Date(data.fetchedAt).toLocaleString()}`:''}. Charts are for looking, not advice. Click any row for details; quarterly earnings need Pro.</p>
     </>
   </main></Favorites.Provider>;
