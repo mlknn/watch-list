@@ -23,7 +23,7 @@ function skeleton():Board{
   };
 }
 
-const INDEX_RANGES=[['1d','1 day'],['1mo','1 month'],['3mo','3 months'],['1y','1 year'],['5y','5 years']] as const;
+const INDEX_RANGES=[['1d','1D'],['1mo','1M'],['3mo','3M'],['1y','1Y'],['5y','5Y']] as const;
 
 function Change({chart}:{chart:MarketChart}){
   const pct=chart.quote.changePercent;
@@ -45,7 +45,7 @@ function IndexHero({indices}:{indices:(Row&{name:string})[]}){
     <div className="market-index-toolbar">
       <Tabs value={symbol} onValueChange={v=>setSymbol(String(v))}>
         <TabsList className="market-index-picks" aria-label="Index">
-          {indices.map(row=><TabsTrigger key={row.symbol} value={row.symbol}>{row.name}</TabsTrigger>)}
+          {indices.map(row=><TabsTrigger key={row.symbol} value={row.symbol}><span className="market-index-short">{row.name.replace('S&P 500','S&P').replace('Dow Jones','Dow')}</span></TabsTrigger>)}
         </TabsList>
       </Tabs>
       <Tabs value={range} onValueChange={v=>setRange(String(v))}>
@@ -141,7 +141,7 @@ export function MarketBoard(){
     </div>
     <form className="market-search" onSubmit={e=>void search(e)} role="search">
       <StockSearch value={query} onChange={v=>{setQuery(v);setSearchError('');}} inputRef={inputRef} onPick={symbol=>void openStock(symbol)}/>
-      <Button type="submit" className="primary-button" disabled={searching}>{searching?<LoaderCircle className="spin"/>:<Search/>}Search</Button>
+      <Button type="submit" className="primary-button" disabled={searching}>{searching?<LoaderCircle className="spin"/>:<Search/>}<span className="market-search-label">Search</span></Button>
     </form>
     {searchError&&<p className="form-error" role="alert">{searchError}</p>}
     {error&&<p className="error-banner" role="alert">{error}</p>}
