@@ -67,13 +67,13 @@ function IndexHero({indices}:{indices:(Row&{name:string})[]}){
   </section>;
 }
 
-function StockRow({row}:{row:Row}){
+function StockRow({row,pending}:{row:Row;pending:boolean}){
   const chart=row.chart;
   const href='/stocks/'+encodeURIComponent(row.symbol);
   return <a className="market-table-row" href={href}>
     <span className="market-table-name"><CompanyIcon symbol={row.symbol}/><span><strong>{chart?.companyName||row.name||row.symbol}</strong><small>{row.symbol}</small></span></span>
     <span className="market-table-price">{chart?price(chart.quote.price,chart.currency):'—'}</span>
-    <span className="market-table-change">{chart?<Change chart={chart}/>:<span className="market-card-error">{row.error||'—'}</span>}</span>
+    <span className="market-table-change">{chart?<Change chart={chart}/>:pending?<span className="market-card-pending">Loading…</span>:<span className="market-card-error">{row.error||'—'}</span>}</span>
     <span className="market-table-open">Details</span>
   </a>;
 }
@@ -84,12 +84,41 @@ export function MarketBoard(){
   const [query,setQuery]=useState('');
   const [searchError,setSearchError]=useState('');
   const [searching,setSearching]=useState(false);
-  const [data,setData]=useState<Board>(skeleton),[error,setError]=useState('');
-  useEffect(()=>{let alive=true,running=false;
-    async function load(){if(running)return;running=true;try{const response=await fetch('/api/market',{cache:'no-store'});const result=await response.json() as Board&{error?:string};if(!response.ok)throw Error(result.error||'Market data is temporarily unavailable.');if(alive){setData(result);setError('');}}catch(e){if(alive)setError((e as Error).message);}finally{running=false;}}
-    void load();
-    const timer=setInterval(()=>{if(!document.hidden)void load();},60000);
-    return()=>{alive=false;clearInterval(timer);};
+  const [data,setData]=useState<Board>(skeleton),[error,setError]=useState(''),[ready,setReady]=useState<Record<string,boolean>>({});
+  useEffect(()=>{let alive=true;
+    const loaded=new Set<string>();
+    const queue=catalog.groups.map(group=>group.id);
+    async function fetchGroup(id:string){
+      const response=await fetch('/api/market?group='+encodeURIComponent(id),{cache:'no-store'});
+      const result=await response.json() as {fetchedAt:string;group:{id:string;stocks:Row[]};error?:string};
+      if(!response.ok)throw Error(result.error||'Market data is temporarily unavailable.');
+      if(!alive)return;
+      setData(prev=>({...prev,fetchedAt:result.fetchedAt,groups:prev.groups.map(group=>group.id===id?{...group,stocks:result.group.stocks}:group)}));
+      setReady(prev=>({...prev,[id]:true}));
+      setError('');
+    }
+    async function pump(){
+      while(alive){
+        const id=queue.find(group=>!loaded.has(group));
+        if(!id)break;
+        loaded.add(id);
+        try{await fetchGroup(id);}catch(e){if(alive)setError((e as Error).message);}
+        if(alive)await new Promise(resolve=>setTimeout(resolve,200));
+      }
+    }
+    const observer=new IntersectionObserver(entries=>{
+      for(const entry of entries){
+        if(!entry.isIntersecting)continue;
+        const id=entry.target.id;
+        const index=queue.indexOf(id);
+        if(index>0&&!loaded.has(id)){queue.splice(index,1);queue.unshift(id);}
+      }
+    },{rootMargin:'800px 0px'});
+    const timer=window.setTimeout(()=>{
+      for(const group of catalog.groups){const node=document.getElementById(group.id);if(node)observer.observe(node);}
+    },0);
+    void pump();
+    return()=>{alive=false;observer.disconnect();clearTimeout(timer);};
   },[]);
   async function openStock(symbol:string){
     router.push('/stocks/'+encodeURIComponent(symbol));
@@ -131,7 +160,7 @@ export function MarketBoard(){
           <div className="market-table-head" role="row">
             <span>Company</span><span>Price</span><span>Today</span><span></span>
           </div>
-          {group.stocks.map(row=><StockRow key={row.symbol} row={row}/>)}
+          {group.stocks.map(row=><StockRow key={row.symbol} row={row} pending={!ready[group.id]}/>)}
         </div>
       </section>)}
       <p className="market-footnote">Yahoo Finance · Quotes may be delayed{data.fetchedAt?` · Updated ${new Date(data.fetchedAt).toLocaleString()}`:''}. Charts are for looking, not advice. Click any row for details; quarterly earnings need Pro.</p>

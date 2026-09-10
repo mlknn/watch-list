@@ -1,11 +1,11 @@
 import catalog from '../lib/market-dashboard.json' with {type:'json'};
-import {getChart} from './charts.mjs';
+import {getQuote,AppError} from './quotes.mjs';
 
 const publicSymbols=new Set([
   ...catalog.indices.map(item=>item.symbol),
   ...catalog.groups.flatMap(group=>group.symbols),
 ]);
-let snapshot=null;
+const quoteCache=new Map();
 
 export function isPublicMarketSymbol(symbol){
   return publicSymbols.has(String(symbol||'').toUpperCase());
@@ -24,26 +24,50 @@ async function mapLimit(items,limit,fn){
   return out;
 }
 
-function quoteOnly(chart){
-  if(!chart)return null;
-  return {...chart,points:[]};
+function asRow(quote){
+  const previous=typeof quote.previousClose==='number'?quote.previousClose:null;
+  const changePercent=typeof quote.changePercent==='number'?quote.changePercent:null;
+  return {
+    symbol:quote.symbol,
+    chart:{
+      symbol:quote.symbol,
+      companyName:quote.companyName,
+      currency:quote.currency,
+      exchange:quote.exchange||'',
+      timezone:'',
+      range:'1d',
+      sessionDate:null,
+      interval:'1d',
+      points:[],
+      quote:{price:quote.price,previousClose:previous,change:previous===null?null:quote.price-previous,changePercent,quoteTime:quote.quoteTime||null,open:null,dayLow:null,dayHigh:null,fiftyTwoWeekLow:null,fiftyTwoWeekHigh:null,volume:null},
+      source:quote.source||'Yahoo Finance',
+      fetchedAt:quote.checkedAt||new Date().toISOString(),
+    },
+    error:null,
+  };
 }
 
 async function loadSymbol(symbol){
-  try{return {symbol,chart:quoteOnly(await getChart(symbol,'5d')),error:null};}
-  catch(e){return {symbol,chart:null,error:e.message||'Quote unavailable.'};}
+  const saved=quoteCache.get(symbol);
+  if(saved&&saved.row.chart&&Date.now()-saved.at<45000)return saved.row;
+  let last=null;
+  for(let attempt=0;attempt<2;attempt++){
+    try{
+      const row=asRow(await getQuote(symbol));
+      quoteCache.set(symbol,{at:Date.now(),row});
+      if(quoteCache.size>200)quoteCache.delete(quoteCache.keys().next().value);
+      return row;
+    }catch(e){
+      last=e;
+      if(attempt===0)await new Promise(resolve=>setTimeout(resolve,450));
+    }
+  }
+  return {symbol,chart:null,error:last?.message||'Quote unavailable.'};
 }
 
-export async function marketDashboard(){
-  if(snapshot&&Date.now()-snapshot.at<60000)return snapshot.data;
-  const symbols=catalog.groups.flatMap(group=>group.symbols);
-  const rows=await mapLimit(symbols,8,loadSymbol);
-  const bySymbol=new Map(rows.map(row=>[row.symbol,row]));
-  const data={
-    fetchedAt:new Date().toISOString(),
-    indices:catalog.indices.map(item=>({...item,chart:null,error:null})),
-    groups:catalog.groups.map(group=>({id:group.id,title:group.title,blurb:group.blurb,stocks:group.symbols.map(symbol=>bySymbol.get(symbol))})),
-  };
-  snapshot={at:Date.now(),data};
-  return data;
+export async function marketGroup(id){
+  const group=catalog.groups.find(item=>item.id===id);
+  if(!group)throw new AppError('Unknown market group.',404);
+  const stocks=await mapLimit(group.symbols,3,loadSymbol);
+  return {fetchedAt:new Date().toISOString(),group:{id:group.id,title:group.title,blurb:group.blurb,stocks}};
 }

@@ -29,9 +29,11 @@ export async function getQuote(value) {
         if (!Number.isFinite(meta.regularMarketPrice) || meta.regularMarketPrice <= 0 || !Number.isFinite(meta.regularMarketTime) || !meta.currency || !(meta.longName || meta.shortName)) {
           throw new AppError(`The provider returned an incomplete quote for ${symbol}. Please try again later.`, 502);
         }
+        const previousClose=Number.isFinite(meta.previousClose)?meta.previousClose:Number.isFinite(meta.chartPreviousClose)?meta.chartPreviousClose:null;
+        const changePercent=Number.isFinite(meta.regularMarketChangePercent)?meta.regularMarketChangePercent:previousClose?((meta.regularMarketPrice-previousClose)/previousClose)*100:null;
         const quote = {
           symbol: normalizeTicker(meta.symbol || symbol), companyName: meta.longName || meta.shortName,
-          currency: meta.currency, price: meta.regularMarketPrice,
+          currency: meta.currency, price: meta.regularMarketPrice, previousClose, changePercent,
           quoteTime: new Date(meta.regularMarketTime * 1000).toISOString(),
           checkedAt: new Date().toISOString(), exchange: meta.fullExchangeName || meta.exchangeName || '', source: 'Yahoo Finance',
         };
