@@ -2,7 +2,7 @@ import {LanguageProvider} from '@/components/product/language';
 import type { Metadata } from 'next';
 import './globals.css';
 export const metadata: Metadata = {
-  title: 'Watchlist — Your market, in focus',
+  title: 'StockWatchlist — Track stocks and ETFs from the day you add them',
   referrer: 'no-referrer',
   icons: {
     icon: [
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico?v=4',
     apple: '/apple-touch-icon.png?v=4',
   },
-  description: 'Follow your stock ideas, track changes from the day you added them, and share watchlists with friends.',
+  description: 'StockWatchlist is a web app for personal stock and ETF watchlists. Save a starting price, follow performance, and share a read-only list. You can read how the product works and our privacy policy without signing in.',
 };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return <html lang="en"><body><LanguageProvider>{children}</LanguageProvider></body></html>;

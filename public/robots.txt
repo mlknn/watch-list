@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Allow: /privacy
+Allow: /pricing
+Disallow: /dashboard
+Disallow: /account
+Disallow: /api/
+
+User-agent: Googlebot
+Allow: /
+Allow: /privacy
+Allow: /pricing

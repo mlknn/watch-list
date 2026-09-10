@@ -1,2 +1,76 @@
+import type {Metadata} from 'next';
 import {PublicNav,PublicFooter} from '@/components/product/nav';
-export default function Privacy(){return <><PublicNav/><main className="privacy-page"><p className="eyebrow">CLEAR BY DEFAULT</p><h1>Your data, your watchlists.</h1><section><h2>Private until you share</h2><p>Your account stores your verified email, display name, watchlists, and the price recorded when each stock was added. Only you can edit or delete your watchlists.</p><h2>Share links</h2><p>Anyone with a share link can view that watchlist and pass the link to someone else. Shared pages show company names, tickers, dates, prices, performance, and any share quantities, purchase costs and notes you enter. They do not show your email or billing details. Turning off sharing makes the link stop working.</p><h2>Community map</h2><p>We count unique verified accounts that have opened the app. You can optionally choose your country in your account, and each country is shown on the public map as a single aggregate pin. We do not request GPS or store a precise location. No Google Analytics or advertising tracker is installed.</p><h2>Accounts and payments</h2><p>When hosted, Supabase handles authentication and account data. In local mode, account data and salted password hashes are saved on this computer. Local verification links simulate email delivery and do not verify ownership of an email address. Google or Apple handles sign-in when you choose those methods. Stripe handles checkout, payment methods, and subscription management. This app does not receive or store full card numbers.</p><h2>Your choices</h2><p>You can remove stocks and watchlists, turn off shared links, remove your country preference, and manage subscriptions in your account. Session tokens stay in your browser so you can remain signed in; signing out clears that session.</p></section></main><PublicFooter/></>;}
+
+export const metadata: Metadata = {
+  title: 'Privacy policy — StockWatchlist',
+  description: 'How StockWatchlist collects, uses, stores, and shares account data, including Google Sign-In name and email.',
+};
+
+export default function Privacy() {
+  return <>
+    <PublicNav/>
+    <main className="privacy-page">
+      <p className="eyebrow">PRIVACY POLICY</p>
+      <h1>How StockWatchlist uses your data</h1>
+      <p className="privacy-updated">Last updated: September 10, 2026. This policy applies to the StockWatchlist web app at <a href="https://stockwatchlist.app">https://stockwatchlist.app</a>.</p>
+      <section>
+        <h2>Who we are and what the app does</h2>
+        <p>StockWatchlist (“we”, “the app”) is a personal watchlist product for stocks and ETFs. You can save tickers, keep the market price from the day you added them, see later performance, optionally record share quantities and purchase details, and share a read-only view of a list. It is not a broker, bank, or investment adviser. You can read this policy and the public home page without signing in.</p>
+
+        <h2>Google user data (Google Sign-In)</h2>
+        <p>If you choose Continue with Google, we use Google OAuth only to sign you in. We request basic account identity needed to create or recognize your StockWatchlist account:</p>
+        <ul>
+          <li>Your Google account email address</li>
+          <li>Your Google account name (display name)</li>
+        </ul>
+        <p>We use that Google user data solely to authenticate you, create or look up your StockWatchlist account, show your name in the product, and send account-related messages such as email verification when those messages are part of sign-in. We do not request access to Gmail, Google Drive, Calendar, Contacts, Photos, or other Google APIs. We do not read, scan, or store the contents of your Google mailbox. We do not use Google user data for advertising, selling data, credit decisions, or training unrelated AI models. We do not share Google user data with other apps or with data brokers.</p>
+        <p>Google’s own handling of your Google Account is described in <a href="https://policies.google.com/privacy">Google’s Privacy Policy</a>. You can disconnect Google Sign-In by signing out of StockWatchlist and, in your Google Account, removing StockWatchlist from apps with account access.</p>
+
+        <h2>Information we collect</h2>
+        <p>Depending on how you use the app, we store:</p>
+        <ul>
+          <li>Account identifiers: verified email, display name, and an internal user ID from our authentication provider (Supabase Auth). Email and name may come from Google or Apple sign-in, or from the email and password you enter.</li>
+          <li>Watchlist content you create: list names, tickers, company names, the date and price recorded when you added a stock, optional share quantities, purchase dates, purchase costs, and notes.</li>
+          <li>Optional country: a country you may choose in Account settings for the public community map. We do not request GPS and we do not store a precise location or IP-based geolocation for that map.</li>
+          <li>Billing association: if you subscribe, Stripe customer and subscription status. We do not receive or store full card numbers.</li>
+          <li>Technical session data: a session token in your browser so you can stay signed in. Signing out clears that session.</li>
+        </ul>
+        <p>We load delayed public market quotes and company information from market-data providers to display prices and research pages. Those requests are for market data, not for your Google account.</p>
+
+        <h2>How we use information</h2>
+        <p>We use the information above to operate StockWatchlist: sign you in, keep your watchlists, refresh quotes, enforce plan limits, process subscriptions, show an aggregate community count, and fix product problems. We do not sell personal information. We do not use your Google name or email for ads.</p>
+
+        <h2>How we share information</h2>
+        <p>Watchlists stay private until you create a share link. Anyone with that link can view that list (company names, tickers, dates, prices, performance, and any quantities, costs, and notes you entered) and can pass the link on. Shared pages do not include your email, Google account identifier, or billing details. Turning sharing off stops the link from working for future visits.</p>
+        <p>We use processors who store or process data on our behalf:</p>
+        <ul>
+          <li>Supabase — authentication and database hosting for accounts and watchlists</li>
+          <li>Google — only if you sign in with Google, as described above</li>
+          <li>Apple — only if you sign in with Apple</li>
+          <li>Stripe — checkout, payment method storage, and subscription management</li>
+          <li>Our hosting provider — to serve the website</li>
+        </ul>
+        <p>We may disclose information if required by law. We do not install Google Analytics or an advertising tracker.</p>
+
+        <h2>Community map</h2>
+        <p>We count unique verified accounts that have opened the app. If you choose a country, that country can appear on the public map as one aggregate pin. Countries with very few members are not shown as separate pins. You can clear the country preference in Account settings.</p>
+
+        <h2>Cookies and local storage</h2>
+        <p>We use a session cookie or equivalent browser storage so you remain signed in. We store a language preference in local storage. These are for running the product, not for third-party ads.</p>
+
+        <h2>Retention and your choices</h2>
+        <p>We keep account and watchlist data while your account exists. You can remove stocks and watchlists, turn off share links, and clear your country preference in the app. You can sign out to clear the local session. To request deletion of your StockWatchlist account and associated personal data (including Google name and email stored for sign-in), email <a href="mailto:privacy@stockwatchlist.app">privacy@stockwatchlist.app</a> from the address on the account. We will delete or anonymize that account data unless we must retain a limited record for legal, security, or billing reasons (for example, Stripe transaction history held by Stripe).</p>
+
+        <h2>Children</h2>
+        <p>StockWatchlist is not directed at children under 13, and we do not knowingly collect personal information from children under 13.</p>
+
+        <h2>Changes</h2>
+        <p>If we change how we access, use, store, or share Google user data or other personal data, we will update this page and the “Last updated” date. Continued use after an update means you should review the new policy.</p>
+
+        <h2>Contact</h2>
+        <p>Questions about privacy or Google user data: <a href="mailto:privacy@stockwatchlist.app">privacy@stockwatchlist.app</a>. Product home: <a href="https://stockwatchlist.app">https://stockwatchlist.app</a>.</p>
+      </section>
+    </main>
+    <PublicFooter/>
+  </>;
+}
