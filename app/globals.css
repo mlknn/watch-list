@@ -249,3 +249,11 @@ h2 { font-size:19px; margin:0; letter-spacing:-.3px; font-weight:600; }
  .index-hero-chart{height:180px!important}
 }
 
+.insights-page .intro{max-width:640px;color:#627391;line-height:1.7;margin:0 0 28px}
+.insights-today{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:28px}
+.insights-today article{background:white;border:1px solid #e0e6ef;border-radius:14px;padding:16px 18px}
+.insights-today span{display:block;font-size:12px;color:#7a889e;margin-bottom:8px}
+.insights-today strong{display:block;font-size:28px;letter-spacing:-.8px}
+.insights-today small{display:block;margin-top:6px;font-size:12px;color:#8a97ab}
+.insights-table small{color:#8a97ab}
+

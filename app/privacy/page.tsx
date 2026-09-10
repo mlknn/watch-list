@@ -34,11 +34,12 @@ export default function Privacy() {
           <li>Optional country: a country you may choose in Account settings for the public community map. We do not request GPS and we do not store a precise location or IP-based geolocation for that map.</li>
           <li>Billing association: if you subscribe, Stripe customer and subscription status. We do not receive or store full card numbers.</li>
           <li>Technical session data: a session token in your browser so you can stay signed in. Signing out clears that session.</li>
+          <li>Anonymous product analytics: a random identifier in local storage used only to count unique daily visitors and product actions (opening the app, viewing the dashboard, searching a stock, creating a watchlist, and completing sign-up). We do not store IP addresses for these counts, and we do not send this data to Google Analytics or an advertising tracker.</li>
         </ul>
         <p>We load delayed public market quotes and company information from market-data providers to display prices and research pages. Those requests are for market data, not for your Google account.</p>
 
         <h2>How we use information</h2>
-        <p>We use the information above to operate StockWatchlist: sign you in, keep your watchlists, refresh quotes, enforce plan limits, process subscriptions, show an aggregate community count, and fix product problems. We do not sell personal information. We do not use your Google name or email for ads.</p>
+        <p>We use the information above to operate StockWatchlist: sign you in, keep your watchlists, refresh quotes, enforce plan limits, process subscriptions, show an aggregate community count, understand which public product steps people use, and fix product problems. We do not sell personal information. We do not use your Google name or email for ads.</p>
 
         <h2>How we share information</h2>
         <p>Watchlists stay private until you create a share link. Anyone with that link can view that list (company names, tickers, dates, prices, performance, and any quantities, costs, and notes you entered) and can pass the link on. Shared pages do not include your email, Google account identifier, or billing details. Turning sharing off stops the link from working for future visits.</p>
@@ -56,7 +57,7 @@ export default function Privacy() {
         <p>We count unique verified accounts that have opened the app. If you choose a country, that country can appear on the public map as one aggregate pin. Countries with very few members are not shown as separate pins. You can clear the country preference in Account settings.</p>
 
         <h2>Cookies and local storage</h2>
-        <p>We use a session cookie or equivalent browser storage so you remain signed in. We store a language preference in local storage. These are for running the product, not for third-party ads.</p>
+        <p>We use a session cookie or equivalent browser storage so you remain signed in. We store a language preference in local storage. Guests may also have a draft watchlist in local storage. We store a random analytics identifier in local storage so we can count unique visitors per day without using an IP address. These are for running the product, not for third-party ads.</p>
 
         <h2>Retention and your choices</h2>
         <p>We keep account and watchlist data while your account exists. You can remove stocks and watchlists, turn off share links, and clear your country preference in the app. You can sign out to clear the local session. To request deletion of your StockWatchlist account and associated personal data (including Google name and email stored for sign-in), email <a href="mailto:privacy@stockwatchlist.app">privacy@stockwatchlist.app</a> from the address on the account. We will delete or anonymize that account data unless we must retain a limited record for legal, security, or billing reasons (for example, Stripe transaction history held by Stripe).</p>

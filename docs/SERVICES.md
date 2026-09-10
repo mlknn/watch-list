@@ -73,6 +73,12 @@ No payments can be accepted until test/live keys, the recurring Price, webhook e
 
 The count is distinct verified accounts that have initialized an account workspace, not pageviews, cookies, or visitors guessed from IP addresses. Country is optional and user-selected. Aggregates below three people are suppressed. No GPS, IP geolocation or Google Analytics is added. Natural Earth map boundaries are processed using world-atlas; regeneration is in `scripts/generate-map.mjs`.
 
+## 9. Product analytics
+
+**Code:** `server/analytics.mjs`, `lib/analytics.ts`, `app/insights/page.tsx`, `supabase/migrations/202609110001_analytics.sql`.
+
+First-party counts live in Postgres. The browser keeps a random visitor id in local storage and posts allowlisted events (`visit`, `dashboard`, `stock_search`, `watchlist_created`). Sign-ups are recorded when a profile is created. Unique counts are per UTC day. The `/insights` page is limited to admin accounts. IP addresses are not stored for these events.
+
 ## Operations
 
 `/api/health` verifies the app process is running; it does not claim the database, sign-in or payment providers are configured. Use startup checks and real end-to-end tests after connections are added. Monitor server errors, Supabase database/auth usage and failed Stripe deliveries separately. Configure database backups in Supabase. Periodically remove old rate-limit rows and retain payment event IDs according to your billing/audit policy. Error logs omit tokens and payloads.

@@ -22,6 +22,7 @@ import {apiJson,config,signedIn,claimGuestWatchlists} from '@/lib/auth-client';
 import {marketChart} from '@/lib/market';
 import {applyGuestAction,ensureGuestList,guestHasDraft,writeGuestState,markSavePromptShown} from '@/lib/guest-watchlist.mjs';
 import {type AccountState,type Stock,type Watchlist,watchlistPerformance} from '@/lib/watchlist';
+import {track} from '@/lib/analytics';
 type Action={mode?:'basic'|'advanced';quantity?:number;costPerShare?:number;acquiredAt?:string;notes?:string;action:string;listId?:string;stockId?:string;name?:string;ticker?:string};
 async function chartQuote(symbol:string){const chart=await marketChart(symbol);return {symbol:chart.symbol,companyName:chart.companyName,currency:chart.currency,exchange:chart.exchange,price:chart.quote.price,quoteTime:chart.quote.quoteTime||chart.fetchedAt,checkedAt:chart.fetchedAt};}
 export default function Watchlists(){const t=useT();
@@ -50,11 +51,13 @@ export default function Watchlists(){const t=useT();
         const firstStock=!stateRef.current.watchlists.some(list=>list.stocks.length);
         const data=writeGuestState(applyGuestAction(stateRef.current,input,quote),window.localStorage);
         apply(data);
+        if(input.action==='createList'||(input.action==='addStock'&&firstStock))track('watchlist_created');
         if(input.action==='addStock'&&firstStock&&!data.savePromptShown)setSaveOpen(true);
         return data;
       }
       const data=await apiJson<AccountState>('/api/watchlists',input);
       apply(data);
+      if(input.action==='createList')track('watchlist_created');
       return data;
     }catch(e){setError((e as Error).message);throw e;}
     finally{lock.current=false;setBusy('');}
