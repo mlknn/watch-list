@@ -1,15 +1,17 @@
 'use client';
 import {createContext,useContext,useEffect,useRef,useState} from 'react';
 import {useRouter} from 'next/navigation';
-import {LoaderCircle,Search,Star} from 'lucide-react';
+import {LoaderCircle,Maximize2,Search,Star} from 'lucide-react';
 import catalog from '@/lib/market-dashboard.json';
-import {PriceChart} from './price-chart';
+import {PriceChart,type ChartStyle} from './price-chart';
 import {CompanyIcon} from './company-icon';
 import {StockSearch} from './stock-search';
 import {Button} from '@/components/ui/button';
+import {Dialog,DialogContent,DialogDescription,DialogTitle} from '@/components/ui/dialog';
 import {Tabs,TabsList,TabsTrigger} from '@/components/ui/tabs';
 import {price} from '@/lib/watchlist';
 import {marketChart,type MarketChart} from '@/lib/market';
+import {chartPeriodStats} from '@/lib/chart-period.mjs';
 import {resolveStockInput} from '@/lib/stock-search.mjs';
 import {apiJson} from '@/lib/auth-client';
 
@@ -30,8 +32,7 @@ function skeleton():Board{
 const INDEX_RANGES=[['1d','1D'],['1mo','1M'],['3mo','3M'],['1y','1Y'],['5y','5Y']] as const;
 
 function Change({chart}:{chart:MarketChart}){
-  const pct=chart.quote.changePercent;
-  const up=(pct??0)>=0;
+  const {changePercent:pct,up}=chartPeriodStats(chart);
   return <span className={up?'up':'down'}>{pct===null?'—':`${up?'+':''}${pct.toFixed(2)}%`}</span>;
 }
 
@@ -44,20 +45,28 @@ function FavoriteStar({symbol}:{symbol:string}){
 }
 
 function IndexHero({indices}:{indices:(Row&{name:string})[]}){
-  const [symbol,setSymbol]=useState(indices[0]?.symbol||'^GSPC');
   const [range,setRange]=useState('1d');
-  const [chart,setChart]=useState<MarketChart|null>(null);
+  const [style,setStyle]=useState<ChartStyle>('line');
+  const [charts,setCharts]=useState<Record<string,MarketChart|null>>({});
+  const [errors,setErrors]=useState<Record<string,string>>({});
   const [busy,setBusy]=useState(true);
-  const [error,setError]=useState('');
-  const selected=indices.find(row=>row.symbol===symbol)||indices[0];
-  useEffect(()=>{let alive=true;setBusy(true);setError('');void marketChart(symbol,range).then(data=>{if(alive)setChart(data);}).catch(e=>{if(alive){setChart(null);setError((e as Error).message);}}).finally(()=>{if(alive)setBusy(false);});return()=>{alive=false;};},[symbol,range]);
-  const quote=chart||selected?.chart||null;
-  const change=quote?.quote.changePercent;
+  const [expanded,setExpanded]=useState<string|null>(null);
+  useEffect(()=>{
+    let alive=true;setBusy(true);
+    void Promise.all(indices.map(row=>marketChart(row.symbol,range).then(data=>[row.symbol,{data,error:''}] as const,e=>[row.symbol,{data:null,error:(e as Error).message}] as const))).then(rows=>{
+      if(!alive)return;
+      const nextCharts:Record<string,MarketChart|null>={};const nextErrors:Record<string,string>={};
+      for(const [symbol,result] of rows){nextCharts[symbol]=result.data;nextErrors[symbol]=result.error;}
+      setCharts(nextCharts);setErrors(nextErrors);setBusy(false);
+    });
+    return()=>{alive=false;};
+  },[indices,range]);
   return <section className="market-index-hero" aria-label="Major markets">
     <div className="market-index-toolbar">
-      <Tabs value={symbol} onValueChange={v=>setSymbol(String(v))}>
-        <TabsList className="market-index-picks" aria-label="Index">
-          {indices.map(row=><TabsTrigger key={row.symbol} value={row.symbol}><span className="market-index-short">{row.short||row.name}</span></TabsTrigger>)}
+      <Tabs value={style} onValueChange={v=>setStyle(v as ChartStyle)}>
+        <TabsList className="chart-ranges market-index-style" aria-label="Chart type">
+          <TabsTrigger value="line">Line</TabsTrigger>
+          <TabsTrigger value="candle">Candle</TabsTrigger>
         </TabsList>
       </Tabs>
       <Tabs value={range} onValueChange={v=>setRange(String(v))}>
@@ -66,16 +75,46 @@ function IndexHero({indices}:{indices:(Row&{name:string})[]}){
         </TabsList>
       </Tabs>
     </div>
-    <div className="market-index-quote-row">
-      <div>
-        <p className="eyebrow">{selected?.symbol.replace('^','')}</p>
-        <h2>{selected?.name}</h2>
-      </div>
-      {quote?<div className="market-index-quote"><strong>{price(quote.quote.price,quote.currency)}</strong>{change!==null&&change!==undefined&&<Change chart={quote}/>}</div>:<p className="market-card-error">{error||'Loading…'}</p>}
+    <div className="market-index-grid" aria-busy={busy}>
+      {indices.map(row=>{
+        const chart=charts[row.symbol]||null;
+        return <article key={row.symbol} className="market-index-card">
+          <div className="market-index-card-head">
+            <div>
+              <p className="eyebrow">{row.short||row.name}</p>
+              <h3>{row.name}</h3>
+            </div>
+            {chart?<div className="market-index-quote"><strong>{price(chart.quote.price,chart.currency)}</strong><Change chart={chart}/></div>:<p className="market-card-error">{errors[row.symbol]||'Loading…'}</p>}
+            <button type="button" className="index-expand" aria-label={'Expand '+row.name+' chart'} title="Expand chart" onClick={()=>setExpanded(row.symbol)}><Maximize2 size={13}/></button>
+          </div>
+          {chart&&chart.range===range?<PriceChart data={chart} compact style={style} className="index-hero-chart"/>:busy?<div className="market-loading"><LoaderCircle className="spin"/></div>:<p className="market-card-error">{errors[row.symbol]||'Chart unavailable.'}</p>}
+        </article>;
+      })}
     </div>
-    <div className="market-index-stage" aria-busy={busy}>
-      {chart&&chart.range===range?<PriceChart data={chart} className="index-hero-chart"/>:error&&!busy?<p className="market-card-error">{error}</p>:<div className="market-loading"><LoaderCircle className="spin"/>Loading index chart…</div>}
-    </div>
+    {(()=>{
+      const row=indices.find(item=>item.symbol===expanded);
+      const chart=expanded?charts[expanded]||null:null;
+      return <Dialog open={!!expanded} onOpenChange={v=>{if(!v)setExpanded(null);}}>
+        <DialogContent className="full-chart-dialog index-chart-dialog">
+          <DialogTitle>{row?.name||expanded}</DialogTitle>
+          <DialogDescription>{chart?`${price(chart.quote.price,chart.currency)} · ${chart.sessionDate||chart.range}`:'Expanded index chart'}</DialogDescription>
+          <div className="market-index-toolbar">
+            <Tabs value={style} onValueChange={v=>setStyle(v as ChartStyle)}>
+              <TabsList className="chart-ranges market-index-style" aria-label="Chart type">
+                <TabsTrigger value="line">Line</TabsTrigger>
+                <TabsTrigger value="candle">Candle</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <Tabs value={range} onValueChange={v=>setRange(String(v))}>
+              <TabsList className="chart-ranges market-index-ranges" aria-label="Chart time range">
+                {INDEX_RANGES.map(([value,label])=><TabsTrigger key={value} value={value}>{label}</TabsTrigger>)}
+              </TabsList>
+            </Tabs>
+          </div>
+          {chart&&chart.range===range?<PriceChart data={chart} style={style} className="index-expanded-chart"/>:busy?<div className="market-loading"><LoaderCircle className="spin"/></div>:<p className="market-card-error">{(expanded&&errors[expanded])||'Chart unavailable.'}</p>}
+        </DialogContent>
+      </Dialog>;
+    })()}
   </section>;
 }
 
