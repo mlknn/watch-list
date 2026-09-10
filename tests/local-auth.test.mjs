@@ -15,7 +15,7 @@ test('local signup requires single-use verification and creates an isolated Basi
  const token=result.payload.localDelivery.url.split('token=')[1];const verified=await localAuth(request(),{action:'verify',token});assert.match(verified.cookie,/HttpOnly/);assert.match(verified.cookie,/SameSite=Strict/);
  await assert.rejects(localAuth(request(),{action:'verify',token}),/already used/);
  const user=await localUser(request(verified.cookie));assert.equal(user.email,input.email);
- const profile=await localDatabase().from('wl_profiles').select('*').eq('id',user.id).single();assert.equal(profile.data.is_admin,false);assert.equal(profile.data.subscription_status,'free');
+ const profile=await localDatabase().from('wl_profiles').select('*').eq('id',user.id).single();assert.equal(profile.data.subscription_status,'free');
  await assert.rejects(localAuth(request(),{...input,action:'login',password:'wrong'}),e=>e.status===401);
  const reset=await localAuth(request(),{action:'reset',email:input.email});await localAuth(request(),{action:'updatePassword',token:reset.payload.localDelivery.url.split('token=')[1],password:'New456'});
  await assert.rejects(localUser(request(verified.cookie)),e=>e.status===401);

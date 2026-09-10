@@ -40,7 +40,7 @@ export async function rate(db,key,max=60,seconds=60) {
   if(!dbResult(await db.rpc('wl_rate',{p_key:key,p_max:max,p_seconds:seconds}))) throw new AppError('Too many updates. Please wait a moment and try again.',429);
 }
 export function planFor(profile, now=Date.now()) {
-  const pro=profile.is_admin===true||(profile.subscription_status==='active'&&Date.parse(profile.pro_until)>now);
+  const pro=profile.subscription_status==='active'&&Date.parse(profile.pro_until)>now;
   return {id:pro?'pro':'free',maxLists:pro?10:1,maxStocks:pro?50:10,pageSize:25,trialEndsAt:profile.trial_ends_at,expired:!pro&&!!profile.trial_ends_at&&Date.parse(profile.trial_ends_at)<=now};
 }
 export async function ownerList(db,userId,listId) {
@@ -82,7 +82,7 @@ export async function listViews(db,lists,refresh=false) {
 export async function accountState(db,user,refresh=false) {
   const profile=dbResult(await db.from('wl_profiles').select('*').eq('id',user.id).single());
   const lists=dbResult(await db.from('wl_watchlists').select('*').eq('owner_id',user.id).order('created_at').order('id'));
-  return {version:2,updatedAt:new Date().toISOString(),user:{id:user.id,name:profile.display_name,email:user.email,isAdmin:profile.is_admin===true,analytics:canViewAnalytics(user.email),local:localMode(),country:profile.country_code,hasBilling:!!profile.stripe_customer_id},plan:planFor(profile),watchlists:await listViews(db,lists,refresh)};
+  return {version:2,updatedAt:new Date().toISOString(),user:{id:user.id,name:profile.display_name,email:user.email,analytics:canViewAnalytics(user.email),local:localMode(),country:profile.country_code,hasBilling:!!profile.stripe_customer_id},plan:planFor(profile),watchlists:await listViews(db,lists,refresh)};
 }
 export async function importGuestLists(db,user,lists){
   if(!Array.isArray(lists))throw new AppError('Invalid request.');

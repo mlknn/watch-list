@@ -77,7 +77,7 @@ The count is distinct verified accounts that have initialized an account workspa
 
 **Code:** `server/analytics.mjs`, `lib/analytics.ts`, `app/insights/page.tsx`, `supabase/migrations/202609110001_analytics.sql`.
 
-First-party counts live in Postgres. The browser keeps a random visitor id in local storage and posts allowlisted events (`visit`, `dashboard`, `stock_search`, `watchlist_created`). Sign-ups are recorded when a profile is created. Unique counts are per UTC day. The `/insights` page and `GET /api/analytics` are limited to two account emails. Other signed-in users, including other admin-flagged profiles, cannot read the counts.
+First-party counts live in Postgres. The browser keeps a random visitor id in local storage and posts allowlisted events (`visit`, `dashboard`, `stock_search`, `watchlist_created`). Sign-ups are recorded when a profile is created. Unique counts are per UTC day. The `/insights` page and `GET /api/analytics` are limited to two account emails. There is no admin account role.
 
 ## Operations
 
@@ -96,7 +96,7 @@ Chart requests are cached for one minute per symbol/range and fundamentals for f
 
 ## Local account service and advanced portfolios
 
-`server/local-auth.mjs` provides loopback-only local signup, simulated verification/reset delivery, scrypt password hashes, expiring single-use tokens and HttpOnly cookie sessions. Persisted rate limits restrict login attempts. The local admin seed contains only a salted password hash and is ignored by Git. This does not verify ownership of email addresses and is disabled for a public APP_URL.
+`server/local-auth.mjs` provides loopback-only local signup, simulated verification/reset delivery, scrypt password hashes, expiring single-use tokens and HttpOnly cookie sessions. Persisted rate limits restrict login attempts. The optional local seed account contains only a salted password hash and is ignored by Git. This does not verify ownership of email addresses and is disabled for a public APP_URL.
 
 `server/local-db.mjs` uses filesystem-backed PGlite with the same SQL migrations and ownership/plan RPCs as Supabase. It exports private watchlist JSON after changes; the password/session tables are excluded from the JSON export. Node filesystem storage is documented by [PGlite](https://pglite.dev/docs/filesystems).
 

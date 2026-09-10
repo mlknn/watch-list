@@ -14,7 +14,8 @@ test('anonymous and Basic members cannot retrieve earnings, including through th
  for(const p of [{subscription_status:'free'},{subscription_status:'active',pro_until:'2020-01-01'}])await assert.rejects(earningsForRequest(request,'AMZN',{authenticate:auth(p),load}),e=>e.status===403);
  assert.equal(fetched,false);
 });
-test('active Pro and admin accounts can retrieve earnings; invalid symbols never reach provider',async()=>{
- for(const p of [{subscription_status:'active',pro_until:'2099-01-01'},{is_admin:true}]){const result=await earningsForRequest(request,'amzn',{authenticate:auth(p),load:async symbol=>({symbol})});assert.equal(result.symbol,'AMZN');}
- await assert.rejects(earningsForRequest(request,'../../secret',{authenticate:auth({is_admin:true}),load:async()=>assert.fail('Invalid symbol reached provider')}));
+test('active Pro accounts can retrieve earnings; invalid symbols never reach provider',async()=>{
+ const pro={subscription_status:'active',pro_until:'2099-01-01'};
+ const result=await earningsForRequest(request,'amzn',{authenticate:auth(pro),load:async symbol=>({symbol})});assert.equal(result.symbol,'AMZN');
+ await assert.rejects(earningsForRequest(request,'../../secret',{authenticate:auth(pro),load:async()=>assert.fail('Invalid symbol reached provider')}));
 });

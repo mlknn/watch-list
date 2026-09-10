@@ -19,7 +19,7 @@ export async function trackAnalytics(event,visitor){
   return {ok:true,stored:true};
 }
 
-export async function requireAdmin(request){
+export async function requireAnalytics(request){
   const {db,user}=await requireUser(request);
   if(!canViewAnalytics(user.email))throw new AppError('This page is only available to the site owner.',403);
   return {db,user};

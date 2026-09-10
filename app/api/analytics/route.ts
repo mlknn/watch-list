@@ -1,4 +1,4 @@
-import {trackAnalytics,requireAdmin,analyticsSummary} from '@/server/analytics.mjs';
+import {trackAnalytics,requireAnalytics,analyticsSummary} from '@/server/analytics.mjs';
 import {json,failure,body,publicRate} from '@/server/http.mjs';
 
 export const dynamic='force-dynamic';
@@ -13,7 +13,7 @@ export async function POST(request:Request){
 
 export async function GET(request:Request){
   try{
-    const {db}=await requireAdmin(request);
+    const {db}=await requireAnalytics(request);
     const days=Number(new URL(request.url).searchParams.get('days')||14);
     return json(await analyticsSummary(db,days));
   }catch(e){return failure(e);}
