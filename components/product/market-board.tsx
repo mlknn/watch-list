@@ -12,7 +12,7 @@ import {Tabs,TabsList,TabsTrigger} from '@/components/ui/tabs';
 import {price} from '@/lib/watchlist';
 import {marketChart,type MarketChart} from '@/lib/market';
 import {chartPeriodStats} from '@/lib/chart-period.mjs';
-import {nyseSession,sectorAverage,tapeBreadth,tapeMovers,uniqueQuoted} from '@/lib/market-tape.mjs';
+import {nyseSession,sectorAverage,tapeMovers} from '@/lib/market-tape.mjs';
 import {resolveStockInput} from '@/lib/stock-search.mjs';
 import {apiJson} from '@/lib/auth-client';
 
@@ -39,18 +39,9 @@ function SessionBadge(){
 }
 
 function TapeStrip({rows}:{rows:Row[]}){
-  const breadth=tapeBreadth(rows);
   const {gainers,losers}=tapeMovers(rows,5);
-  if(!breadth.quoted)return null;
-  return <section className="market-tape" aria-label="Today on this tape">
-    <div className="market-breadth">
-      <div>
-        <p className="eyebrow">ON THIS TAPE</p>
-        <h2>Advance / decline</h2>
-        <p>{breadth.up} up · {breadth.down} down{breadth.flat?` · ${breadth.flat} unchanged`:''} among {breadth.quoted} names loaded so far.</p>
-      </div>
-      <div className="market-breadth-bar" aria-hidden="true"><span className="up" style={{flexGrow:Math.max(breadth.up,0.01)}}/><span className="down" style={{flexGrow:Math.max(breadth.down,0.01)}}/></div>
-    </div>
+  if(!gainers.length&&!losers.length)return null;
+  return <section className="market-tape" aria-label="Today’s movers">
     <div className="market-movers">
       <div>
         <p className="eyebrow">LEADERS</p>
@@ -62,28 +53,6 @@ function TapeStrip({rows}:{rows:Row[]}){
         <h3>Losers</h3>
         {losers.map(row=><a key={'l-'+row.symbol} href={'/stocks/'+encodeURIComponent(row.symbol)}><CompanyIcon symbol={row.symbol}/><span>{row.symbol}</span><em className="down">{fmtPct(dayPct(row))}</em></a>)}
       </div>
-    </div>
-  </section>;
-}
-
-function Heatmap({rows}:{rows:Row[]}){
-  const quoted=[...uniqueQuoted(rows)].sort((a,b)=>Math.abs(b.chart!.quote.changePercent!)-Math.abs(a.chart!.quote.changePercent!));
-  if(quoted.length<6)return null;
-  return <section className="market-heat-wrap" aria-label="Price heatmap">
-    <div className="market-group-copy">
-      <p className="eyebrow">ONE GLANCE</p>
-      <h2>Heatmap.</h2>
-      <p>Every loaded name, colored by today’s move. Darker cells swung more.</p>
-    </div>
-    <div className="market-heat">
-      {quoted.map(row=>{
-        const pct=row.chart!.quote.changePercent!;
-        const t=Math.min(Math.abs(pct)/5,1);
-        return <a key={row.symbol} className={'market-heat-cell '+(pct>=0?'up':'down')} href={'/stocks/'+encodeURIComponent(row.symbol)} style={{background:pct>=0?`rgba(35,131,98,${0.14+t*0.42})`:`rgba(190,77,89,${0.14+t*0.42})`}}>
-          <strong>{row.symbol}</strong>
-          <span>{fmtPct(pct)}</span>
-        </a>;
-      })}
     </div>
   </section>;
 }
@@ -328,7 +297,6 @@ export function MarketBoard(){
     <>
       <IndexHero indices={data.indices}/>
       <TapeStrip rows={quotedRows}/>
-      <Heatmap rows={quotedRows}/>
       <FavoritesBoard rows={favoriteRows}/>
       <nav className="market-sector-jump" aria-label="Industries">
         {data.groups.map(group=>{
