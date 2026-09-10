@@ -24,25 +24,24 @@ async function mapLimit(items,limit,fn){
   return out;
 }
 
-function slimChart(chart){
+function quoteOnly(chart){
   if(!chart)return null;
-  const points=chart.points.length>80?chart.points.filter((_,i,all)=>i===0||i===all.length-1||i%Math.ceil(all.length/72)===0):chart.points;
-  return {...chart,points};
+  return {...chart,points:[]};
 }
 
 async function loadSymbol(symbol){
-  try{return {symbol,chart:slimChart(await getChart(symbol,'1d')),error:null};}
+  try{return {symbol,chart:quoteOnly(await getChart(symbol,'5d')),error:null};}
   catch(e){return {symbol,chart:null,error:e.message||'Quote unavailable.'};}
 }
 
 export async function marketDashboard(){
   if(snapshot&&Date.now()-snapshot.at<60000)return snapshot.data;
-  const symbols=[...publicSymbols];
-  const rows=await mapLimit(symbols,4,loadSymbol);
+  const symbols=catalog.groups.flatMap(group=>group.symbols);
+  const rows=await mapLimit(symbols,8,loadSymbol);
   const bySymbol=new Map(rows.map(row=>[row.symbol,row]));
   const data={
     fetchedAt:new Date().toISOString(),
-    indices:catalog.indices.map(item=>({...item,...bySymbol.get(item.symbol)})),
+    indices:catalog.indices.map(item=>({...item,chart:null,error:null})),
     groups:catalog.groups.map(group=>({id:group.id,title:group.title,blurb:group.blurb,stocks:group.symbols.map(symbol=>bySymbol.get(symbol))})),
   };
   snapshot={at:Date.now(),data};

@@ -2,6 +2,14 @@ import {AppError} from './quotes.mjs';
 import {origin} from './cloud.mjs';
 export const json=(data,status=200)=>Response.json(data,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'}});
 export function failure(e){if(e instanceof AppError)return json({error:e.message},e.status);console.error('Request failed:',e?.message);return json({error:'Something went wrong. Please try again.'},500);}
+const buckets=new Map();
+export function publicRate(request,key,limit=80,seconds=60){
+  const ip=request.headers.get('cf-connecting-ip')||request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()||'local';
+  const id=key+':'+ip;const now=Date.now();const row=buckets.get(id)||{at:now,n:0};
+  if(now-row.at>seconds*1000){row.at=now;row.n=0;}
+  row.n+=1;buckets.set(id,row);if(buckets.size>4000)buckets.delete(buckets.keys().next().value);
+  if(row.n>limit)throw new AppError('Too many market requests. Please wait a minute.',429);
+}
 export async function body(request,max=16384){
   const source=request.headers.get('origin');
   if((source&&source!==origin())||request.headers.get('sec-fetch-site')==='cross-site')throw new AppError('Cross-site requests are not allowed.',403);

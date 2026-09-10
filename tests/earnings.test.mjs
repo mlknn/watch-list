@@ -1,8 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {normalizeEarnings,earningsForRequest} from '../server/earnings.mjs';
-import {normalizeTicker} from '../server/quotes.mjs';
-const access=async(_r,symbol)=>({symbol:normalizeTicker(symbol)});
 const request=new Request('http://127.0.0.1:4317/api/stocks/AMZN/earnings');
 const auth=profile=>async()=>({user:{id:'member'},db:{from(){return {select(){return this;},eq(){return this;},async single(){return {data:profile};}};},async rpc(){return {data:true};}}});
 test('quarterly reports exclude annual, empty and future periods and keep six latest unique quarters',()=>{
@@ -17,6 +15,6 @@ test('anonymous and Basic members cannot retrieve earnings, including through th
  assert.equal(fetched,false);
 });
 test('active Pro and admin accounts can retrieve earnings; invalid symbols never reach provider',async()=>{
- for(const p of [{subscription_status:'active',pro_until:'2099-01-01'},{is_admin:true}]){const result=await earningsForRequest(request,'amzn',{authenticate:auth(p),access,load:async symbol=>({symbol})});assert.equal(result.symbol,'AMZN');}
- await assert.rejects(earningsForRequest(request,'../../secret',{authenticate:auth({is_admin:true}),access,load:async()=>assert.fail('Invalid symbol reached provider')}));
+ for(const p of [{subscription_status:'active',pro_until:'2099-01-01'},{is_admin:true}]){const result=await earningsForRequest(request,'amzn',{authenticate:auth(p),load:async symbol=>({symbol})});assert.equal(result.symbol,'AMZN');}
+ await assert.rejects(earningsForRequest(request,'../../secret',{authenticate:auth({is_admin:true}),load:async()=>assert.fail('Invalid symbol reached provider')}));
 });

@@ -4,7 +4,7 @@ import {MarketBoard} from '@/components/product/market-board';
 
 export const metadata: Metadata = {
   title: 'Dashboard — Markets | StockWatchlist',
-  description: 'Follow the S&P 500, Nasdaq and Dow Jones, then scroll through technology, finance, health care and more. No sign-in required.',
+  description: 'Search any stock, read the S&P 500, Nasdaq and Dow Jones, and browse industries. Charts and company details are public; earnings reports are Pro.',
 };
 
 export default function Dashboard(){
