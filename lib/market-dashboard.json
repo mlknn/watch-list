@@ -1,0 +1,15 @@
+{
+  "indices": [
+    {"symbol": "^GSPC", "name": "S&P 500"},
+    {"symbol": "^IXIC", "name": "Nasdaq"},
+    {"symbol": "^DJI", "name": "Dow Jones"}
+  ],
+  "groups": [
+    {"id": "tech", "title": "Technology", "blurb": "Chips, software and the platforms behind the tape.", "symbols": ["AAPL", "MSFT", "NVDA", "GOOGL", "META", "AVGO"]},
+    {"id": "finance", "title": "Finance", "blurb": "Banks, payments and the plumbing of markets.", "symbols": ["JPM", "BAC", "V", "GS", "BRK-B", "MA"]},
+    {"id": "health", "title": "Health care", "blurb": "Insurers, medicines and the businesses behind them.", "symbols": ["UNH", "LLY", "JNJ", "ABBV", "PFE"]},
+    {"id": "consumer", "title": "Consumer", "blurb": "Retail, brands and everyday demand.", "symbols": ["AMZN", "WMT", "COST", "KO", "NKE", "HD"]},
+    {"id": "energy", "title": "Energy", "blurb": "Oil, gas and the companies that move it.", "symbols": ["XOM", "CVX", "COP"]},
+    {"id": "industrial", "title": "Industrials", "blurb": "Machines, aerospace and freight.", "symbols": ["CAT", "GE", "HON"]}
+  ]
+}
