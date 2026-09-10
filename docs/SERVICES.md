@@ -100,7 +100,7 @@ Chart requests are cached for one minute per symbol/range and fundamentals for f
 
 `server/local-db.mjs` uses filesystem-backed PGlite with the same SQL migrations and ownership/plan RPCs as Supabase. It exports private watchlist JSON after changes; the password/session tables are excluded from the JSON export. Node filesystem storage is documented by [PGlite](https://pglite.dev/docs/filesystems).
 
-`server/portfolio.mjs` fetches historical bars with bounded concurrency and aggregates quantities from entered acquisition dates. It keeps invested capital separate from market value, omits unknown positions explicitly and refuses incomplete provider history instead of inventing totals. It models current holdings only, not a brokerage transaction ledger. Advanced positions are USD-only to avoid summing currencies without an exchange-rate model.
+`server/portfolio.mjs` fetches historical bars with bounded concurrency and aggregates quantities from entered acquisition dates. It keeps invested capital separate from market value, omits unknown positions explicitly and refuses incomplete provider history instead of inventing totals. The over-time percent follows price changes only, so adding stocks at cost does not look like a gain. It models current holdings only, not a brokerage transaction ledger. Advanced positions are USD-only to avoid summing currencies without an exchange-rate model.
 
 `server/showcase.mjs` fetches actual dated daily closes for TSLA/MU/NVDA, compares them with current quotes, and caches the result for 60 seconds. Source dates and split-adjustment methodology are visible in the welcome card.
 

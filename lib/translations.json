@@ -131,9 +131,9 @@
     "Zaman içinde portföyün",
     "Tu cartera a lo largo del tiempo"
   ],
-  "Market value and invested capital · USD": [
-    "Piyasa değeri ve yatırılan tutar · USD",
-    "Valor de mercado y capital invertido · USD"
+  "Price changes this period · USD": [
+    "Bu dönemdeki fiyat değişimi · USD",
+    "Cambios de precio en este período · USD"
   ],
   "Show performance overall in graph": [
     "Toplam performansı göster",
