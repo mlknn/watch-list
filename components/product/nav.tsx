@@ -33,5 +33,5 @@ export function PublicNav() {
 
 export function PublicFooter() {
  const member=useMember();
- return <footer className="public-footer"><Brand/><LanguageSelect/><span><T text="Good ideas deserve a starting point."/></span><a href="/dashboard"><T text="Dashboard"/></a>{member&&<a href="/watchlists"><T text="My watchlists"/></a>}<a href="/#about"><T text="About"/></a><a href="/privacy"><T text="Privacy"/></a><a href="/pricing"><T text="Plans"/></a>{member&&<a href="/account"><T text="Account"/></a>}{member?<SignOutButton/>:<a href="/login"><T text="Log in"/></a>}</footer>;
+ return <footer className="public-footer"><Brand/><LanguageSelect/><p className="footer-tagline"><T text="Good ideas deserve a starting point."/></p><nav className="footer-links" aria-label="Footer"><a href="/dashboard"><T text="Dashboard"/></a>{member&&<a href="/watchlists"><T text="My watchlists"/></a>}<a href="/#about"><T text="About"/></a><a href="/privacy"><T text="Privacy"/></a><a href="/pricing"><T text="Plans"/></a>{member&&<a href="/account"><T text="Account"/></a>}{member?<SignOutButton/>:<a href="/login"><T text="Log in"/></a>}</nav></footer>;
 }
