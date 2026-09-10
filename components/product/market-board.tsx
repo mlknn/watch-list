@@ -1,7 +1,7 @@
 'use client';
-import {useEffect,useRef,useState} from 'react';
+import {createContext,useContext,useEffect,useRef,useState} from 'react';
 import {useRouter} from 'next/navigation';
-import {LoaderCircle,Search} from 'lucide-react';
+import {LoaderCircle,Search,Star} from 'lucide-react';
 import catalog from '@/lib/market-dashboard.json';
 import {PriceChart} from './price-chart';
 import {CompanyIcon} from './company-icon';
@@ -11,9 +11,13 @@ import {Tabs,TabsList,TabsTrigger} from '@/components/ui/tabs';
 import {price} from '@/lib/watchlist';
 import {marketChart,type MarketChart} from '@/lib/market';
 import {resolveStockInput} from '@/lib/stock-search.mjs';
+import {apiJson} from '@/lib/auth-client';
 
-type Row={symbol:string;name?:string;chart:MarketChart|null;error:string|null};
+type Row={symbol:string;name?:string;short?:string;chart:MarketChart|null;error:string|null};
 type Board={fetchedAt:string;indices:(Row&{name:string})[];groups:{id:string;title:string;blurb:string;stocks:Row[]}[]};
+type FavoriteState={signedIn:boolean;ids:Set<string>;rows:Row[];toggle:(symbol:string)=>void};
+
+const Favorites=createContext<FavoriteState>({signedIn:false,ids:new Set(),rows:[],toggle:()=>{}});
 
 function skeleton():Board{
   return {
@@ -31,6 +35,14 @@ function Change({chart}:{chart:MarketChart}){
   return <span className={up?'up':'down'}>{pct===null?'—':`${up?'+':''}${pct.toFixed(2)}%`}</span>;
 }
 
+function FavoriteStar({symbol}:{symbol:string}){
+  const {signedIn,ids,toggle}=useContext(Favorites);
+  const on=ids.has(symbol);
+  return <button type="button" className={'favorite-star'+(on?' is-on':'')} aria-label={on?'Remove from favorites':'Add to favorites'} title={on?'Remove from favorites':'Add to favorites'} onClick={e=>{e.preventDefault();e.stopPropagation();if(!signedIn){window.location.assign('/signup');return;}toggle(symbol);}}>
+    <Star size={13} strokeWidth={2} fill={on?'currentColor':'none'}/>
+  </button>;
+}
+
 function IndexHero({indices}:{indices:(Row&{name:string})[]}){
   const [symbol,setSymbol]=useState(indices[0]?.symbol||'^GSPC');
   const [range,setRange]=useState('1d');
@@ -41,11 +53,11 @@ function IndexHero({indices}:{indices:(Row&{name:string})[]}){
   useEffect(()=>{let alive=true;setBusy(true);setError('');void marketChart(symbol,range).then(data=>{if(alive)setChart(data);}).catch(e=>{if(alive){setChart(null);setError((e as Error).message);}}).finally(()=>{if(alive)setBusy(false);});return()=>{alive=false;};},[symbol,range]);
   const quote=chart||selected?.chart||null;
   const change=quote?.quote.changePercent;
-  return <section className="market-index-hero" aria-label="Major US indexes">
+  return <section className="market-index-hero" aria-label="Major markets">
     <div className="market-index-toolbar">
       <Tabs value={symbol} onValueChange={v=>setSymbol(String(v))}>
         <TabsList className="market-index-picks" aria-label="Index">
-          {indices.map(row=><TabsTrigger key={row.symbol} value={row.symbol}><span className="market-index-short">{row.name.replace('S&P 500','S&P').replace('Dow Jones','Dow')}</span></TabsTrigger>)}
+          {indices.map(row=><TabsTrigger key={row.symbol} value={row.symbol}><span className="market-index-short">{row.short||row.name}</span></TabsTrigger>)}
         </TabsList>
       </Tabs>
       <Tabs value={range} onValueChange={v=>setRange(String(v))}>
@@ -70,12 +82,29 @@ function IndexHero({indices}:{indices:(Row&{name:string})[]}){
 function StockRow({row,pending}:{row:Row;pending:boolean}){
   const chart=row.chart;
   const href='/stocks/'+encodeURIComponent(row.symbol);
-  return <a className="market-table-row" href={href}>
-    <span className="market-table-name"><CompanyIcon symbol={row.symbol}/><span><strong>{chart?.companyName||row.name||row.symbol}</strong><small>{row.symbol}</small></span></span>
-    <span className="market-table-price">{chart?price(chart.quote.price,chart.currency):'—'}</span>
-    <span className="market-table-change">{chart?<Change chart={chart}/>:pending?<span className="market-card-pending">Loading…</span>:<span className="market-card-error">{row.error||'—'}</span>}</span>
-    <span className="market-table-open">Details</span>
-  </a>;
+  return <div className="market-table-row">
+    <span className="market-table-name"><FavoriteStar symbol={row.symbol}/><a href={href}><CompanyIcon symbol={row.symbol}/><span><strong>{chart?.companyName||row.name||row.symbol}</strong><small>{row.symbol}</small></span></a></span>
+    <a className="market-table-price" href={href}>{chart?price(chart.quote.price,chart.currency):'—'}</a>
+    <a className="market-table-change" href={href}>{chart?<Change chart={chart}/>:pending?<span className="market-card-pending">Loading…</span>:<span className="market-card-error">{row.error||'—'}</span>}</a>
+    <a className="market-table-open" href={href}>Details</a>
+  </div>;
+}
+
+function FavoritesBoard({rows}:{rows:Row[]}){
+  if(!rows.length)return null;
+  return <section className="market-group market-favorites" aria-label="Favorite stocks">
+    <div className="market-group-copy">
+      <p className="eyebrow">SAVED FOR THE TAPE</p>
+      <h2>Favorites</h2>
+      <p>Stocks you star on this dashboard. They stay here, separate from your watchlists.</p>
+    </div>
+    <div className="market-table" role="table" aria-label="Favorite stocks">
+      <div className="market-table-head" role="row">
+        <span>Company</span><span>Price</span><span>Today</span><span></span>
+      </div>
+      {rows.map(row=><StockRow key={row.symbol} row={row} pending={!row.chart&&!row.error}/>)}
+    </div>
+  </section>;
 }
 
 export function MarketBoard(){
@@ -85,6 +114,8 @@ export function MarketBoard(){
   const [searchError,setSearchError]=useState('');
   const [searching,setSearching]=useState(false);
   const [data,setData]=useState<Board>(skeleton),[error,setError]=useState(''),[ready,setReady]=useState<Record<string,boolean>>({});
+  const [signedIn,setSignedIn]=useState(false);
+  const [favoriteRows,setFavoriteRows]=useState<Row[]>([]);
   useEffect(()=>{let alive=true;
     const loaded=new Set<string>();
     const queue=catalog.groups.map(group=>group.id);
@@ -120,6 +151,7 @@ export function MarketBoard(){
     void pump();
     return()=>{alive=false;observer.disconnect();clearTimeout(timer);};
   },[]);
+  useEffect(()=>{let alive=true;void apiJson<{signedIn:boolean;favorites:Row[]}>('/api/favorites',undefined,false).then(result=>{if(!alive)return;setSignedIn(!!result.signedIn);setFavoriteRows(result.favorites||[]);}).catch(()=>{if(alive){setSignedIn(false);setFavoriteRows([]);}});return()=>{alive=false;};},[]);
   async function openStock(symbol:string){
     router.push('/stocks/'+encodeURIComponent(symbol));
   }
@@ -131,7 +163,19 @@ export function MarketBoard(){
     catch(err){setSearchError((err as Error).message);}
     finally{setSearching(false);}
   }
-  return <main className="market-page">
+  async function toggle(symbol:string){
+    const on=favoriteRows.some(row=>row.symbol===symbol);
+    setFavoriteRows(current=>on?current.filter(row=>row.symbol!==symbol):[{symbol,chart:null,error:null},...current.filter(row=>row.symbol!==symbol)]);
+    try{
+      const result=await apiJson<{signedIn:boolean;favorites:Row[]}>('/api/favorites',{symbol,favorite:!on});
+      setSignedIn(true);
+      setFavoriteRows(result.favorites||[]);
+    }catch(e){
+      setError((e as Error).message);
+    }
+  }
+  const favoriteState:FavoriteState={signedIn,ids:new Set(favoriteRows.map(row=>row.symbol)),rows:favoriteRows,toggle};
+  return <Favorites.Provider value={favoriteState}><main className="market-page">
     <div className="page-heading market-heading">
       <div>
         <p className="eyebrow">MARKETS, IN ONE PLACE</p>
@@ -147,6 +191,7 @@ export function MarketBoard(){
     {error&&<p className="error-banner" role="alert">{error}</p>}
     <>
       <IndexHero indices={data.indices}/>
+      <FavoritesBoard rows={favoriteRows}/>
       <nav className="market-sector-jump" aria-label="Industries">
         {data.groups.map(group=><a key={group.id} href={'#'+group.id}>{group.title}</a>)}
       </nav>
@@ -165,5 +210,5 @@ export function MarketBoard(){
       </section>)}
       <p className="market-footnote">Yahoo Finance · Quotes may be delayed{data.fetchedAt?` · Updated ${new Date(data.fetchedAt).toLocaleString()}`:''}. Charts are for looking, not advice. Click any row for details; quarterly earnings need Pro.</p>
     </>
-  </main>;
+  </main></Favorites.Provider>;
 }

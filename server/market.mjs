@@ -65,6 +65,11 @@ async function loadSymbol(symbol){
   return {symbol,chart:null,error:last?.message||'Quote unavailable.'};
 }
 
+export async function quotesForSymbols(symbols){
+  const unique=[...new Set((symbols||[]).map(s=>String(s||'').toUpperCase()).filter(Boolean))];
+  return mapLimit(unique,3,loadSymbol);
+}
+
 export async function marketGroup(id){
   const group=catalog.groups.find(item=>item.id===id);
   if(!group)throw new AppError('Unknown market group.',404);

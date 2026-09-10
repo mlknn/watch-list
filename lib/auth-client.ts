@@ -16,8 +16,8 @@ export async function apiFetch(path:string,init:RequestInit={},requireLogin=true
   if(response.status===401&&requireLogin){await client.auth.signOut({scope:'local'});window.location.assign('/login');}
   return response;
 }
-export async function apiJson<T>(path:string,input?:unknown):Promise<T>{
-  const response=await apiFetch(path,input===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input)});
+export async function apiJson<T>(path:string,input?:unknown,requireLogin=true):Promise<T>{
+  const response=await apiFetch(path,input===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input)},requireLogin);
   const result=await response.json() as T&{error?:string};if(!response.ok)throw new Error(result.error||'Request failed.');return result;
 }
 export async function localAuth(input:unknown){const response=await fetch('/api/local-auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input),credentials:'same-origin'});const data=await response.json() as {error?:string;localDelivery?:{url:string;label:string};user?:{id:string}};if(!response.ok)throw new Error(data.error||'Account request failed.');return data;}

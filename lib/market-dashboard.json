@@ -1,8 +1,10 @@
 {
   "indices": [
-    {"symbol": "^GSPC", "name": "S&P 500"},
-    {"symbol": "^IXIC", "name": "Nasdaq"},
-    {"symbol": "^DJI", "name": "Dow Jones"}
+    {"symbol": "^GSPC", "name": "S&P 500", "short": "S&P"},
+    {"symbol": "^IXIC", "name": "Nasdaq", "short": "Nasdaq"},
+    {"symbol": "GC=F", "name": "Gold", "short": "Gold"},
+    {"symbol": "^DJI", "name": "Dow Jones", "short": "Dow"},
+    {"symbol": "BTC-USD", "name": "Bitcoin", "short": "BTC"}
   ],
   "groups": [
     {"id": "tech", "title": "Technology", "blurb": "Chips, software, cloud and the platforms behind the tape.", "symbols": ["AAPL", "MSFT", "NVDA", "GOOGL", "META", "AVGO", "AMD", "ORCL", "CRM", "ADBE", "AMAT", "INTC", "CSCO", "QCOM", "NOW"]},
