@@ -28,7 +28,7 @@ function SignOutButton(){
 
 export function PublicNav() {
  const member=useMember();
- return <header className="topbar public-nav"><Brand/><nav aria-label="Main navigation">{member?<a className="solid-link" href="/watchlists"><T text="My watchlists"/></a>:<><a className="nav-extra" href="/dashboard"><T text="Dashboard"/></a><a className="nav-extra" href="/#about"><T text="About"/></a><a className="nav-extra" href="/pricing"><T text="Pricing"/></a><a className="nav-extra" href="/privacy"><T text="Privacy"/></a><a className="nav-extra" href="/login"><T text="Log in"/></a><a className="solid-link" href="/signup"><T text="Start watching"/><ArrowUpRight size={16}/></a></>}</nav></header>;
+ return <header className="topbar public-nav"><Brand/><nav aria-label="Main navigation">{member?<a className="solid-link" href="/watchlists"><T text="My watchlists"/></a>:<><a className="nav-extra" href="/dashboard"><T text="Dashboard"/></a><a className="nav-extra" href="/#about"><T text="About"/></a><a className="nav-extra" href="/pricing"><T text="Pricing"/></a><a className="nav-extra" href="/privacy"><T text="Privacy"/></a><a className="nav-extra" href="/login"><T text="Log in"/></a><a className="solid-link" href="/watchlists"><T text="Start watching"/><ArrowUpRight size={16}/></a></>}</nav></header>;
 }
 
 export function PublicFooter() {

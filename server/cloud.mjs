@@ -83,9 +83,40 @@ export async function accountState(db,user,refresh=false) {
   const lists=dbResult(await db.from('wl_watchlists').select('*').eq('owner_id',user.id).order('created_at').order('id'));
   return {version:2,updatedAt:new Date().toISOString(),user:{id:user.id,name:profile.display_name,email:user.email,isAdmin:profile.is_admin===true,local:localMode(),country:profile.country_code,hasBilling:!!profile.stripe_customer_id},plan:planFor(profile),watchlists:await listViews(db,lists,refresh)};
 }
+export async function importGuestLists(db,user,lists){
+  if(!Array.isArray(lists))throw new AppError('Invalid request.');
+  let state=await accountState(db,user);
+  for(const raw of lists.slice(0,state.plan.maxLists)){
+    const name=String(raw?.name||'').trim().slice(0,60)||'My watchlist';
+    const stocks=Array.isArray(raw?.stocks)?raw.stocks:[];
+    let target=state.watchlists.find(list=>!list.stocks.length);
+    if(!target){
+      if(state.watchlists.length>=state.plan.maxLists)target=state.watchlists[0];
+      else{
+        state=await accountAction(db,user,{action:'createList',name,mode:'advanced'});
+        target=[...state.watchlists].sort((a,b)=>Date.parse(b.createdAt)-Date.parse(a.createdAt))[0];
+      }
+    }else if(name&&name!==target.name){
+      state=await accountAction(db,user,{action:'renameList',listId:target.id,name});
+      target=state.watchlists.find(list=>list.id===target.id)||target;
+    }
+    if(!target)continue;
+    for(const stock of stocks){
+      const list=state.watchlists.find(item=>item.id===target.id);
+      if(!list||list.stocks.length>=state.plan.maxStocks)break;
+      try{
+        const symbol=normalizeTicker(stock.symbol);
+        if(list.stocks.some(item=>item.symbol===symbol))continue;
+        state=await accountAction(db,user,{action:'addStock',listId:target.id,ticker:symbol,quantity:stock.quantity,costPerShare:stock.costPerShare,acquiredAt:stock.acquiredAt,notes:stock.notes||''});
+      }catch{/* Keep remaining guest stocks if one ticker cannot be quoted. */}
+    }
+  }
+  return state;
+}
 export async function accountAction(db,user,input) {
   if(!input||typeof input!=='object'||Array.isArray(input))throw new AppError('Invalid request.');
   if(input.action==='refresh')return accountState(db,user,true);
+  if(input.action==='importGuest')return importGuestLists(db,user,input.lists);
   const allowed=['createList','renameList','deleteList','addStock','removeStock','shareList','revokeShare','convertList','initializePosition'];
   if(!allowed.includes(input.action))throw new AppError('Unknown action.');
   if(input.action!=='createList')await ownerList(db,user.id,input.listId);

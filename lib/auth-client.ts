@@ -1,5 +1,6 @@
 'use client';
 import {createClient,type SupabaseClient} from '@supabase/supabase-js';
+import type {AccountState} from './watchlist';
 export type Config={localMode:boolean;authReady:boolean;supabaseUrl:string;supabaseKey:string;appUrl:string;googleEnabled:boolean;appleEnabled:boolean;billingReady:boolean;trialDays:number};
 let configPromise:Promise<Config>|null=null;
 let clientPromise:Promise<SupabaseClient>|null=null;
@@ -19,6 +20,24 @@ export async function apiFetch(path:string,init:RequestInit={},requireLogin=true
 export async function apiJson<T>(path:string,input?:unknown,requireLogin=true):Promise<T>{
   const response=await apiFetch(path,input===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input)},requireLogin);
   const result=await response.json() as T&{error?:string};if(!response.ok)throw new Error(result.error||'Request failed.');return result;
+}
+export async function signedIn(){
+  const settings=await config();
+  if(settings.localMode){
+    const response=await fetch('/api/local-auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'session'}),credentials:'same-origin',cache:'no-store'});
+    return response.ok;
+  }
+  if(!settings.authReady)return false;
+  try{const {data}=await(await authClient()).auth.getSession();return !!data.session;}catch{return false;}
+}
+export async function claimGuestWatchlists():Promise<AccountState|null>{
+  if(typeof window==='undefined')return null;
+  const {readGuestState,guestImportPayload,clearGuestState,guestHasDraft}=await import('./guest-watchlist.mjs');
+  const guest=readGuestState(window.localStorage);
+  if(!guestHasDraft(guest))return null;
+  const result=await apiJson<AccountState>('/api/watchlists',{action:'importGuest',lists:guestImportPayload(guest)});
+  clearGuestState(window.localStorage);
+  return result;
 }
 export async function localAuth(input:unknown){const response=await fetch('/api/local-auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input),credentials:'same-origin'});const data=await response.json() as {error?:string;localDelivery?:{url:string;label:string};user?:{id:string}};if(!response.ok)throw new Error(data.error||'Account request failed.');return data;}
 export function invalidateAccess(){window.dispatchEvent(new Event('watchlist:auth-change'));try{localStorage.setItem('watchlist:auth-change',String(Date.now())+Math.random());}catch{/* Same-tab invalidation still applies if storage is unavailable. */}}

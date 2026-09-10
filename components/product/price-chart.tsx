@@ -3,7 +3,7 @@ import {useId} from 'react';
 import {Area,AreaChart,CartesianGrid,ReferenceLine,Tooltip,XAxis,YAxis} from 'recharts';
 import {ChartContainer} from '@/components/ui/chart';
 import {type ChartPoint,type MarketChart} from '@/lib/market';
-import {chartPeriodStats,RANGE_LABEL} from '@/lib/chart-period.mjs';
+import {chartPeriodStats,rangeLabel} from '@/lib/chart-period.mjs';
 import {price} from '@/lib/watchlist';
 
 export type ChartStyle='line'|'candle';
@@ -58,5 +58,5 @@ export function PriceChart({data,compact=false,className,style='line'}:{data:Mar
   const body=style==='candle'
     ?<CandleChart data={data} compact={compact} className={chartClass}/>
     :<ChartContainer config={{price:{label:'Price',color}}} className={chartClass} aria-label={`${data.symbol} price chart, ${data.sessionDate||data.range}, ${data.currency}`}><AreaChart accessibilityLayer data={data.points} margin={{top:8,right:compact?0:4,bottom:0,left:4}}><defs><linearGradient id={'price-fill-'+id} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={color} stopOpacity={.23}/><stop offset="100%" stopColor={color} stopOpacity={.015}/></linearGradient></defs>{!compact&&<CartesianGrid vertical={false} stroke="#e7edf3"/>}<XAxis hide={compact} dataKey="time" tickFormatter={label} minTickGap={36} tickLine={false} axisLine={false} tickMargin={8}/><YAxis hide={compact} orientation="right" domain={['auto','auto']} tickFormatter={v=>Number(v).toFixed(data.quote.price<1?4:0)} width={44} tickLine={false} axisLine={false}/>{data.range==='1d'&&base!==null&&base!==undefined&&!compact&&<ReferenceLine y={base} stroke="#9ba8ba" strokeDasharray="3 4"/>}{!compact&&<Tooltip labelFormatter={value=>label(Number(value))} formatter={value=>[price(Number(value),data.currency),'Price']} contentStyle={{border:'1px solid #e1e7ef',borderRadius:9,fontSize:13}}/>}<Area type="linear" dataKey="price" stroke={color} strokeWidth={compact?1.8:2} fill={`url(#price-fill-${id})`} isAnimationActive={false} dot={false} connectNulls={false}/></AreaChart></ChartContainer>;
-  return <>{!compact&&<div className={`chart-period-return ${up?'up':'down'}`} aria-live="polite"><strong>{percent===null?'—':`${percent>=0?'+':''}${percent.toFixed(2)}%`}</strong><span>{RANGE_LABEL[data.range]} · {price(data.points[0].price,data.currency)} → {price(last,data.currency)}</span></div>}{body}</>;
+  return <>{!compact&&<div className={`chart-period-return ${up?'up':'down'}`} aria-live="polite"><strong>{percent===null?'—':`${percent>=0?'+':''}${percent.toFixed(2)}%`}</strong><span>{rangeLabel(data.range)} · {price(data.points[0].price,data.currency)} → {price(last,data.currency)}</span></div>}{body}</>;
 }
