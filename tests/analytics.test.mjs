@@ -2,7 +2,7 @@ import {test,before,after} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile,readdir} from 'node:fs/promises';
 import {PGlite} from '@electric-sql/pglite';
-import {visitorHash} from '../server/analytics.mjs';
+import {visitorHash,canViewAnalytics} from '../server/analytics.mjs';
 
 const A='11111111-1111-4111-8111-111111111111';
 let db;
@@ -30,6 +30,14 @@ test('analytics counts unique visitors separately from repeat events',async()=>{
   assert.equal(today.stock_search.unique,1);
   assert.equal(today.watchlist_created.unique,1);
   assert.equal(today.signup.unique,0);
+});
+
+test('analytics access is limited to two owner emails',()=>{
+  assert.equal(canViewAnalytics('owner@example.com'),true);
+  assert.equal(canViewAnalytics('OPS@EXAMPLE.COM'),true);
+  assert.equal(canViewAnalytics('other@example.com'),false);
+  assert.equal(canViewAnalytics('stranger@example.com'),false);
+  assert.equal(canViewAnalytics(''),false);
 });
 
 test('new profiles count as a signup once',async()=>{

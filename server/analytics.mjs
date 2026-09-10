@@ -1,7 +1,9 @@
 import {createHash} from 'node:crypto';
 import {AppError} from './quotes.mjs';
 import {authConfigured,database,dbResult,requireUser} from './cloud.mjs';
+import {canViewAnalytics} from './analytics-access.mjs';
 
+export {canViewAnalytics};
 export const ANALYTICS_EVENTS=['visit','dashboard','stock_search','watchlist_created','signup'];
 
 export function visitorHash(visitor){
@@ -19,8 +21,7 @@ export async function trackAnalytics(event,visitor){
 
 export async function requireAdmin(request){
   const {db,user}=await requireUser(request);
-  const profile=dbResult(await db.from('wl_profiles').select('is_admin').eq('id',user.id).single());
-  if(profile.is_admin!==true)throw new AppError('This page is only available to the site owner.',403);
+  if(!canViewAnalytics(user.email))throw new AppError('This page is only available to the site owner.',403);
   return {db,user};
 }
 

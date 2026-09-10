@@ -2,6 +2,7 @@ import {localMode,localDatabase,exportLocalData} from './local-db.mjs';
 import {localUser} from './local-auth.mjs';
 import { createClient } from '@supabase/supabase-js';
 import { randomBytes } from 'node:crypto';
+import {canViewAnalytics} from './analytics-access.mjs';
 import { AppError, getQuote, normalizeTicker } from './quotes.mjs';
 
 export const authConfigured = () => localMode() || !!(process.env.SUPABASE_URL && process.env.SUPABASE_PUBLISHABLE_KEY && process.env.SUPABASE_SERVICE_ROLE_KEY);
@@ -81,7 +82,7 @@ export async function listViews(db,lists,refresh=false) {
 export async function accountState(db,user,refresh=false) {
   const profile=dbResult(await db.from('wl_profiles').select('*').eq('id',user.id).single());
   const lists=dbResult(await db.from('wl_watchlists').select('*').eq('owner_id',user.id).order('created_at').order('id'));
-  return {version:2,updatedAt:new Date().toISOString(),user:{id:user.id,name:profile.display_name,email:user.email,isAdmin:profile.is_admin===true,local:localMode(),country:profile.country_code,hasBilling:!!profile.stripe_customer_id},plan:planFor(profile),watchlists:await listViews(db,lists,refresh)};
+  return {version:2,updatedAt:new Date().toISOString(),user:{id:user.id,name:profile.display_name,email:user.email,isAdmin:profile.is_admin===true,analytics:canViewAnalytics(user.email),local:localMode(),country:profile.country_code,hasBilling:!!profile.stripe_customer_id},plan:planFor(profile),watchlists:await listViews(db,lists,refresh)};
 }
 export async function importGuestLists(db,user,lists){
   if(!Array.isArray(lists))throw new AppError('Invalid request.');
