@@ -26,6 +26,38 @@ type Sort={key:'name'|'price'|'change';dir:1|-1};
 function dayPct(row:Row){return typeof row.chart?.quote.changePercent==='number'?row.chart.quote.changePercent:null;}
 function fmtPct(pct:number|null){return pct===null||pct===undefined?'—':`${pct>=0?'+':''}${pct.toFixed(2)}%`;}
 
+function LiveTicker({groups,ready}:{groups:Board['groups'];ready:Record<string,boolean>}){
+  const [indexes,setIndexes]=useState<(Row&{name:string;short?:string})[]>([]);
+  useEffect(()=>{
+    let alive=true;
+    void Promise.all(catalog.indices.map(item=>marketChart(item.symbol,'1d').then(chart=>({...item,chart,error:null} as Row&{name:string}),()=>({...item,chart:null,error:null} as Row&{name:string})))).then(rows=>{if(alive)setIndexes(rows);});
+    return()=>{alive=false;};
+  },[]);
+  const items=[
+    ...(indexes.length?indexes:catalog.indices.map(item=>({...item,chart:null,error:null}))).map(row=>{
+      const slug=String(row.short||row.name).replace(/[^a-zA-Z]/g,'').toLowerCase();
+      return {key:'i-'+row.symbol,href:'#index-'+slug,label:row.short||row.name,price:row.chart?price(row.chart.quote.price,row.chart.currency):null,pct:dayPct(row)};
+    }),
+    ...groups.map(group=>({key:'g-'+group.id,href:'#'+group.id,label:group.title,price:null as string|null,pct:ready[group.id]?sectorAverage(group.stocks):null})),
+  ];
+  function go(e:React.MouseEvent<HTMLAnchorElement>,href:string){
+    e.preventDefault();
+    document.querySelector(href)?.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  const track=[...items,...items];
+  return <nav className="market-ticker" aria-label="Live market tape">
+    <div className="market-ticker-track">
+      {track.map((item,i)=>
+        <a key={item.key+i} href={item.href} onClick={e=>go(e,item.href)} className={item.pct==null?'':item.pct>=0?'is-up':'is-down'}>
+          <strong>{item.label}</strong>
+          {item.price&&<span>{item.price}</span>}
+          {item.pct!=null&&<small>{fmtPct(item.pct)}</small>}
+        </a>
+      )}
+    </div>
+  </nav>;
+}
+
 function SessionBadge(){
   const [now,setNow]=useState(()=>new Date());
   useEffect(()=>{const id=window.setInterval(()=>setNow(new Date()),30000);return()=>clearInterval(id);},[]);
@@ -117,7 +149,7 @@ function IndexHero({indices}:{indices:(Row&{name:string})[]}){
     });
     return()=>{alive=false;};
   },[indices,range]);
-  return <section className="market-index-hero" aria-label="Major markets">
+  return <section id="indexes" className="market-index-hero" aria-label="Major markets">
     <div className="market-index-toolbar">
       <Tabs value={style} onValueChange={v=>setStyle(v as ChartStyle)}>
         <TabsList className="chart-ranges market-index-style" aria-label="Chart type">
@@ -134,7 +166,7 @@ function IndexHero({indices}:{indices:(Row&{name:string})[]}){
     <div className="market-index-grid" aria-busy={busy}>
       {indices.map(row=>{
         const chart=charts[row.symbol]||null;
-        return <article key={row.symbol} className="market-index-card">
+        return <article key={row.symbol} id={'index-'+String(row.short||row.name).replace(/[^a-zA-Z]/g,'').toLowerCase()} className="market-index-card">
           <div className="market-index-card-head">
             <div>
               <p className="eyebrow">{row.short||row.name}</p>
@@ -280,6 +312,7 @@ export function MarketBoard(){
     });
   }
   return <Favorites.Provider value={favoriteState}><main className="market-page">
+    <LiveTicker groups={data.groups} ready={ready}/>
     <div className="page-heading market-heading">
       <div>
         <p className="eyebrow">MARKETS, IN ONE PLACE</p>
@@ -298,12 +331,6 @@ export function MarketBoard(){
       <IndexHero indices={data.indices}/>
       <TapeStrip rows={quotedRows}/>
       <FavoritesBoard rows={favoriteRows}/>
-      <nav className="market-sector-jump" aria-label="Industries">
-        {data.groups.map(group=>{
-          const avg=ready[group.id]?sectorAverage(group.stocks):null;
-          return <a key={group.id} href={'#'+group.id} className={avg==null?'':avg>=0?'is-up':'is-down'}>{group.title}{avg!==null&&<small>{fmtPct(avg)}</small>}</a>;
-        })}
-      </nav>
       {data.groups.map((group,index)=>{
         const avg=ready[group.id]?sectorAverage(group.stocks):null;
         const sort=sorts[group.id]||null;
