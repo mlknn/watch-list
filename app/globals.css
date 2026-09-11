@@ -27,6 +27,7 @@ button:focus-visible,a:focus-visible { outline:3px solid #8fa9ff; outline-offset
 .local-tag { font-size:10px; letter-spacing:1.4px; font-weight:600; color:#7b879a; border-left:1px solid #e2e7ef; padding-left:17px; margin-left:20px; }
 .save-state { color:#69758a; display:flex; align-items:center; gap:7px; font-size:13px; }
 .save-state svg { color:#19855e; }
+.account-nav .solid-link{padding:8px 14px;font-size:13px;min-height:36px;gap:6px}
 .workspace { max-width:1480px; margin:auto; padding:58px 5.3% 30px; width:100%; box-sizing:border-box; }
 .page-heading { display:flex; justify-content:space-between; align-items:center; margin-bottom:40px; gap:24px; }
 .eyebrow { font-size:11px; letter-spacing:1.8px; color:#6f7e97; font-weight:700; margin:0 0 13px; }
