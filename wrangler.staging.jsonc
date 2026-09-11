@@ -6,7 +6,11 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
-  "workers_dev": true,
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [
+    { "pattern": "stockwatchlist.app", "custom_domain": true }
+  ],
   "keep_vars": true,
   "assets": {
     "directory": "dist/client",
