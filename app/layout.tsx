@@ -3,20 +3,20 @@ import {Analytics} from '@/components/product/analytics';
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 export const metadata: Metadata = {
-  title: 'StockWatchlist — It remembers the price from the day you added the stock',
+  title: 'StockWatchlist — What if you invested in your picks today?',
   referrer: 'no-referrer',
   metadataBase: new URL('https://stockwatchlist.app'),
   openGraph: {
-    title: 'StockWatchlist — The price from the day you started watching',
-    description: 'Add a stock or ETF and we freeze that day’s quote. See what happened after you noticed it, and share a read-only list with starting prices still on it.',
+    title: 'StockWatchlist — Build a what-if stock portfolio',
+    description: 'Build a portfolio, set starting amounts, and track what happens. No signup to start. Freeze the day you put a number on an idea.',
     url: 'https://stockwatchlist.app',
     siteName: 'StockWatchlist',
     type: 'website',
   },
   twitter: {
     card: 'summary',
-    title: 'StockWatchlist — The price from the day you started watching',
-    description: 'Add a ticker, lock that day’s price, and follow what happens next.',
+    title: 'StockWatchlist — Build a what-if stock portfolio',
+    description: 'Pick stocks, set starting amounts, and see how the portfolio performs. No signup to start.',
   },
   icons: {
     icon: [
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico?v=4',
     apple: '/apple-touch-icon.png?v=4',
   },
-  description: 'Add a stock and we freeze that day’s price. Follow what happened after you started watching, and share the list with starting prices still on it.',
+  description: 'Build a what-if stock portfolio and see how your picks perform over time. No signup to start.',
 };
 export const viewport: Viewport = {width:'device-width',initialScale:1,viewportFit:'cover'};
 export default function RootLayout({ children }: { children: React.ReactNode }) {

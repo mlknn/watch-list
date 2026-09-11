@@ -37,6 +37,21 @@ test('guest add requires a quote and keeps the draft when the action fails',()=>
   assert.equal(readGuestState(storage).watchlists[0].stocks.length,0);
 });
 
+test('guest rename and holdings survive import payload',()=>{
+  const storage=memory();
+  let state=applyGuestAction(emptyGuestState(),{action:'createList'});
+  writeGuestState(state,storage);
+  state=applyGuestAction(readGuestState(storage),{action:'renameList',listId:state.watchlists[0].id,name:'2027 AI Picks'});
+  const quote={symbol:'NVDA',companyName:'NVIDIA',currency:'USD',exchange:'Nasdaq',price:120,quoteTime:'2026-09-11T20:00:00.000Z',checkedAt:'2026-09-11T20:00:00.000Z'};
+  state=applyGuestAction(state,{action:'addStock',listId:state.watchlists[0].id,ticker:'NVDA',quantity:10,costPerShare:100,acquiredAt:'2026-01-02T00:00:00.000Z'},quote);
+  writeGuestState(state,storage);
+  const payload=guestImportPayload(readGuestState(storage));
+  assert.equal(payload[0].name,'2027 AI Picks');
+  assert.equal(payload[0].stocks[0].symbol,'NVDA');
+  assert.equal(payload[0].stocks[0].quantity,10);
+  assert.equal(payload[0].stocks[0].costPerShare,100);
+});
+
 test('guest workspace starts with an unnamed default list',async()=>{
   const {ensureGuestList}=await import('../lib/guest-watchlist.mjs');
   const storage=memory();

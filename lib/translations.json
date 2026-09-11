@@ -35,6 +35,18 @@
     "Takibe başla",
     "Empezar"
   ],
+  "Build a portfolio": [
+    "Portföy oluştur",
+    "Crear una cartera"
+  ],
+  "Build a portfolio — no signup": [
+    "Portföy oluştur — üyelik yok",
+    "Crear una cartera — sin registro"
+  ],
+  "Save portfolio": [
+    "Portföyü kaydet",
+    "Guardar cartera"
+  ],
   "Privacy": [
     "Gizlilik",
     "Privacidad"
@@ -203,9 +215,13 @@
     "Tekrar hoş geldin",
     "Bienvenido de nuevo"
   ],
+  "Save your portfolio": [
+    "Portföyünü kaydet",
+    "Guarda tu cartera"
+  ],
   "Start your watchlist": [
-    "Listeni oluşturmaya başla",
-    "Crea tu lista"
+    "Ücretsiz hesap oluştur",
+    "Crea una cuenta gratis"
   ],
   "Build my watchlist": [
     "Listemi oluştur",
