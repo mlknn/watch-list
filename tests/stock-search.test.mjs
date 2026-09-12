@@ -17,6 +17,17 @@ test('stock suggestions match ticker and company names', () => {
   assert.ok(byTicker.some(item => item.symbol === 'MSFT'));
 });
 
+test('a US list does not silently take a Canadian ticker or its look-alike',async()=>{
+  const {resolveStockInput,otherMarketIntent}=await import('../lib/stock-search.mjs');
+  assert.equal(otherMarketIntent('RY.TO','USD'),'CAD');
+  assert.equal(otherMarketIntent('RY','USD'),'CAD');
+  assert.equal(otherMarketIntent('CSU','USD'),'CAD');
+  assert.equal(otherMarketIntent('SHOP','USD'),null);
+  await assert.rejects(resolveStockInput('RY.TO','USD'),/CAD stocks/);
+  await assert.rejects(resolveStockInput('Royal Bank','USD'),/CAD stocks/);
+  assert.equal(await resolveStockInput('SHOP','USD'),'SHOP');
+  assert.equal(await resolveStockInput('Tesla','USD'),'TSLA');
+});
 test('european, canadian and turkish tickers appear in local suggestions',()=>{
   assert.ok(getTickerSuggestions('thy').some(item=>item.symbol==='THYAO.IS'));
   assert.ok(getTickerSuggestions('asml').some(item=>item.symbol==='ASML.AS'));

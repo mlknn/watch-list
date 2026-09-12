@@ -1183,6 +1183,34 @@
     "Bu listede karışık para birimleri var. Listede tek para birimi tut.",
     "Esta lista mezcló monedas. Una moneda por lista."
   ],
+  "Wrong market for this list": [
+    "Bu liste için yanlış piyasa",
+    "Mercado equivocado para esta lista"
+  ],
+  "This list holds {list} stocks. Add {market} stocks to a new list so currencies stay separate.": [
+    "Bu liste {list} hisseleri tutuyor. {market} hisselerini yeni bir listeye ekle ki para birimleri karışmasın.",
+    "Esta lista guarda valores {list}. Añade valores {market} a una lista nueva para no mezclar monedas."
+  ],
+  "US (USD)": [
+    "ABD (USD)",
+    "EE. UU. (USD)"
+  ],
+  "Europe (EUR)": [
+    "Avrupa (EUR)",
+    "Europa (EUR)"
+  ],
+  "Canada (CAD)": [
+    "Kanada (CAD)",
+    "Canadá (CAD)"
+  ],
+  "Turkey (TRY)": [
+    "Türkiye (TRY)",
+    "Turquía (TRY)"
+  ],
+  "Dismiss": [
+    "Kapat",
+    "Cerrar"
+  ],
   "Price changes this period": [
     "Bu dönemdeki fiyat değişimi",
     "Cambios de precio en este período"

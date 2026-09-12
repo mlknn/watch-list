@@ -98,6 +98,11 @@ h2 { font-size:19px; margin:0; letter-spacing:-.3px; font-weight:600; }
 .table-footer { display:flex; justify-content:space-between; gap:20px; padding:17px 28px; color:#8793a5; font-size:12px; border-top:1px solid #edf0f5; }
 .error-banner { display:flex; align-items:center; gap:10px; color:#a43340; background:#fff3f3; border:1px solid #f2d5d7; border-radius:8px; padding:13px 17px; font-size:14px; margin-bottom:20px; }
 .error-banner svg { flex-shrink:0; }
+.market-lock-banner { display:flex; align-items:flex-start; gap:12px; color:#6b3a12; background:#fff7eb; border:1px solid #f0d4a8; border-radius:10px; padding:14px 16px; font-size:14px; line-height:1.5; margin:0 0 16px; }
+.market-lock-banner svg { flex-shrink:0; margin-top:2px; color:#c4841d; }
+.market-lock-banner strong { display:block; font-weight:650; margin-bottom:3px; }
+.market-lock-banner p { margin:0; color:#7a5220; }
+.market-lock-dismiss { margin-left:auto; flex-shrink:0; background:none; border:0; color:#8a5a16; font:inherit; font-size:13px; font-weight:600; cursor:pointer; min-height:44px; padding:0 4px; }
 .quote-warning { display:flex; align-items:center; gap:8px; color:#967027; background:#fffbef; padding:12px 28px; font-size:13px; border-top:1px solid #f4ebd0; }
 .quote-failed { color:#a77822; } .warning-dot { background:#b9882e; }
 .form-label { display:block; margin:5px 0 8px; font-size:14px; font-weight:500; }
