@@ -590,5 +590,973 @@
   "Your starting prices always stay fixed. Downgrading keeps your existing data; extra lists become read-only for new additions.": [
     "Başlangıç fiyatların sabit kalır. Plan düşürülünce verilerin korunur; ek listelere yeni varlık eklenemez.",
     "Tus precios iniciales permanecen fijos. Al cambiar a un plan inferior conservas tus datos; no se pueden añadir activos a las listas adicionales."
+  ],
+  "Dashboard": [
+    "Piyasalar",
+    "Mercados"
+  ],
+  "About": [
+    "Hakkında",
+    "Acerca de"
+  ],
+  "Signing out…": [
+    "Çıkış yapılıyor…",
+    "Cerrando sesión…"
+  ],
+  "Could not sign out. Try again.": [
+    "Çıkış yapılamadı. Tekrar dene.",
+    "No se pudo cerrar sesión. Inténtalo de nuevo."
+  ],
+  "CHANGE": [
+    "DEĞİŞİM",
+    "CAMBIO"
+  ],
+  "Saved on this device": [
+    "Bu cihaza kaydedildi",
+    "Guardado en este dispositivo"
+  ],
+  "YOUR INVESTING SPACE": [
+    "YATIRIM ALANIN",
+    "TU ESPACIO DE INVERSIÓN"
+  ],
+  "Retry": [
+    "Yeniden dene",
+    "Reintentar"
+  ],
+  "Try again": [
+    "Tekrar dene",
+    "Intentar de nuevo"
+  ],
+  "Search": [
+    "Ara",
+    "Buscar"
+  ],
+  "Line": [
+    "Çizgi",
+    "Línea"
+  ],
+  "Candle": [
+    "Mum",
+    "Vela"
+  ],
+  "Details": [
+    "Detay",
+    "Detalles"
+  ],
+  "Company": [
+    "Şirket",
+    "Empresa"
+  ],
+  "Price": [
+    "Fiyat",
+    "Precio"
+  ],
+  "Today": [
+    "Bugün",
+    "Hoy"
+  ],
+  "Favorites": [
+    "Favoriler",
+    "Favoritos"
+  ],
+  "Favorite": [
+    "Favori",
+    "Favorito"
+  ],
+  "Favorited": [
+    "Favoride",
+    "En favoritos"
+  ],
+  "Gainers": [
+    "Yükselenler",
+    "Alzas"
+  ],
+  "Losers": [
+    "Düşenler",
+    "Bajas"
+  ],
+  "Session open": [
+    "Seans açık",
+    "Sesión abierta"
+  ],
+  "Closed": [
+    "Kapalı",
+    "Cerrado"
+  ],
+  "Pre-market": [
+    "Ön seans",
+    "Preapertura"
+  ],
+  "After hours": [
+    "Kapanış sonrası",
+    "Fuera de horario"
+  ],
+  "Loading…": [
+    "Yükleniyor…",
+    "Cargando…"
+  ],
+  "All": [
+    "Tümü",
+    "Todo"
+  ],
+  "Search BIST, e.g. THYAO.IS": [
+    "BIST ara, ör. THYAO.IS",
+    "Buscar BIST, ej. THYAO.IS"
+  ],
+  "Search Europe, e.g. ASML.AS": [
+    "Avrupa ara, ör. ASML.AS",
+    "Buscar Europa, ej. ASML.AS"
+  ],
+  "Search US, e.g. Tesla": [
+    "ABD ara, ör. Tesla",
+    "Buscar EE. UU., ej. Tesla"
+  ],
+  "Search US, Europe, or Turkey": [
+    "ABD, Avrupa veya Türkiye ara",
+    "Busca EE. UU., Europa o Turquía"
+  ],
+  "Searching companies…": [
+    "Şirketler aranıyor…",
+    "Buscando empresas…"
+  ],
+  "No matching company. Try its stock ticker.": [
+    "Eşleşen şirket yok. Hisse kodunu dene.",
+    "Sin coincidencias. Prueba el ticker."
+  ],
+  "WHAT IF": [
+    "YA OLSAYDI",
+    "Y SI"
+  ],
+  "What if you invested $10,000 in your stock picks today?": [
+    "Bugün seçtiğin hisselere 10.000 $ yatırsaydın?",
+    "¿Y si hoy invirtieras 10.000 $ en tus acciones?"
+  ],
+  "Build a portfolio. Pick your stocks. Set your starting amounts. We’ll remember the starting point and track what happens.": [
+    "Bir portföy oluştur. Hisselerini seç. Başlangıç tutarlarını gir. Başlangıcı kaydeder, ne olduğunu izleriz.",
+    "Crea una cartera. Elige acciones. Fija importes iniciales. Recordamos el punto de partida y seguimos lo que ocurre."
+  ],
+  "No account needed to start · ": [
+    "Başlamak için hesap gerekmez · ",
+    "No hace falta cuenta para empezar · "
+  ],
+  "WHAT THIS APP IS": [
+    "BU UYGULAMA NEDİR",
+    "QUÉ ES ESTA APP"
+  ],
+  "A what-if portfolio, not another watchlist.": [
+    "Bir “ya olsaydı” portföyü; sıradan bir izleme listesi değil.",
+    "Una cartera de “y si…”, no otra lista."
+  ],
+  "Yahoo, Robinhood, and the rest show today’s price. This shows what happened after you put a number on an idea. Name a portfolio, add tickers, enter shares and cost, and we freeze that starting point. Sign in only when you want to keep it — not before you’ve built anything. Market data is delayed public quotes, not advice.": [
+    "Yahoo, Robinhood ve diğerleri bugünün fiyatını gösterir. Burası bir fikre sayı koyduktan sonra ne olduğunu gösterir. Portföye ad ver, sembol ekle, adet ve maliyeti gir; başlangıcı dondururuz. Kaydetmek istediğinde giriş yap — bir şey oluşturmadan önce değil. Piyasa verisi gecikmeli genel fiyatlardır, tavsiye değildir.",
+    "Yahoo, Robinhood y el resto muestran el precio de hoy. Esto muestra qué pasó después de poner un número a una idea. Nombra una cartera, añade tickers, introduce unidades y costo, y congelamos ese punto de partida. Entra solo cuando quieras guardarla. Los datos son cotizaciones públicas con retraso, no un consejo."
+  ],
+  "Build first. Save later.": [
+    "Önce oluştur. Sonra kaydet.",
+    "Primero crea. Luego guarda."
+  ],
+  "The portfolio lives on this device until you choose to create a free account.": [
+    "Portföy, ücretsiz hesap açana kadar bu cihazda kalır.",
+    "La cartera vive en este dispositivo hasta que crees una cuenta gratis."
+  ],
+  "Starting amounts stay fixed.": [
+    "Başlangıç tutarları sabit kalır.",
+    "Los importes iniciales no cambian."
+  ],
+  "Later quotes do not rewrite the price or cost from the day you added a stock.": [
+    "Sonraki fiyatlar, eklediğin günkü fiyatı veya maliyeti değiştirmez.",
+    "Las cotizaciones posteriores no reescriben el precio o costo del día en que añadiste."
+  ],
+  "See the finished picture immediately.": [
+    "Tabloyu hemen gör.",
+    "Ve el resultado al instante."
+  ],
+  "Cost, value, and change show up as soon as you add holdings.": [
+    "Maliyet, değer ve değişim, varlık ekler eklemez görünür.",
+    "Costo, valor y cambio aparecen en cuanto añades posiciones."
+  ],
+  "Optional Google Sign-In.": [
+    "İsteğe bağlı Google girişi.",
+    "Inicio de sesión con Google opcional."
+  ],
+  "We use your Google name and email only to save the account. We do not read Gmail, Drive, or contacts. ": [
+    "Google adını ve e-postanı yalnızca hesabı kaydetmek için kullanırız. Gmail, Drive veya kişileri okumayız. ",
+    "Usamos tu nombre y correo de Google solo para guardar la cuenta. No leemos Gmail, Drive ni contactos. "
+  ],
+  "How we use Google account data": [
+    "Google hesabı verilerini nasıl kullanıyoruz",
+    "Cómo usamos los datos de Google"
+  ],
+  "FROM “WHAT IF” TO “LOOK AT THAT”": [
+    "“YA OLSAYDI”DAN “BAK ŞUNA”YA",
+    "DE “Y SI…” A “MIRA ESO”"
+  ],
+  "Less noise. More perspective.": [
+    "Daha az gürültü. Daha fazla bakış.",
+    "Menos ruido. Más perspectiva."
+  ],
+  "Name a portfolio": [
+    "Portföye ad ver",
+    "Nombra una cartera"
+  ],
+  "Call it whatever you are testing — 2027 AI Picks, a sector bet, a what-if with $10,000.": [
+    "Denediğin şeye ad ver — 2027 yapay zekâ, bir sektör, 10.000 $’lık bir senaryo.",
+    "Llámalo como quieras — ideas 2027, un sector, un “y si” con 10.000 $."
+  ],
+  "Add stocks and amounts": [
+    "Hisse ve tutar ekle",
+    "Añade acciones e importes"
+  ],
+  "Pick tickers, then enter shares, cost, and a purchase date. We lock that starting point.": [
+    "Sembol seç; adet, maliyet ve alım tarihini gir. Başlangıcı kilitleriz.",
+    "Elige tickers e introduce unidades, costo y fecha. Bloqueamos ese punto de partida."
+  ],
+  "Save when it is worth keeping": [
+    "Saklamaya değer olunca kaydet",
+    "Guárdala cuando merezca la pena"
+  ],
+  "See the portfolio right away. Create an account only if you want it back on another device.": [
+    "Portföyü hemen gör. Başka cihazda istersen hesap oluştur.",
+    "Ve la cartera al instante. Crea una cuenta solo si quieres verla en otro dispositivo."
+  ],
+  "MAKE ROOM FOR YOUR NEXT IDEA": [
+    "YENİ FİKRİNE YER AÇ",
+    "HAZ SITIO A TU PRÓXIMA IDEA"
+  ],
+  "Start with one portfolio. See where it leads.": [
+    "Bir portföyle başla. Nereye gittiğini gör.",
+    "Empieza con una cartera. Mira a dónde llega."
+  ],
+  "No signup to build · 1 portfolio · 10 stocks · Save with a free account when you are ready": [
+    "Oluşturmak ücretsiz · 1 portföy · 10 hisse · Hazır olunca ücretsiz hesapla kaydet",
+    "Sin registro para crear · 1 cartera · 10 acciones · Guárdala con una cuenta gratis cuando quieras"
+  ],
+  "CURIOSITY HAS NO BORDERS": [
+    "MERAKIN SINIRI YOK",
+    "LA CURIOSIDAD NO TIENE FRONTERAS"
+  ],
+  "A world of different perspectives.": [
+    "Farklı bakışların dünyası.",
+    "Un mundo de distintas perspectivas."
+  ],
+  "Ideas travel. Follow the market with people who see it a little differently.": [
+    "Fikirler dolaşır. Piyasayı biraz farklı görenlerle takip et.",
+    "Las ideas viajan. Sigue el mercado con quienes lo ven de otro modo."
+  ],
+  "unique verified members": [
+    "benzersiz doğrulanmış üye",
+    "miembros verificados únicos"
+  ],
+  "local member accounts": [
+    "yerel üye hesapları",
+    "cuentas locales"
+  ],
+  "Members who share a country appear on the map.": [
+    "Ülkesini paylaşan üyeler haritada görünür.",
+    "Quienes comparten un país aparecen en el mapa."
+  ],
+  "The map shows members who have shared their country. No precise location is collected.": [
+    "Harita ülkesini paylaşan üyeleri gösterir. Kesin konum toplanmaz.",
+    "El mapa muestra a quienes compartieron su país. No se recoge la ubicación exacta."
+  ],
+  "No countries shared yet.": [
+    "Henüz paylaşılmış ülke yok.",
+    "Aún no se ha compartido ningún país."
+  ],
+  "MARKETS, IN ONE PLACE": [
+    "PİYASALAR, TEK YERDE",
+    "MERCADOS, EN UN SOLO LUGAR"
+  ],
+  "Today’s tape.": [
+    "Bugünün bandı.",
+    "La cinta de hoy."
+  ],
+  "Look up any stock or ETF, open its chart and company details, then scroll the sectors. Earnings reports stay with Pro.": [
+    "Herhangi bir hisse veya ETF ara, grafiğini ve şirket detayını aç, sektörleri kaydır. Kazanç raporları Pro’da.",
+    "Busca cualquier acción o ETF, abre su gráfico y datos, y recorre sectores. Los resultados son Pro."
+  ],
+  "LEADERS": [
+    "LİDERLER",
+    "LÍDERES"
+  ],
+  "LAGGARDS": [
+    "GERİDE KALANLAR",
+    "REZAGADOS"
+  ],
+  "SAVED FOR THE TAPE": [
+    "BANDA İÇİN KAYITLI",
+    "GUARDADOS EN LA CINTA"
+  ],
+  "Stocks you star on this dashboard. They stay here, separate from your watchlists.": [
+    "Bu panelde yıldızladığın hisseler. İzleme listelerinden ayrı burada kalır.",
+    "Acciones que marcas aquí. Quedan aparte de tus listas."
+  ],
+  "Yahoo Finance · Quotes may be delayed": [
+    "Yahoo Finance · Fiyatlar gecikmeli olabilir",
+    "Yahoo Finance · Cotizaciones con retraso"
+  ],
+  "Charts are for looking, not advice. Click any row for details; quarterly earnings need Pro.": [
+    "Grafikler bakmak içindir, tavsiye değildir. Detay için satıra tıkla; çeyreklik sonuçlar Pro’dur.",
+    "Los gráficos son para mirar, no un consejo. Pulsa una fila; los resultados trimestrales son Pro."
+  ],
+  "Technology": [
+    "Teknoloji",
+    "Tecnología"
+  ],
+  "Chips, software, cloud and the platforms behind the tape.": [
+    "Çip, yazılım, bulut ve bandın arkasındaki platformlar.",
+    "Chips, software, nube y las plataformas de la cinta."
+  ],
+  "Finance": [
+    "Finans",
+    "Finanzas"
+  ],
+  "Banks, payments and the plumbing of markets.": [
+    "Bankalar, ödemeler ve piyasaların altyapısı.",
+    "Bancos, pagos y la fontanería de los mercados."
+  ],
+  "Health care": [
+    "Sağlık",
+    "Salud"
+  ],
+  "Insurers, medicines, devices and the businesses behind them.": [
+    "Sigorta, ilaç, cihazlar ve arkalarındaki şirketler.",
+    "Aseguradoras, medicamentos, dispositivos y sus negocios."
+  ],
+  "Consumer": [
+    "Tüketici",
+    "Consumo"
+  ],
+  "Retail, brands, restaurants and everyday demand.": [
+    "Perakende, markalar, restoranlar ve günlük talep.",
+    "Retail, marcas, restaurantes y demanda cotidiana."
+  ],
+  "Communication": [
+    "İletişim",
+    "Comunicación"
+  ],
+  "Networks, streaming and advertising platforms.": [
+    "Ağlar, yayın ve reklam platformları.",
+    "Redes, streaming y publicidad."
+  ],
+  "Energy": [
+    "Enerji",
+    "Energía"
+  ],
+  "Oil, gas and the companies that move it.": [
+    "Petrol, gaz ve bunları taşıyan şirketler.",
+    "Petróleo, gas y quienes lo mueven."
+  ],
+  "Industrials": [
+    "Sanayi",
+    "Industriales"
+  ],
+  "Machines, aerospace, freight and defense.": [
+    "Makineler, havacılık, lojistik ve savunma.",
+    "Máquinas, aeroespacial, carga y defensa."
+  ],
+  "Materials": [
+    "Malzemeler",
+    "Materiales"
+  ],
+  "Chemicals, metals and the inputs behind manufacturing.": [
+    "Kimya, metaller ve üretimin girdileri.",
+    "Químicos, metales e insumos de fabricación."
+  ],
+  "Utilities": [
+    "Altyapı",
+    "Servicios públicos"
+  ],
+  "Power, grids and regulated cash flows.": [
+    "Elektrik, şebekeler ve düzenlenmiş nakit akışları.",
+    "Energía, redes y flujos regulados."
+  ],
+  "Real estate": [
+    "Gayrimenkul",
+    "Inmobiliario"
+  ],
+  "Towers, warehouses and listed property.": [
+    "Kuleler, depolar ve borsadaki gayrimenkul.",
+    "Torres, almacenes e inmuebles cotizados."
+  ],
+  "YOUR OWN CORNER OF THE MARKET": [
+    "PİYASADAKİ KÖŞEN",
+    "TU RINCÓN DEL MERCADO"
+  ],
+  "Your account": [
+    "Hesabın",
+    "Tu cuenta"
+  ],
+  "Sign out": [
+    "Çıkış yap",
+    "Cerrar sesión"
+  ],
+  "Verified email": [
+    "Doğrulanmış e-posta",
+    "Correo verificado"
+  ],
+  "Local account verified": [
+    "Yerel hesap doğrulandı",
+    "Cuenta local verificada"
+  ],
+  "Pro plan": [
+    "Pro plan",
+    "Plan Pro"
+  ],
+  "Basic plan": [
+    "Temel plan",
+    "Plan básico"
+  ],
+  "Manage billing": [
+    "Faturalamayı yönet",
+    "Gestionar facturación"
+  ],
+  "Explore Pro": [
+    "Pro’yu incele",
+    "Explorar Pro"
+  ],
+  "Refresh billing status": [
+    "Fatura durumunu yenile",
+    "Actualizar facturación"
+  ],
+  "Keep my location private": [
+    "Konumumu gizli tut",
+    "Mantener mi ubicación privada"
+  ],
+  "Loading your account…": [
+    "Hesabın yükleniyor…",
+    "Cargando tu cuenta…"
+  ],
+  "← Back to my watchlists": [
+    "← Listelerime dön",
+    "← Volver a mis listas"
+  ],
+  "Product analytics": [
+    "Ürün analitiği",
+    "Analítica del producto"
+  ],
+  "Open analytics": [
+    "Analitiği aç",
+    "Abrir analítica"
+  ],
+  "Location preference saved.": [
+    "Konum tercihi kaydedildi.",
+    "Preferencia de ubicación guardada."
+  ],
+  "Billing status refreshed.": [
+    "Fatura durumu yenilendi.",
+    "Estado de facturación actualizado."
+  ],
+  "Pro is active. You’re ready to add more ideas.": [
+    "Pro aktif. Daha fazla fikir ekleyebilirsin.",
+    "Pro está activo. Ya puedes añadir más ideas."
+  ],
+  "Payment is still being confirmed. Refresh billing status shortly.": [
+    "Ödeme hâlâ onaylanıyor. Biraz sonra fatura durumunu yenile.",
+    "El pago se está confirmando. Actualiza la facturación en un momento."
+  ],
+  "YOUR MARKET, WITH COMPANY": [
+    "PİYASAN, BERABER",
+    "TU MERCADO, EN COMPAÑÍA"
+  ],
+  "Every idea has a beginning.": [
+    "Her fikrin bir başlangıcı vardır.",
+    "Toda idea tiene un comienzo."
+  ],
+  "Give yours a place to grow. Follow stocks, remember your starting point, and bring friends along for the ride.": [
+    "Fikrine büyüyecek bir yer ver. Hisseleri takip et, başlangıcı hatırla, arkadaşlarını da davet et.",
+    "Dale un lugar para crecer. Sigue acciones, recuerda el punto de partida e invita a amigos."
+  ],
+  "Prices update automatically": [
+    "Fiyatlar otomatik güncellenir",
+    "Los precios se actualizan solos"
+  ],
+  "Your starting price stays fixed": [
+    "Başlangıç fiyatın sabit kalır",
+    "Tu precio inicial permanece fijo"
+  ],
+  "Share a view, keep control": [
+    "Görünümü paylaş, kontrol sende kalsın",
+    "Comparte la vista, conserva el control"
+  ],
+  "Check your inbox": [
+    "Gelen kutunu kontrol et",
+    "Revisa tu correo"
+  ],
+  "Reset your password": [
+    "Şifreni sıfırla",
+    "Restablece tu contraseña"
+  ],
+  "Send reset link": [
+    "Sıfırlama bağlantısı gönder",
+    "Enviar enlace de restablecimiento"
+  ],
+  "Already watching? ": [
+    "Zaten takip ediyor musun? ",
+    "¿Ya estás siguiendo? "
+  ],
+  "Your lists start private. ": [
+    "Listelerin gizli başlar. ",
+    "Tus listas empiezan privadas. "
+  ],
+  "How we use your data": [
+    "Verilerini nasıl kullanıyoruz",
+    "Cómo usamos tus datos"
+  ],
+  "Pick up where your ideas left off.": [
+    "Fikirlerinin kaldığı yerden devam et.",
+    "Sigue donde lo dejaste."
+  ],
+  "Build first if you want — or create an account now.": [
+    "İstersen önce oluştur — veya şimdi hesap aç.",
+    "Crea primero si quieres — o abre una cuenta ahora."
+  ],
+  "Don’t lose your portfolio": [
+    "Portföyünü kaybetme",
+    "No pierdas tu cartera"
+  ],
+  "Create a free account to save this list and come back to it anytime. Everything you entered on this device stays with the account.": [
+    "Bu listeyi kaydetmek için ücretsiz hesap oluştur. Bu cihazda girdiğin her şey hesaba taşınır.",
+    "Crea una cuenta gratis para guardar esta lista. Lo que pusiste en este dispositivo va con la cuenta."
+  ],
+  "or Email": [
+    "veya e-posta",
+    "o correo"
+  ],
+  "Create a free account": [
+    "Ücretsiz hesap oluştur",
+    "Crear una cuenta gratis"
+  ],
+  "Continue for now": [
+    "Şimdilik devam et",
+    "Seguir por ahora"
+  ],
+  "Enter shares and costs adjusted for past stock splits. ": [
+    "Geçmiş bölünmelere göre düzeltilmiş adet ve maliyet gir. ",
+    "Introduce unidades y costos ajustados por splits. "
+  ],
+  "Leave cost blank to use the latest quote. ": [
+    "Son fiyatı kullanmak için maliyeti boş bırak. ",
+    "Deja el costo en blanco para usar la última cotización. "
+  ],
+  "US, Europe (EUR), and Turkey (TRY). A list stays in the currency of the first stock you add. Quantity and purchase details are fixed after saving.": [
+    "ABD, Avrupa (EUR) ve Türkiye (TRY). Liste, eklediğin ilk hissenin para biriminde kalır. Adet ve alım bilgileri kayıttan sonra değişmez.",
+    "EE. UU., Europa (EUR) y Turquía (TRY). La lista queda en la moneda del primer valor. Unidades y compra no cambian después de guardar."
+  ],
+  "No stocks yet": [
+    "Henüz varlık yok",
+    "Aún no hay activos"
+  ],
+  "Add missing purchase quantities to see complete totals.": [
+    "Toplamlar için eksik alım adetlerini gir.",
+    "Añade las cantidades de compra para ver totales."
+  ],
+  "This list mixed currencies. Keep one currency per list.": [
+    "Bu listede karışık para birimleri var. Listede tek para birimi tut.",
+    "Esta lista mezcló monedas. Una moneda por lista."
+  ],
+  "Price changes this period": [
+    "Bu dönemdeki fiyat değişimi",
+    "Cambios de precio en este período"
+  ],
+  "positions": [
+    "pozisyon",
+    "posiciones"
+  ],
+  "Loading portfolio history…": [
+    "Portföy geçmişi yükleniyor…",
+    "Cargando historial de cartera…"
+  ],
+  "Save your list to keep daily history on your account.": [
+    "Günlük geçmiş için listenı hesabına kaydet.",
+    "Guarda tu lista para el historial diario en la cuenta."
+  ],
+  "Daily history starts on your purchase date. A trend appears after two days of data.": [
+    "Günlük geçmiş alım tarihinde başlar. Eğilim iki günlük veriden sonra görünür.",
+    "El historial diario empieza en la fecha de compra. La tendencia aparece tras dos días."
+  ],
+  "Add shares and purchase costs to see your portfolio chart.": [
+    "Portföy grafiği için adet ve maliyeti gir.",
+    "Añade unidades y costos para ver el gráfico."
+  ],
+  "Current holdings only. The percent and solid line follow price changes, not stocks you add. Excludes sold positions, dividends, fees and tax.": [
+    "Yalnızca mevcut varlıklar. Yüzde ve çizgi fiyat değişimini izler, eklediğin hisseleri değil. Satılanlar, temettü, ücret ve vergi hariç.",
+    "Solo posiciones actuales. El porcentaje sigue precios, no altas. Excluye ventas, dividendos, comisiones e impuestos."
+  ],
+  "Shares / cost each": [
+    "Adet / birim maliyet",
+    "Unidades / costo"
+  ],
+  "Holding value": [
+    "Pozisyon değeri",
+    "Valor de la posición"
+  ],
+  "Set position": [
+    "Pozisyon gir",
+    "Definir posición"
+  ],
+  "Last known price · Refresh failed": [
+    "Son bilinen fiyat · Yenileme başarısız",
+    "Último precio · Falló la actualización"
+  ],
+  "Refresh failed": [
+    "Yenileme başarısız",
+    "Falló la actualización"
+  ],
+  "No matching stocks": [
+    "Eşleşen hisse yok",
+    "Sin coincidencias"
+  ],
+  "Prices may be delayed · Latest regular-session quote": [
+    "Fiyatlar gecikmeli olabilir · Son resmi seans kotasyonu",
+    "Precios con retraso · Última cotización de sesión"
+  ],
+  " / share": [
+    " / adet",
+    " / unidad"
+  ],
+  "Add a ticker, then enter shares and cost. The portfolio appears as soon as you add holdings.": [
+    "Sembol ekle, adet ve maliyeti gir. Portföy varlık ekler eklemez görünür.",
+    "Añade un ticker, unidades y costo. La cartera aparece al instante."
+  ],
+  "Try": [
+    "Dene",
+    "Prueba"
+  ],
+  "Opening your watchlists…": [
+    "Listelerin açılıyor…",
+    "Abriendo tus listas…"
+  ],
+  "Only the owner can edit · ": [
+    "Yalnızca sahip düzenleyebilir · ",
+    "Solo el propietario edita · "
+  ],
+  "Track your holdings, cost basis, and the bigger picture.": [
+    "Varlıklarını, maliyeti ve büyük resmi takip et.",
+    "Sigue posiciones, costo y el panorama."
+  ],
+  "Track performance from the day you add a stock.": [
+    "Performansı hisse eklediğin günden izle.",
+    "Sigue el rendimiento desde el día en que añades."
+  ],
+  "Advanced": [
+    "Gelişmiş",
+    "Avanzada"
+  ],
+  "Rename watchlist": [
+    "Listeyi yeniden adlandır",
+    "Renombrar lista"
+  ],
+  "A name is optional. Leave it blank to use My watchlist.": [
+    "Ad isteğe bağlı. Boş bırakırsan Listem kullanılır.",
+    "El nombre es opcional. En blanco se usa Mi lista."
+  ],
+  "Keep your ideas together with a name that makes sense to you.": [
+    "Fikirlerini sana anlamlı gelen bir adla topla.",
+    "Reúne tus ideas con un nombre que te encaje."
+  ],
+  "Optional. Every watchlist includes quantities, costs and portfolio performance.": [
+    "İsteğe bağlı. Her listede adet, maliyet ve performans vardır.",
+    "Opcional. Cada lista incluye unidades, costos y rendimiento."
+  ],
+  "Every watchlist includes quantities, costs and portfolio performance.": [
+    "Her listede adet, maliyet ve performans vardır.",
+    "Cada lista incluye unidades, costos y rendimiento."
+  ],
+  "View plans": [
+    "Planları gör",
+    "Ver planes"
+  ],
+  "This list has reached your plan’s limit. ": [
+    "Bu liste plan sınırına ulaştı. ",
+    "Esta lista llegó al límite de tu plan. "
+  ],
+  "View plans →": [
+    "Planları gör →",
+    "Ver planes →"
+  ],
+  "Your free trial has ended. Your saved lists remain available. ": [
+    "Ücretsiz deneme bitti. Kayıtlı listelerin duruyor. ",
+    "La prueba terminó. Tus listas siguen disponibles. "
+  ],
+  "Upgrade to add more stocks →": [
+    "Daha fazla hisse için yükselt →",
+    "Mejora para añadir más →"
+  ],
+  "Watchlist": [
+    "İzleme listesi",
+    "Lista"
+  ],
+  "Created": [
+    "Oluşturulma",
+    "Creada"
+  ],
+  "Stocks": [
+    "Varlıklar",
+    "Activos"
+  ],
+  "Since created": [
+    "Oluşturulduğundan beri",
+    "Desde la creación"
+  ],
+  "Good ideas are better together": [
+    "İyi fikirler birlikte daha iyi",
+    "Las buenas ideas se comparten"
+  ],
+  "Read-only share link": [
+    "Salt okunur paylaşım bağlantısı",
+    "Enlace de solo lectura"
+  ],
+  "Copy link": [
+    "Bağlantıyı kopyala",
+    "Copiar enlace"
+  ],
+  "Invite by email": [
+    "E-postayla davet et",
+    "Invitar por correo"
+  ],
+  "Turn off sharing": [
+    "Paylaşımı kapat",
+    "Desactivar compartir"
+  ],
+  "Keep it": [
+    "Vazgeç",
+    "Conservar"
+  ],
+  "Remove": [
+    "Kaldır",
+    "Quitar"
+  ],
+  "Removing…": [
+    "Kaldırılıyor…",
+    "Quitando…"
+  ],
+  "Save fixed quantity": [
+    "Sabit adeti kaydet",
+    "Guardar cantidad fija"
+  ],
+  "A WATCHLIST SHARED WITH YOU": [
+    "SENİNLE PAYLAŞILAN LİSTE",
+    "UNA LISTA COMPARTIDA CONTIGO"
+  ],
+  "Shared watchlist": [
+    "Paylaşılan liste",
+    "Lista compartida"
+  ],
+  "Read-only · The owner controls this watchlist": [
+    "Salt okunur · Listeyi sahip yönetir",
+    "Solo lectura · El propietario controla la lista"
+  ],
+  "Opening the shared watchlist…": [
+    "Paylaşılan liste açılıyor…",
+    "Abriendo la lista compartida…"
+  ],
+  "← Markets": [
+    "← Piyasalar",
+    "← Mercados"
+  ],
+  "About company": [
+    "Şirket hakkında",
+    "Sobre la empresa"
+  ],
+  "Sector": [
+    "Sektör",
+    "Sector"
+  ],
+  "Industry": [
+    "Sektör kolu",
+    "Industria"
+  ],
+  "Employees": [
+    "Çalışanlar",
+    "Empleados"
+  ],
+  "Country": [
+    "Ülke",
+    "País"
+  ],
+  "Company website ↗": [
+    "Şirket sitesi ↗",
+    "Web de la empresa ↗"
+  ],
+  "Add to watchlist": [
+    "Listeye ekle",
+    "Añadir a la lista"
+  ],
+  "Market cap": [
+    "Piyasa değeri",
+    "Capitalización"
+  ],
+  "Revenue (TTM)": [
+    "Gelir (TTM)",
+    "Ingresos (TTM)"
+  ],
+  "Net income": [
+    "Net kâr",
+    "Beneficio neto"
+  ],
+  "EPS": [
+    "HBK",
+    "BPA"
+  ],
+  "Shares outstanding": [
+    "Dolaşımdaki pay",
+    "Acciones en circulación"
+  ],
+  "P/E ratio": [
+    "F/K",
+    "PER"
+  ],
+  "Forward P/E": [
+    "İleri F/K",
+    "PER a futuro"
+  ],
+  "Dividend yield": [
+    "Temettü verimi",
+    "Rentabilidad por dividendo"
+  ],
+  "Ex-dividend date": [
+    "Temettü tarihi",
+    "Fecha ex-dividendo"
+  ],
+  "Volume": [
+    "Hacim",
+    "Volumen"
+  ],
+  "Previous close": [
+    "Önceki kapanış",
+    "Cierre anterior"
+  ],
+  "Day’s range": [
+    "Gün aralığı",
+    "Rango del día"
+  ],
+  "52-week range": [
+    "52 hafta aralığı",
+    "Rango 52 semanas"
+  ],
+  "Beta": [
+    "Beta",
+    "Beta"
+  ],
+  "Analyst consensus": [
+    "Analist görüşü",
+    "Consenso de analistas"
+  ],
+  "Price target": [
+    "Hedef fiyat",
+    "Precio objetivo"
+  ],
+  "Company and trading statistics": [
+    "Şirket ve işlem istatistikleri",
+    "Estadísticas de la empresa"
+  ],
+  "Loading chart…": [
+    "Grafik yükleniyor…",
+    "Cargando gráfico…"
+  ],
+  "The latest six reported quarters, oldest to newest.": [
+    "Son altı raporlanan çeyrek, eskiden yeniye.",
+    "Los últimos seis trimestres, de más antiguo a más reciente."
+  ],
+  "Loading quarterly results…": [
+    "Çeyreklik sonuçlar yükleniyor…",
+    "Cargando resultados trimestrales…"
+  ],
+  "A closer look at the business.": [
+    "İşletmeye daha yakından bak.",
+    "Una mirada más cercana al negocio."
+  ],
+  "Compare quarterly revenue, net income, and diluted earnings per share with Pro.": [
+    "Pro ile çeyreklik gelir, net kâr ve seyreltilmiş HBK’yı karşılaştır.",
+    "Compara ingresos, beneficio neto y BPA diluido con Pro."
+  ],
+  "Explore Pro · $2.99/month ": [
+    "Pro’yu incele · aylık 2,99 $ ",
+    "Explorar Pro · 2,99 $/mes "
+  ],
+  "Or $30/year · Already a member? ": [
+    "Veya yıllık 30 $ · Zaten üye misin? ",
+    "O 30 $/año · ¿Ya eres miembro? "
+  ],
+  "Quarter ending": [
+    "Çeyrek sonu",
+    "Cierre del trimestre"
+  ],
+  "Diluted EPS": [
+    "Seyreltilmiş HBK",
+    "BPA diluido"
+  ],
+  "Revenue & earnings per share": [
+    "Gelir ve hisse başı kâr",
+    "Ingresos y BPA"
+  ],
+  "Overall performance": [
+    "Genel performans",
+    "Rendimiento general"
+  ],
+  "Portfolio value, invested cost and gains across your selected time range.": [
+    "Seçtiğin dönemde portföy değeri, maliyet ve kazanç.",
+    "Valor, costo invertido y ganancias en el periodo elegido."
+  ],
+  "10 companies · Since 2021": [
+    "10 şirket · 2021’den beri",
+    "10 empresas · Desde 2021"
+  ],
+  "now": [
+    "şimdi",
+    "ahora"
+  ],
+  "Example watchlist · Real prices": [
+    "Örnek liste · Gerçek fiyatlar",
+    "Lista de ejemplo · Precios reales"
+  ],
+  "TEN IDEAS. FIVE YEARS OF PERSPECTIVE.": [
+    "ON FİKİR. BEŞ YILLIK BAKIŞ.",
+    "DIEZ IDEAS. CINCO AÑOS DE PERSPECTIVA."
+  ],
+  "Watchlist performance since 2021.": [
+    "2021’den beri liste performansı.",
+    "Rendimiento de la lista desde 2021."
+  ],
+  "Cumulative gain": [
+    "Kümülatif kazanç",
+    "Ganancia acumulada"
+  ],
+  "Cumulative loss": [
+    "Kümülatif kayıp",
+    "Pérdida acumulada"
+  ],
+  "Illustrative watchlist": [
+    "Örnek izleme listesi",
+    "Lista ilustrativa"
+  ],
+  "Open": [
+    "Açılış",
+    "Apertura"
+  ],
+  "Chart unavailable.": [
+    "Grafik yok.",
+    "Gráfico no disponible."
+  ],
+  "Loading companies and their story since 2021…": [
+    "Şirketler ve 2021’den beri hikâyeleri yükleniyor…",
+    "Cargando empresas y su historia desde 2021…"
+  ],
+  "Calculating the watchlist’s five-year performance…": [
+    "Listenin beş yıllık performansı hesaplanıyor…",
+    "Calculando el rendimiento a cinco años…"
+  ],
+  "Value from price changes": [
+    "Fiyat değişiminden değer",
+    "Valor por cambios de precio"
+  ],
+  "Starting invested capital": [
+    "Başlangıç yatırılan sermaye",
+    "Capital invertido inicial"
+  ],
+  "↑ ↓ to browse · Enter to select": [
+    "↑ ↓ gez · Enter ile seç",
+    "↑ ↓ para recorrer · Enter para elegir"
   ]
 }

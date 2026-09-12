@@ -21,7 +21,7 @@ function SignOutButton(){
  const t=useT();
  const [busy,setBusy]=useState(false),[error,setError]=useState('');
  return <>
-  <button type="button" className="nav-signout" disabled={busy} onClick={()=>{setBusy(true);setError('');void signOut().catch(()=>{setBusy(false);setError('Could not sign out. Try again.');});}}>{busy?'Signing out…':t("Log out")}</button>
+  <button type="button" className="nav-signout" disabled={busy} onClick={()=>{setBusy(true);setError('');void signOut().catch(()=>{setBusy(false);setError(t("Could not sign out. Try again."));});}}>{busy?t("Signing out…"):t("Log out")}</button>
   {error&&<span role="alert">{error}</span>}
  </>;
 }

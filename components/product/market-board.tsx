@@ -1,5 +1,6 @@
 'use client';
 import {createContext,useContext,useEffect,useRef,useState} from 'react';
+import {T,useT} from '@/components/product/language';
 import {useRouter} from 'next/navigation';
 import {LoaderCircle,Maximize2,Search,Star} from 'lucide-react';
 import catalog from '@/lib/market-dashboard.json';
@@ -59,30 +60,33 @@ function LiveTicker({groups,ready}:{groups:Board['groups'];ready:Record<string,b
 }
 
 function SessionBadge(){
+  const t=useT();
   const [now,setNow]=useState(()=>new Date());
   useEffect(()=>{const id=window.setInterval(()=>setNow(new Date()),30000);return()=>clearInterval(id);},[]);
   const session=nyseSession(now);
   const clock=new Intl.DateTimeFormat(undefined,{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}).format(now);
+  const label=session.code==='open'?t('Session open'):t(session.label);
   return <aside className={'market-session is-'+session.code} aria-live="polite">
-    <strong><span className="market-session-dot" aria-hidden="true"/>{session.label}</strong>
+    <strong><span className="market-session-dot" aria-hidden="true"/>{label}</strong>
     <span>{session.detail}</span>
     <small>{clock} ET</small>
   </aside>;
 }
 
 function TapeStrip({rows}:{rows:Row[]}){
+  const t=useT();
   const {gainers,losers}=tapeMovers(rows,5);
   if(!gainers.length&&!losers.length)return null;
-  return <section className="market-tape" aria-label="Today’s movers">
+  return <section className="market-tape" aria-label={t('Today')}>
     <div className="market-movers">
       <div>
-        <p className="eyebrow">LEADERS</p>
-        <h3>Gainers</h3>
+        <p className="eyebrow"><T text="LEADERS"/></p>
+        <h3><T text="Gainers"/></h3>
         {gainers.map(row=><a key={'g-'+row.symbol} href={'/stocks/'+encodeURIComponent(row.symbol)}><CompanyIcon symbol={row.symbol}/><span>{row.symbol}</span><em className="up">{fmtPct(dayPct(row))}</em></a>)}
       </div>
       <div>
-        <p className="eyebrow">LAGGARDS</p>
-        <h3>Losers</h3>
+        <p className="eyebrow"><T text="LAGGARDS"/></p>
+        <h3><T text="Losers"/></h3>
         {losers.map(row=><a key={'l-'+row.symbol} href={'/stocks/'+encodeURIComponent(row.symbol)}><CompanyIcon symbol={row.symbol}/><span>{row.symbol}</span><em className="down">{fmtPct(dayPct(row))}</em></a>)}
       </div>
     </div>
@@ -133,6 +137,7 @@ function FavoriteStar({symbol}:{symbol:string}){
 }
 
 function IndexHero({indices}:{indices:(Row&{name:string})[]}){
+  const t=useT();
   const [range,setRange]=useState('1d');
   const [style,setStyle]=useState<ChartStyle>('line');
   const [charts,setCharts]=useState<Record<string,MarketChart|null>>({});
@@ -153,8 +158,8 @@ function IndexHero({indices}:{indices:(Row&{name:string})[]}){
     <div className="market-index-toolbar">
       <Tabs value={style} onValueChange={v=>setStyle(v as ChartStyle)}>
         <TabsList className="chart-ranges market-index-style" aria-label="Chart type">
-          <TabsTrigger value="line">Line</TabsTrigger>
-          <TabsTrigger value="candle">Candle</TabsTrigger>
+          <TabsTrigger value="line"><T text="Line"/></TabsTrigger>
+          <TabsTrigger value="candle"><T text="Candle"/></TabsTrigger>
         </TabsList>
       </Tabs>
       <Tabs value={range} onValueChange={v=>setRange(String(v))}>
@@ -172,10 +177,10 @@ function IndexHero({indices}:{indices:(Row&{name:string})[]}){
               <p className="eyebrow">{row.short||row.name}</p>
               <h3>{row.name}</h3>
             </div>
-            {chart?<div className="market-index-quote"><strong>{price(chart.quote.price,chart.currency)}</strong><Change chart={chart}/></div>:<p className="market-card-error">{errors[row.symbol]||'Loading…'}</p>}
+            {chart?<div className="market-index-quote"><strong>{price(chart.quote.price,chart.currency)}</strong><Change chart={chart}/></div>:<p className="market-card-error">{errors[row.symbol]||t('Loading…')}</p>}
             <button type="button" className="index-expand" aria-label={'Expand '+row.name+' chart'} title="Expand chart" onClick={()=>setExpanded(row.symbol)}><Maximize2 size={13}/></button>
           </div>
-          {chart&&chart.range===range?<PriceChart data={chart} compact style={style} className="index-hero-chart"/>:busy?<div className="market-loading"><LoaderCircle className="spin"/></div>:<p className="market-card-error">{errors[row.symbol]||'Chart unavailable.'}</p>}
+          {chart&&chart.range===range?<PriceChart data={chart} compact style={style} className="index-hero-chart"/>:busy?<div className="market-loading"><LoaderCircle className="spin"/></div>:<p className="market-card-error">{errors[row.symbol]||t('Chart unavailable.')}</p>}
         </article>;
       })}
     </div>
@@ -189,8 +194,8 @@ function IndexHero({indices}:{indices:(Row&{name:string})[]}){
           <div className="market-index-toolbar">
             <Tabs value={style} onValueChange={v=>setStyle(v as ChartStyle)}>
               <TabsList className="chart-ranges market-index-style" aria-label="Chart type">
-                <TabsTrigger value="line">Line</TabsTrigger>
-                <TabsTrigger value="candle">Candle</TabsTrigger>
+                <TabsTrigger value="line"><T text="Line"/></TabsTrigger>
+                <TabsTrigger value="candle"><T text="Candle"/></TabsTrigger>
               </TabsList>
             </Tabs>
             <Tabs value={range} onValueChange={v=>setRange(String(v))}>
@@ -199,7 +204,7 @@ function IndexHero({indices}:{indices:(Row&{name:string})[]}){
               </TabsList>
             </Tabs>
           </div>
-          {chart&&chart.range===range?<PriceChart data={chart} style={style} className="index-expanded-chart"/>:busy?<div className="market-loading"><LoaderCircle className="spin"/></div>:<p className="market-card-error">{(expanded&&errors[expanded])||'Chart unavailable.'}</p>}
+          {chart&&chart.range===range?<PriceChart data={chart} style={style} className="index-expanded-chart"/>:busy?<div className="market-loading"><LoaderCircle className="spin"/></div>:<p className="market-card-error">{(expanded&&errors[expanded])||t('Chart unavailable.')}</p>}
         </DialogContent>
       </Dialog>;
     })()}
@@ -207,27 +212,29 @@ function IndexHero({indices}:{indices:(Row&{name:string})[]}){
 }
 
 function StockRow({row,pending}:{row:Row;pending:boolean}){
+  const t=useT();
   const chart=row.chart;
   const href='/stocks/'+encodeURIComponent(row.symbol);
   return <div className="market-table-row">
     <span className="market-table-name"><FavoriteStar symbol={row.symbol}/><a href={href}><CompanyIcon symbol={row.symbol}/><span><strong>{chart?.companyName||row.name||row.symbol}</strong><small>{row.symbol}</small></span></a></span>
     <a className="market-table-price" href={href}>{chart?price(chart.quote.price,chart.currency):'—'}</a>
-    <a className="market-table-change" href={href}>{chart?<Change chart={chart}/>:pending?<span className="market-card-pending">Loading…</span>:<span className="market-card-error">{row.error||'—'}</span>}</a>
-    <a className="market-table-open" href={href}>Details</a>
+    <a className="market-table-change" href={href}>{chart?<Change chart={chart}/>:pending?<span className="market-card-pending">{t('Loading…')}</span>:<span className="market-card-error">{row.error||'—'}</span>}</a>
+    <a className="market-table-open" href={href}>{t('Details')}</a>
   </div>;
 }
 
 function FavoritesBoard({rows}:{rows:Row[]}){
+  const t=useT();
   if(!rows.length)return null;
-  return <section className="market-group market-favorites" aria-label="Favorite stocks">
+  return <section className="market-group market-favorites" aria-label={t('Favorites')}>
     <div className="market-group-copy">
-      <p className="eyebrow">SAVED FOR THE TAPE</p>
-      <h2>Favorites</h2>
-      <p>Stocks you star on this dashboard. They stay here, separate from your watchlists.</p>
+      <p className="eyebrow"><T text="SAVED FOR THE TAPE"/></p>
+      <h2><T text="Favorites"/></h2>
+      <p><T text="Stocks you star on this dashboard. They stay here, separate from your watchlists."/></p>
     </div>
-    <div className="market-table" role="table" aria-label="Favorite stocks">
+    <div className="market-table" role="table" aria-label={t('Favorites')}>
       <div className="market-table-head" role="row">
-        <span>Company</span><span>Price</span><span>Today</span><span></span>
+        <span><T text="Company"/></span><span><T text="Price"/></span><span><T text="Today"/></span><span></span>
       </div>
       {rows.map(row=><StockRow key={row.symbol} row={row} pending={!row.chart&&!row.error}/>)}
     </div>
@@ -235,6 +242,7 @@ function FavoritesBoard({rows}:{rows:Row[]}){
 }
 
 export function MarketBoard(){
+  const t=useT();
   const router=useRouter();
   const inputRef=useRef<HTMLInputElement>(null);
   const [query,setQuery]=useState('');
@@ -315,15 +323,15 @@ export function MarketBoard(){
     <LiveTicker groups={data.groups} ready={ready}/>
     <div className="page-heading market-heading">
       <div>
-        <p className="eyebrow">MARKETS, IN ONE PLACE</p>
-        <h1>Today’s tape.</h1>
-        <p className="intro">Look up any stock or ETF, open its chart and company details, then scroll the sectors. Earnings reports stay with Pro.</p>
+        <p className="eyebrow"><T text="MARKETS, IN ONE PLACE"/></p>
+        <h1><T text="Today’s tape."/></h1>
+        <p className="intro"><T text="Look up any stock or ETF, open its chart and company details, then scroll the sectors. Earnings reports stay with Pro."/></p>
       </div>
       <SessionBadge/>
     </div>
     <form className="market-search" onSubmit={e=>void search(e)} role="search">
       <StockSearch value={query} onChange={v=>{setQuery(v);setSearchError('');}} inputRef={inputRef} onPick={symbol=>void openStock(symbol)}/>
-      <Button type="submit" className="primary-button" disabled={searching}>{searching?<LoaderCircle className="spin"/>:<Search/>}<span className="market-search-label">Search</span></Button>
+      <Button type="submit" className="primary-button" disabled={searching}>{searching?<LoaderCircle className="spin"/>:<Search/>}<span className="market-search-label">{t('Search')}</span></Button>
     </form>
     {searchError&&<p className="form-error" role="alert">{searchError}</p>}
     {error&&<p className="error-banner" role="alert">{error}</p>}
@@ -337,21 +345,21 @@ export function MarketBoard(){
         return <section key={group.id} id={group.id} className="market-group">
           <div className="market-group-copy">
             <p className="eyebrow">{String(index+1).padStart(2,'0')}</p>
-            <h2>{group.title}{avg!==null&&<span className={avg>=0?'up':'down'}>{fmtPct(avg)}</span>}</h2>
-            <p>{group.blurb}</p>
+            <h2>{t(group.title)}{avg!==null&&<span className={avg>=0?'up':'down'}>{fmtPct(avg)}</span>}</h2>
+            <p>{t(group.blurb)}</p>
           </div>
           <div className="market-table" role="table" aria-label={group.title+' stocks'}>
             <div className="market-table-head" role="row">
-              <SortHead label="Company" k="name" sort={sort} onSort={key=>cycleSort(group.id,key)}/>
-              <SortHead label="Price" k="price" sort={sort} onSort={key=>cycleSort(group.id,key)}/>
-              <SortHead label="Today" k="change" sort={sort} onSort={key=>cycleSort(group.id,key)}/>
+              <SortHead label={t('Company')} k="name" sort={sort} onSort={key=>cycleSort(group.id,key)}/>
+              <SortHead label={t('Price')} k="price" sort={sort} onSort={key=>cycleSort(group.id,key)}/>
+              <SortHead label={t('Today')} k="change" sort={sort} onSort={key=>cycleSort(group.id,key)}/>
               <span></span>
             </div>
             {sortRows(group.stocks,sort).map(row=><StockRow key={row.symbol} row={row} pending={!ready[group.id]}/>)}
           </div>
         </section>;
       })}
-      <p className="market-footnote">Yahoo Finance · Quotes may be delayed{data.fetchedAt?` · Updated ${new Date(data.fetchedAt).toLocaleString()}`:''}. Charts are for looking, not advice. Click any row for details; quarterly earnings need Pro.</p>
+      <p className="market-footnote">{t('Yahoo Finance · Quotes may be delayed')}{data.fetchedAt?` · ${new Date(data.fetchedAt).toLocaleString()}`:''}. {t('Charts are for looking, not advice. Click any row for details; quarterly earnings need Pro.')}</p>
     </>
   </main></Favorites.Provider>;
 }
