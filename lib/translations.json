@@ -711,9 +711,17 @@
     "ABD ara, ör. Tesla",
     "Buscar EE. UU., ej. Tesla"
   ],
+  "Search Canada, e.g. RY.TO": [
+    "Kanada ara, ör. RY.TO",
+    "Buscar Canadá, ej. RY.TO"
+  ],
   "Search US, Europe, or Turkey": [
     "ABD, Avrupa veya Türkiye ara",
     "Busca EE. UU., Europa o Turquía"
+  ],
+  "Search US, Europe, Canada, or Turkey": [
+    "ABD, Avrupa, Kanada veya Türkiye ara",
+    "Busca EE. UU., Europa, Canadá o Turquía"
   ],
   "Searching companies…": [
     "Şirketler aranıyor…",
@@ -774,6 +782,14 @@
   "Cost, value, and change show up as soon as you add holdings.": [
     "Maliyet, değer ve değişim, varlık ekler eklemez görünür.",
     "Costo, valor y cambio aparecen en cuanto añades posiciones."
+  ],
+  "US, Europe, Canada, and Turkey.": [
+    "ABD, Avrupa, Kanada ve Türkiye.",
+    "EE. UU., Europa, Canadá y Turquía."
+  ],
+  "Each list stays in the currency of the first stock you add — USD, EUR, CAD, or TRY.": [
+    "Liste, eklediğin ilk hissenin para biriminde kalır — USD, EUR, CAD veya TRY.",
+    "Cada lista queda en la moneda del primer valor — USD, EUR, CAD o TRY."
   ],
   "Optional Google Sign-In.": [
     "İsteğe bağlı Google girişi.",
@@ -843,6 +859,10 @@
     "Fikirler dolaşır. Piyasayı biraz farklı görenlerle takip et.",
     "Las ideas viajan. Sigue el mercado con quienes lo ven de otro modo."
   ],
+  "Follow US, European, Canadian, and Turkish markets with people who see them a little differently.": [
+    "ABD, Avrupa, Kanada ve Türkiye piyasalarını biraz farklı görenlerle takip et.",
+    "Sigue los mercados de EE. UU., Europa, Canadá y Turquía con quienes los ven de otro modo."
+  ],
   "unique verified members": [
     "benzersiz doğrulanmış üye",
     "miembros verificados únicos"
@@ -874,6 +894,10 @@
   "Look up any stock or ETF, open its chart and company details, then scroll the sectors. Earnings reports stay with Pro.": [
     "Herhangi bir hisse veya ETF ara, grafiğini ve şirket detayını aç, sektörleri kaydır. Kazanç raporları Pro’da.",
     "Busca cualquier acción o ETF, abre su gráfico y datos, y recorre sectores. Los resultados son Pro."
+  ],
+  "Look up stocks from the US, Europe, Canada, and Turkey. Open a chart and company details, then scroll the sectors. Earnings reports stay with Pro.": [
+    "ABD, Avrupa, Kanada ve Türkiye hisselerini ara. Grafiği ve şirket detayını aç, sektörleri kaydır. Kazanç raporları Pro’da.",
+    "Busca valores de EE. UU., Europa, Canadá y Turquía. Abre el gráfico y los datos, y recorre sectores. Los resultados son Pro."
   ],
   "LEADERS": [
     "LİDERLER",
@@ -1142,6 +1166,10 @@
   "US, Europe (EUR), and Turkey (TRY). A list stays in the currency of the first stock you add. Quantity and purchase details are fixed after saving.": [
     "ABD, Avrupa (EUR) ve Türkiye (TRY). Liste, eklediğin ilk hissenin para biriminde kalır. Adet ve alım bilgileri kayıttan sonra değişmez.",
     "EE. UU., Europa (EUR) y Turquía (TRY). La lista queda en la moneda del primer valor. Unidades y compra no cambian después de guardar."
+  ],
+  "US, Europe (EUR), Canada (CAD), and Turkey (TRY). A list stays in the currency of the first stock you add. Quantity and purchase details are fixed after saving.": [
+    "ABD, Avrupa (EUR), Kanada (CAD) ve Türkiye (TRY). Liste, eklediğin ilk hissenin para biriminde kalır. Adet ve alım bilgileri kayıttan sonra değişmez.",
+    "EE. UU., Europa (EUR), Canadá (CAD) y Turquía (TRY). La lista queda en la moneda del primer valor. Unidades y compra no cambian después de guardar."
   ],
   "No stocks yet": [
     "Henüz varlık yok",

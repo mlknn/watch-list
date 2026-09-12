@@ -28,7 +28,7 @@ export function Community(){
   <div className="community-copy">
    <p className="eyebrow"><T text="CURIOSITY HAS NO BORDERS"/></p>
    <h2><T text="A world of different perspectives."/></h2>
-   <p><T text="Ideas travel. Follow the market with people who see it a little differently."/></p>
+   <p><T text="Follow US, European, Canadian, and Turkish markets with people who see them a little differently."/></p>
    <div className="community-number">
     <strong>{ready?data!.users.toLocaleString():data?'—':''}</strong>
     <span>{ready?(data!.local?t('local member accounts'):t('unique verified members')):t('Members who share a country appear on the map.')}</span>

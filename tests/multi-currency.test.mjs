@@ -26,4 +26,8 @@ test('a Turkish list rejects US stocks and a euro list accepts other euro stocks
   await db.query("select wl_advanced_action($1,'addStock',$2,p_symbol=>'ASML.AS',p_quote=>$3,p_quantity=>1,p_cost=>800,p_acquired=>'2026-01-02')",[user,europe,JSON.stringify(quote('ASML.AS','EUR'))]);
   await db.query("select wl_advanced_action($1,'addStock',$2,p_symbol=>'MC.PA',p_quote=>$3,p_quantity=>1,p_cost=>700,p_acquired=>'2026-01-02')",[user,europe,JSON.stringify(quote('MC.PA','EUR'))]);
   assert.equal((await db.query('select count(*)::int n from wl_stocks where watchlist_id=$1',[europe])).rows[0].n,2);
+  await db.query("select wl_advanced_action($1,'createList',p_name=>'Canada')",[user]);
+  const canada=(await db.query("select id from wl_watchlists where owner_id=$1 and name='Canada'",[user])).rows[0].id;
+  await db.query("select wl_advanced_action($1,'addStock',$2,p_symbol=>'RY.TO',p_quote=>$3,p_quantity=>1,p_cost=>140,p_acquired=>'2026-01-02')",[user,canada,JSON.stringify(quote('RY.TO','CAD'))]);
+  await assert.rejects(db.query("select wl_advanced_action($1,'addStock',$2,p_symbol=>'AAPL',p_quote=>$3,p_quantity=>1,p_cost=>190,p_acquired=>'2026-01-02')",[user,canada,JSON.stringify(quote('AAPL','USD'))]),/CAD only/);
 });

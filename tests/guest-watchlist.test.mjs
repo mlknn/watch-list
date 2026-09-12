@@ -75,4 +75,8 @@ test('guest lists lock to the first stock currency',()=>{
   europe=applyGuestAction(europe,{action:'addStock',listId:europe.watchlists[0].id,ticker:'ASML.AS',quantity:1,costPerShare:800,acquiredAt:'2026-01-02T00:00:00.000Z'},eu);
   europe=applyGuestAction(europe,{action:'addStock',listId:europe.watchlists[0].id,ticker:'MC.PA',quantity:1,costPerShare:700,acquiredAt:'2026-01-02T00:00:00.000Z'},eu2);
   assert.equal(europe.watchlists[0].stocks.length,2);
+  const ca={symbol:'RY.TO',companyName:'RBC',currency:'CAD',exchange:'Toronto',price:140,quoteTime:'2026-09-11T20:00:00.000Z',checkedAt:'2026-09-11T20:00:00.000Z'};
+  let canada=applyGuestAction(emptyGuestState(),{action:'createList'});
+  canada=applyGuestAction(canada,{action:'addStock',listId:canada.watchlists[0].id,ticker:'RY.TO',quantity:1,costPerShare:140,acquiredAt:'2026-01-02T00:00:00.000Z'},ca);
+  assert.throws(()=>applyGuestAction(canada,{action:'addStock',listId:canada.watchlists[0].id,ticker:'AAPL',quantity:1,costPerShare:190,acquiredAt:'2026-01-02T00:00:00.000Z'},us),/CAD only/);
 });

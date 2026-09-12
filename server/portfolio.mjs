@@ -4,7 +4,7 @@ import {PORTFOLIO_CURRENCIES,listCurrency,tradingTimezone} from '../lib/portfoli
 export function portfolioTotals(stocks){
  const holdings=stocks.filter(s=>s.quantity>0&&s.costPerShare>0);
  const currency=listCurrency(holdings);
- if(currency&&!PORTFOLIO_CURRENCIES.includes(currency))throw new AppError('Portfolios support US (USD), Europe (EUR), and Turkey (TRY) stocks.');
+ if(currency&&!PORTFOLIO_CURRENCIES.includes(currency))throw new AppError('Portfolios support US (USD), Europe (EUR), Canada (CAD), and Turkey (TRY) stocks.');
  const cost=holdings.reduce((sum,s)=>sum+s.quantity*s.costPerShare,0),value=holdings.reduce((sum,s)=>sum+s.quantity*s.currentPrice,0);
  return {cost,value,gain:value-cost,gainPercent:cost?(value-cost)/cost*100:null,positions:holdings.length,incomplete:stocks.length-holdings.length,currency};
 }

@@ -325,7 +325,7 @@ export function MarketBoard(){
       <div>
         <p className="eyebrow"><T text="MARKETS, IN ONE PLACE"/></p>
         <h1><T text="Today’s tape."/></h1>
-        <p className="intro"><T text="Look up any stock or ETF, open its chart and company details, then scroll the sectors. Earnings reports stay with Pro."/></p>
+        <p className="intro"><T text="Look up stocks from the US, Europe, Canada, and Turkey. Open a chart and company details, then scroll the sectors. Earnings reports stay with Pro."/></p>
       </div>
       <SessionBadge/>
     </div>

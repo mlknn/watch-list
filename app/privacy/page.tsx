@@ -15,7 +15,7 @@ export default function Privacy() {
       <p className="privacy-updated">Last updated: September 10, 2026. This policy applies to the StockWatchlist web app at <a href="https://stockwatchlist.app">https://stockwatchlist.app</a>.</p>
       <section>
         <h2>Who we are and what the app does</h2>
-        <p>StockWatchlist (“we”, “the app”) is a personal watchlist product for stocks and ETFs. You can save tickers, keep the market price from the day you added them, see later performance, optionally record share quantities and purchase details, and share a read-only view of a list. It is not a broker, bank, or investment adviser. You can read this policy and the public home page without signing in.</p>
+        <p>StockWatchlist (“we”, “the app”) is a personal watchlist product for stocks and ETFs from the US, Europe, Canada, and Turkey. You can save tickers, keep the market price from the day you added them, see later performance, optionally record share quantities and purchase details, and share a read-only view of a list. It is not a broker, bank, or investment adviser. You can read this policy and the public home page without signing in.</p>
 
         <h2>Google user data (Google Sign-In)</h2>
         <p>If you choose Continue with Google, we use Google OAuth only to sign you in. We request basic account identity needed to create or recognize your StockWatchlist account:</p>
