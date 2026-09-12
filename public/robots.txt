@@ -1,5 +1,8 @@
+# Public product brief for assistants: https://stockwatchlist.app/llms.txt
+
 User-agent: *
 Allow: /
+Allow: /llms.txt
 Allow: /privacy
 Allow: /pricing
 Allow: /dashboard
@@ -9,6 +12,63 @@ Disallow: /api/
 
 User-agent: Googlebot
 Allow: /
+Allow: /llms.txt
 Allow: /privacy
 Allow: /pricing
 Allow: /dashboard
+
+User-agent: GPTBot
+Allow: /
+Allow: /llms.txt
+Disallow: /watchlists
+Disallow: /account
+Disallow: /api/
+
+User-agent: ChatGPT-User
+Allow: /
+Allow: /llms.txt
+Disallow: /watchlists
+Disallow: /account
+Disallow: /api/
+
+User-agent: OAI-SearchBot
+Allow: /
+Allow: /llms.txt
+Disallow: /watchlists
+Disallow: /account
+Disallow: /api/
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /llms.txt
+Disallow: /watchlists
+Disallow: /account
+Disallow: /api/
+
+User-agent: anthropic-ai
+Allow: /
+Allow: /llms.txt
+Disallow: /watchlists
+Disallow: /account
+Disallow: /api/
+
+User-agent: Google-Extended
+Allow: /
+Allow: /llms.txt
+Disallow: /watchlists
+Disallow: /account
+Disallow: /api/
+
+User-agent: PerplexityBot
+Allow: /
+Allow: /llms.txt
+Disallow: /watchlists
+Disallow: /account
+Disallow: /api/
+
+User-agent: Applebot-Extended
+Allow: /
+Allow: /llms.txt
+Disallow: /watchlists
+Disallow: /account
+Disallow: /api/

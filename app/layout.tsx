@@ -30,6 +30,17 @@ export const metadata: Metadata = {
   description: 'Build a what-if stock portfolio and see how your picks perform over time. No signup to start.',
 };
 export const viewport: Viewport = {width:'device-width',initialScale:1,viewportFit:'cover'};
+const softwareJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'StockWatchlist',
+  url: 'https://stockwatchlist.app',
+  applicationCategory: 'FinanceApplication',
+  operatingSystem: 'Web',
+  description: 'A what-if stock portfolio that freezes the price and cost from the day you add a pick, then tracks US, Europe, Canada, and Turkey lists. Not a broker. Not investment advice.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return <html lang="en"><body><LanguageProvider><Analytics/>{children}</LanguageProvider></body></html>;
+  return <html lang="en"><body><script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(softwareJsonLd)}} /><LanguageProvider><Analytics/>{children}</LanguageProvider></body></html>;
 }
