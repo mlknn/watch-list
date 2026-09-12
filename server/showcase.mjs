@@ -29,6 +29,6 @@ export function buildShowcase(entries){
  points=points.filter(p=>p.time<quoteTime);points.push({time:quoteTime,value:currentValue,changePercent:(currentValue/initialValue-1)*100});
  return {stocks,source:'Yahoo Finance',performance:{startDate:SHOWCASE_START,initialValue,currentValue,changePercent:(currentValue/initialValue-1)*100,investmentPerStock,points,quoteTime:new Date(quoteTime).toISOString()},method:'Illustrative buy-and-hold basket: $1,000 invested in each stock on September 3, 2021, with fractional shares and no rebalancing. Split-adjusted prices; excludes dividends, fees and tax. Not actual member activity.'};
 }
-export async function showcase(){if(cached&&Date.now()-cached.at<60000)return cached.data;if(pending)return pending;
+export async function showcase(){if(cached&&Date.now()-cached.at<15000)return cached.data;if(pending)return pending;
  pending=(async()=>{const entries=new Array(examples.length);let next=0;await Promise.all(Array.from({length:3},async()=>{while(next<examples.length){const i=next++,example=examples[i];const [bars,current]=await Promise.all([history(example.symbol),getQuote(example.symbol)]);entries[i]={example,bars,current};}}));const data=buildShowcase(entries);cached={at:Date.now(),data};return data;})();try{return await pending;}finally{pending=null;}
 }
