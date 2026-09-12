@@ -20,7 +20,7 @@ export function dbResult(result) {
     if(e.code==='23505') throw new AppError('This stock or watchlist name already exists.',409);
     if(e.code==='P0002') throw new AppError(e.message,404);
     if(e.code==='P0001') throw new AppError(e.message,400);
-    console.error('Database operation failed:',e.code);
+    console.error('Database operation failed:',e.code,e.message);
     throw new AppError('Could not save or load your data. Please try again.',503);
   }
   return result.data;
@@ -59,7 +59,7 @@ export async function cachedQuote(db,symbol) {
     let row;
     try { const quote=await getQuote(symbol);row={symbol,quote,fetched_at:new Date().toISOString(),error:null}; }
     catch(error){ if(!saved) throw error; row={...saved,fetched_at:new Date().toISOString(),error:error.message}; }
-    dbResult(await db.from('wl_quotes').upsert(row));return row;
+    try{dbResult(await db.from('wl_quotes').upsert(row));}catch(error){if(saved)return saved;throw error;}return row;
   })();
   inFlight.set(symbol,operation);
   try{return await operation;}finally{inFlight.delete(symbol);}

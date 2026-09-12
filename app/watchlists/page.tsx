@@ -31,13 +31,14 @@ async function chartQuote(symbol:string){const chart=await marketChart(symbol);r
 export default function Watchlists(){const t=useT();
   const [position,setPosition]=useState<PositionDraft>(emptyPosition),[editing,setEditing]=useState<Stock|null>(null),[editDraft,setEditDraft]=useState<PositionDraft>(emptyPosition);
   const [state,setState]=useState<AccountState|null>(null),[activeId,setActiveId]=useState(''),[ticker,setTicker]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(''),[notice,setNotice]=useState(''),[dialog,setDialog]=useState<'create'|'rename'|'share'|null>(null),[name,setName]=useState(''),[deletion,setDeletion]=useState<{listId:string;stockId?:string;label:string}|null>(null),[configured,setConfigured]=useState<boolean|null>(null),[saveOpen,setSaveOpen]=useState(false);
-  const lock=useRef(false),stateRef=useRef<AccountState|null>(null),inputRef=useRef<HTMLInputElement>(null);
+  const lock=useRef(false),refreshing=useRef(false),generation=useRef(0),stateRef=useRef<AccountState|null>(null),inputRef=useRef<HTMLInputElement>(null);
 
   const apply=useCallback((data:AccountState)=>{if(stateRef.current&&Date.parse(data.updatedAt)<Date.parse(stateRef.current.updatedAt))return;stateRef.current=data;setState(data);setActiveId(current=>data.watchlists.some((list:Watchlist)=>list.id===current)?current:data.watchlists[0]?.id||'');},[]);
   const load=useCallback(async()=>{try{await config();setConfigured(true);if(await signedIn()){let claimed=null as AccountState|null;try{claimed=await claimGuestWatchlists();}catch(e){setError((e as Error).message);}apply(claimed||await apiJson<AccountState>('/api/watchlists'));if(claimed)setError('');return;}apply(ensureGuestList(window.localStorage));setError('');}catch(e){setError((e as Error).message);}},[apply]);
   const act=useCallback(async(input:Action,automatic=false):Promise<AccountState|null>=>{
-    if(lock.current){if(automatic)return null;throw new Error('An update is already in progress.');}
-    lock.current=true;setBusy(input.action);if(!automatic){setError('');setNotice('');}
+    if(automatic){if(lock.current||refreshing.current||!stateRef.current)return null;refreshing.current=true;}
+    else{if(lock.current)throw new Error('An update is already in progress.');lock.current=true;generation.current+=1;setBusy(input.action);setError('');setNotice('');}
+    const token=generation.current;
     try{
       if(stateRef.current?.guest){
         if(input.action==='shareList'||input.action==='revokeShare'){setSaveOpen(true);throw new Error('Save your list to share it with friends.');}
@@ -53,18 +54,20 @@ export default function Watchlists(){const t=useT();
         }
         const firstStock=!stateRef.current.watchlists.some(list=>list.stocks.length);
         const data=writeGuestState(applyGuestAction(stateRef.current,input,quote),window.localStorage);
+        if(automatic&&token!==generation.current)return null;
         apply(data);
         if(input.action==='createList'||(input.action==='addStock'&&firstStock))track('watchlist_created');
         return data;
       }
-      const data=await apiJson<AccountState>('/api/watchlists',input);
+      const data=input.action==='refresh'?await apiJson<AccountState>('/api/watchlists?refresh=1'):await apiJson<AccountState>('/api/watchlists',input);
+      if(automatic&&token!==generation.current)return null;
       apply(data);
       if(input.action==='createList')track('watchlist_created');
       return data;
-    }catch(e){setError((e as Error).message);throw e;}
-    finally{lock.current=false;setBusy('');}
+    }catch(e){if(!automatic){setError((e as Error).message);throw e;}return null;}
+    finally{if(automatic)refreshing.current=false;else{lock.current=false;setBusy('');}}
   },[apply]);
-  useEffect(()=>{void load().then(()=>{if(stateRef.current)void act({action:'refresh'},true).catch(()=>{});});const refresh=()=>{if(!document.hidden&&stateRef.current)void act({action:'refresh'},true).catch(()=>{});};const timer=setInterval(refresh,60000);document.addEventListener('visibilitychange',refresh);return()=>{clearInterval(timer);document.removeEventListener('visibilitychange',refresh);};},[load,act]);
+  useEffect(()=>{void load();const refresh=()=>{if(!document.hidden&&stateRef.current)void act({action:'refresh'},true);};const timer=setInterval(refresh,60000);document.addEventListener('visibilitychange',refresh);return()=>{clearInterval(timer);document.removeEventListener('visibilitychange',refresh);};},[load,act]);
   useEffect(()=>{
     type Tool={name:string;description:string;inputSchema:object;annotations:object;execute:(input:unknown)=>unknown};
     const context=(document as Document&{modelContext?:{registerTool:(tool:Tool,options:{signal:AbortSignal})=>unknown}}).modelContext;if(!context?.registerTool)return;const lifecycle=new AbortController();
