@@ -37,11 +37,13 @@ async function customerFor(db,user,stripe){
 export async function checkout(db,user,cycle='monthly'){
   const priceId=priceIdFor(cycle);
   if(!billingReady(cycle))throw new AppError('Pro checkout is not available yet.',503);
+  const existing=dbResult(await db.from('wl_profiles').select('*').eq('id',user.id).single());
+  if(existing.subscription_status==='active'&&Date.parse(existing.pro_until)>Date.now())throw new AppError('You already have Pro.',409);
   await proPrice(cycle);
   const stripe=stripeClient();const customer=await customerFor(db,user,stripe);
   await syncBilling(db,customer);
   const profile=dbResult(await db.from('wl_profiles').select('*').eq('id',user.id).single());
-  if(profile.subscription_status==='active'&&Date.parse(profile.pro_until)>Date.now())throw new AppError('You already have Pro. Manage your subscription in your account.',409);
+  if(profile.subscription_status==='active'&&Date.parse(profile.pro_until)>Date.now())throw new AppError('You already have Pro.',409);
   const existing=await stripe.checkout.sessions.list({customer,status:'open',limit:10});
   const open=existing.data.find(s=>s.mode==='subscription'&&s.metadata?.price_id===priceId&&s.metadata?.checkout_design===CHECKOUT_DESIGN&&s.url);
   if(open)return {url:open.url};
