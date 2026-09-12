@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { randomBytes } from 'node:crypto';
 import {canViewAnalytics} from './analytics-access.mjs';
 import { AppError, getQuote, normalizeTicker } from './quotes.mjs';
+import {assertQuoteCurrency} from '../lib/portfolio-currency.mjs';
 
 export const authConfigured = () => localMode() || !!(process.env.SUPABASE_URL && process.env.SUPABASE_PUBLISHABLE_KEY && process.env.SUPABASE_SERVICE_ROLE_KEY);
 export const origin = () => (process.env.APP_URL || 'http://127.0.0.1:4317').replace(/\/$/, '');
@@ -126,6 +127,9 @@ export async function accountAction(db,user,input) {
     const result=await cachedQuote(db,normalizeTicker(input.ticker));
     if(result.error)throw new AppError('A current quote is unavailable. Please try adding this stock again shortly.',502);
     quote=result.quote;
+    const existing=dbResult(await db.from('wl_stocks').select('snapshot').eq('watchlist_id',input.listId));
+    try{assertQuoteCurrency(quote.currency,existing.map(row=>({currency:row.snapshot?.currency})));}
+    catch(error){throw new AppError(error.message);}
   }
   dbResult(await db.rpc('wl_advanced_action',{p_user:user.id,p_action:input.action,p_list:input.listId||null,p_name:input.name||null,p_symbol:quote?.symbol||null,p_quote:quote,p_stock:input.stockId||null,p_token:input.action==='shareList'?randomBytes(32).toString('base64url'):null,p_mode:'advanced',p_quantity:input.quantity??null,p_cost:input.costPerShare??quote?.price??null,p_acquired:input.acquiredAt||new Date().toISOString(),p_notes:input.notes||''}));
   if(localMode())await exportLocalData();

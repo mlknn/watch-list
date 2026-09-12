@@ -62,3 +62,17 @@ test('guest workspace starts with an unnamed default list',async()=>{
   assert.equal(again.watchlists[0].id,first.watchlists[0].id);
   assert.equal(guestHasDraft(first),false);
 });
+
+test('guest lists lock to the first stock currency',()=>{
+  const tr={symbol:'THYAO.IS',companyName:'THY',currency:'TRY',exchange:'Istanbul',price:300,quoteTime:'2026-09-11T20:00:00.000Z',checkedAt:'2026-09-11T20:00:00.000Z'};
+  const us={symbol:'AAPL',companyName:'Apple',currency:'USD',exchange:'Nasdaq',price:190,quoteTime:'2026-09-11T20:00:00.000Z',checkedAt:'2026-09-11T20:00:00.000Z'};
+  const eu={symbol:'ASML.AS',companyName:'ASML',currency:'EUR',exchange:'Amsterdam',price:800,quoteTime:'2026-09-11T20:00:00.000Z',checkedAt:'2026-09-11T20:00:00.000Z'};
+  const eu2={symbol:'MC.PA',companyName:'LVMH',currency:'EUR',exchange:'Paris',price:700,quoteTime:'2026-09-11T20:00:00.000Z',checkedAt:'2026-09-11T20:00:00.000Z'};
+  let state=applyGuestAction(emptyGuestState(),{action:'createList'});
+  state=applyGuestAction(state,{action:'addStock',listId:state.watchlists[0].id,ticker:'THYAO.IS',quantity:10,costPerShare:300,acquiredAt:'2026-01-02T00:00:00.000Z'},tr);
+  assert.throws(()=>applyGuestAction(state,{action:'addStock',listId:state.watchlists[0].id,ticker:'AAPL',quantity:1,costPerShare:190,acquiredAt:'2026-01-02T00:00:00.000Z'},us),/TRY only/);
+  let europe=applyGuestAction(emptyGuestState(),{action:'createList'});
+  europe=applyGuestAction(europe,{action:'addStock',listId:europe.watchlists[0].id,ticker:'ASML.AS',quantity:1,costPerShare:800,acquiredAt:'2026-01-02T00:00:00.000Z'},eu);
+  europe=applyGuestAction(europe,{action:'addStock',listId:europe.watchlists[0].id,ticker:'MC.PA',quantity:1,costPerShare:700,acquiredAt:'2026-01-02T00:00:00.000Z'},eu2);
+  assert.equal(europe.watchlists[0].stocks.length,2);
+});

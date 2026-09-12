@@ -79,6 +79,10 @@
     "Birim maliyet (USD)",
     "Costo por unidad (USD)"
   ],
+  "Cost per share": [
+    "Birim maliyet",
+    "Costo por unidad"
+  ],
   "Purchase date": [
     "Alım tarihi",
     "Fecha de compra"
