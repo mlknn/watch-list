@@ -1,5 +1,6 @@
 import {LanguageProvider} from '@/components/product/language';
 import {Analytics} from '@/components/product/analytics';
+import {GoogleAdsTag} from '@/components/product/google-ads-tag';
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 export const metadata: Metadata = {
@@ -42,5 +43,5 @@ const softwareJsonLd = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return <html lang="en"><body><script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(softwareJsonLd)}} /><LanguageProvider><Analytics/>{children}</LanguageProvider></body></html>;
+  return <html lang="en"><body><script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(softwareJsonLd)}} /><LanguageProvider><Analytics/><GoogleAdsTag/>{children}</LanguageProvider></body></html>;
 }
