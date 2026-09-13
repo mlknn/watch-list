@@ -1,4 +1,5 @@
 # Public product brief for assistants: https://stockwatchlist.app/llms.txt
+Sitemap: https://stockwatchlist.app/sitemap.xml
 
 User-agent: *
 Allow: /
