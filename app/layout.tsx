@@ -33,13 +33,22 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {width:'device-width',initialScale:1,viewportFit:'cover'};
 const softwareJsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'WebApplication',
-  name: 'StockWatchlist',
-  url: 'https://stockwatchlist.app',
-  applicationCategory: 'FinanceApplication',
-  operatingSystem: 'Web',
-  description: 'A what-if stock portfolio that freezes the price and cost from the day you add a pick, then tracks US, Europe, Canada, and Turkey lists. Not a broker. Not investment advice.',
-  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      name: 'StockWatchlist',
+      url: 'https://stockwatchlist.app/',
+    },
+    {
+      '@type': 'WebApplication',
+      name: 'StockWatchlist',
+      url: 'https://stockwatchlist.app/',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Web',
+      description: 'A what-if stock portfolio that freezes the price and cost from the day you add a pick, then tracks US, Europe, Canada, and Turkey lists. Not a broker. Not investment advice.',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

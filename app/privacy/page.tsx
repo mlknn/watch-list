@@ -4,6 +4,7 @@ import {PublicNav,PublicFooter} from '@/components/product/nav';
 export const metadata: Metadata = {
   title: 'Privacy policy — StockWatchlist',
   description: 'How StockWatchlist collects, uses, stores, and shares account data, including Google Sign-In name and email.',
+  alternates: {canonical: 'https://stockwatchlist.app/privacy'},
 };
 
 export default function Privacy() {
