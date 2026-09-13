@@ -1614,5 +1614,17 @@
   "↑ ↓ to browse · Enter to select": [
     "↑ ↓ gez · Enter ile seç",
     "↑ ↓ para recorrer · Enter para elegir"
+  ],
+  "Invalid URL": [
+    "Geçersiz URL",
+    "URL no válida"
+  ],
+  "This page does not exist.": [
+    "Bu sayfa yok.",
+    "Esta página no existe."
+  ],
+  "Navigating to the dashboard page…": [
+    "Gösterge panosuna yönlendiriliyorsunuz…",
+    "Yendo al panel…"
   ]
 }
