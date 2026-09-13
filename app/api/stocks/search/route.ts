@@ -1,9 +1,10 @@
-import {json} from '@/server/http.mjs';
+import {json,failure,publicRate} from '@/server/http.mjs';
 import {getTickerSuggestions,rankStockSuggestions} from '@/lib/stock-search.mjs';
 import {tickerFitsCurrency} from '@/lib/portfolio-currency.mjs';
 const cache=new Map<string,{at:number;items:{symbol:string;name:string}[]}>();
 export async function GET(request:Request){
  const url=new URL(request.url),query=(url.searchParams.get('q')||'').trim(),limit=Math.min(12,Math.max(1,Number(url.searchParams.get('limit'))||8)),currency=(url.searchParams.get('currency')||'').toUpperCase()||undefined;
+ try{publicRate(request,'search',90,60);}catch(e){return failure(e);}
  if(!query)return json([]);if(query.length>80)return json({error:'Keep searches under 80 characters.'},400);
  const local=getTickerSuggestions(query,12,currency),key=query.toLowerCase()+'|'+(currency||''),saved=cache.get(key);
  if(saved&&Date.now()-saved.at<300000)return json(rankStockSuggestions(query,[...local,...saved.items].filter(s=>tickerFitsCurrency(s.symbol,currency)),limit));

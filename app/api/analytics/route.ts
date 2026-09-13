@@ -14,7 +14,7 @@ export async function POST(request:Request){
 export async function GET(request:Request){
   try{
     const {db}=await requireAnalytics(request);
-    const days=Number(new URL(request.url).searchParams.get('days')||14);
+    const days=Math.min(90,Math.max(1,Number(new URL(request.url).searchParams.get('days'))||14));
     return json(await analyticsSummary(db,days));
   }catch(e){return failure(e);}
 }
