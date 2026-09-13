@@ -1,6 +1,7 @@
 import {AppError} from './quotes.mjs';
 import {origin} from './cloud.mjs';
-export const json=(data,status=200)=>Response.json(data,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'}});
+export const json=(data,status=200,extra)=>Response.json(data,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer',...extra||{}}});
+export const publicJson=(data,seconds=30)=>json(data,200,{'Cache-Control':`public, max-age=0, s-maxage=${seconds}, stale-while-revalidate=${Math.max(60,seconds*2)}`});
 export function failure(e){if(e instanceof AppError)return json({error:e.message},e.status);console.error('Request failed:',e?.message);return json({error:'Something went wrong. Please try again.'},500);}
 const buckets=new Map();
 export function publicRate(request,key,limit=80,seconds=60){
