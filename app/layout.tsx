@@ -12,11 +12,13 @@ export const metadata: Metadata = {
     url: 'https://stockwatchlist.app',
     siteName: 'StockWatchlist',
     type: 'website',
+    images: [{url: '/og.jpg', width: 1200, height: 630, alt: 'StockWatchlist what-if portfolio'}],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: 'StockWatchlist — Build a what-if stock portfolio',
     description: 'Pick stocks, set starting amounts, and see how the portfolio performs. No signup to start.',
+    images: ['/og.jpg'],
   },
   icons: {
     icon: [
