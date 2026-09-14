@@ -55,6 +55,26 @@
     "Planlar",
     "Planes"
   ],
+  "Compare": [
+    "Karşılaştır",
+    "Comparar"
+  ],
+  "Open source": [
+    "Açık kaynak",
+    "Código abierto"
+  ],
+  "GitHub": [
+    "GitHub",
+    "GitHub"
+  ],
+  "Open source (MIT).": [
+    "Açık kaynak (MIT).",
+    "Código abierto (MIT)."
+  ],
+  "Read the code, self-host it, or follow the public repo.": [
+    "Kodu oku, kendi sunucunda çalıştır veya public repoyu takip et.",
+    "Lee el código, autoalójalo o sigue el repositorio público."
+  ],
   "Invite a friend": [
     "Arkadaşını davet et",
     "Invitar a un amigo"

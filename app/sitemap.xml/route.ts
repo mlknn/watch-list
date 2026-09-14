@@ -1,7 +1,16 @@
-const urls=['https://stockwatchlist.app/','https://stockwatchlist.app/dashboard','https://stockwatchlist.app/pricing','https://stockwatchlist.app/privacy','https://stockwatchlist.app/signup','https://stockwatchlist.app/login'];
+const urls=[
+  ['https://stockwatchlist.app/','daily','1.0'],
+  ['https://stockwatchlist.app/dashboard','hourly','0.9'],
+  ['https://stockwatchlist.app/pricing','weekly','0.8'],
+  ['https://stockwatchlist.app/compare','weekly','0.8'],
+  ['https://stockwatchlist.app/open-source','monthly','0.7'],
+  ['https://stockwatchlist.app/privacy','yearly','0.5'],
+  ['https://stockwatchlist.app/signup','monthly','0.6'],
+  ['https://stockwatchlist.app/login','monthly','0.4'],
+];
 const body=`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map((loc,i)=>`  <url><loc>${loc}</loc><changefreq>${i<2?'daily':'weekly'}</changefreq><priority>${['1.0','0.9','0.8','0.5','0.6','0.4'][i]}</priority></url>`).join('\n')}
+${urls.map(([loc,changefreq,priority])=>`  <url><loc>${loc}</loc><changefreq>${changefreq}</changefreq><priority>${priority}</priority></url>`).join('\n')}
 </urlset>
 `;
 export const dynamic='force-static';

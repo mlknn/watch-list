@@ -7,6 +7,8 @@ Allow: /llms.txt
 Allow: /privacy
 Allow: /pricing
 Allow: /dashboard
+Allow: /compare
+Allow: /open-source
 Disallow: /watchlists
 Disallow: /account
 Disallow: /api/
@@ -17,6 +19,8 @@ Allow: /llms.txt
 Allow: /privacy
 Allow: /pricing
 Allow: /dashboard
+Allow: /compare
+Allow: /open-source
 
 User-agent: GPTBot
 Allow: /

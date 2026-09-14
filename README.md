@@ -5,6 +5,8 @@ A what-if stock portfolio at [stockwatchlist.app](https://stockwatchlist.app). Y
 **Not a broker. Not investment advice.** Quotes are delayed public data.
 
 - [Live app](https://stockwatchlist.app) — no account required to start
+- [Compare](https://stockwatchlist.app/compare) — vs Yahoo Finance, Google Finance, TradingView
+- [Open source notes](https://stockwatchlist.app/open-source)
 - [Example paper book](https://stockwatchlist.app/share/REDACTED_SHARE_TOKEN)
 - Markets: US (USD), Europe (EUR), Canada (CAD), Turkey (TRY). Each list locks to the first stock’s currency.
 

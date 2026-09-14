@@ -2,6 +2,12 @@
   "name": "watch-list",
   "version": "0.1.0",
   "private": true,
+  "description": "What-if stock portfolios that freeze the price from the day you add a pick.",
+  "homepage": "https://stockwatchlist.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mlknn/watch-list.git"
+  },
   "engines": {
     "node": ">=22.13.0"
   },
