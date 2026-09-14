@@ -55,3 +55,6 @@ next-env.d.ts
 .cursor/
 .openai/
 Start Watchlist.command
+
+# Local Supabase CLI config (may reference env-backed Apple secrets)
+supabase/config.toml

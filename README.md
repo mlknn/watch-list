@@ -7,7 +7,7 @@ A what-if stock portfolio at [stockwatchlist.app](https://stockwatchlist.app). Y
 - [Live app](https://stockwatchlist.app) — no account required to start
 - [Compare](https://stockwatchlist.app/compare) — vs Yahoo Finance, Google Finance, TradingView
 - [Open source notes](https://stockwatchlist.app/open-source)
-- [Example paper book](https://stockwatchlist.app/share/REDACTED_SHARE_TOKEN)
+- Saved lists can issue a read-only `/share/…` link (capability token; do not commit live tokens)
 - Markets: US (USD), Europe (EUR), Canada (CAD), Turkey (TRY). Each list locks to the first stock’s currency.
 
 ## Features

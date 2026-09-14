@@ -68,13 +68,15 @@ export default function Watchlists(){const t=useT();
     finally{if(automatic)refreshing.current=false;else{lock.current=false;setBusy('');}}
   },[apply]);
   useEffect(()=>{void load();const refresh=()=>{if(!document.hidden&&stateRef.current)void act({action:'refresh'},true);};const timer=setInterval(refresh,60000);document.addEventListener('visibilitychange',refresh);return()=>{clearInterval(timer);document.removeEventListener('visibilitychange',refresh);};},[load,act]);
+  const canRegisterTools=!!state&&!state.guest;
   useEffect(()=>{
+    if(!canRegisterTools)return;
     type Tool={name:string;description:string;inputSchema:object;annotations:object;execute:(input:unknown)=>unknown};
     const context=(document as Document&{modelContext?:{registerTool:(tool:Tool,options:{signal:AbortSignal})=>unknown}}).modelContext;if(!context?.registerTool)return;const lifecycle=new AbortController();
     const register=(tool:Tool)=>{try{void Promise.resolve(context.registerTool(tool,{signal:lifecycle.signal})).catch(console.warn);}catch(e){console.warn(e);}};
     register({name:'read_watchlists',description:'Read this signed-in user’s saved watchlists and prices.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:true},execute:()=>stateRef.current});
     register({name:'add_stock_to_watchlist',description:'Add a stock to a watchlist owned by the signed-in user, within their plan limits.',inputSchema:{type:'object',properties:{listId:{type:'string'},ticker:{type:'string'},quantity:{type:'number',exclusiveMinimum:0}},required:['listId','ticker','quantity'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:true},execute:async input=>{const value=input as {listId?:unknown;ticker?:unknown;quantity?:unknown};if(!value||typeof value.listId!=='string'||typeof value.ticker!=='string'||typeof value.quantity!=='number'||!Number.isFinite(value.quantity)||value.quantity<=0)throw new Error('Provide listId, ticker, and a positive quantity.');const result=await act({action:'addStock',listId:value.listId,ticker:value.ticker,quantity:value.quantity});setActiveId(value.listId);return result?.watchlists.find(l=>l.id===value.listId);}});return()=>lifecycle.abort();
-  },[act]);
+  },[act,canRegisterTools]);
   const active=state?.watchlists.find(l=>l.id===activeId)||state?.watchlists[0];const canEdit=active?.role==='owner';const stale=active?.stocks.filter(s=>s.quoteError).length||0;
   const marketError=parseCurrencyMismatch(error);
   const shareUrl=active?.shareToken&&typeof window!=='undefined'?`${window.location.origin}/share/${active.shareToken}`:'';

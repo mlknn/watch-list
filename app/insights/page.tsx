@@ -11,7 +11,7 @@ export default function Insights(){
   if(!days)return <><header className="topbar"><Brand/><a className="quiet-link" href="/account">← Account</a></header><main className="account-page insights-page">{error?<p className="error-banner" role="alert">{error}</p>:<p>Loading analytics…</p>}</main><PublicFooter/></>;
   return <><header className="topbar"><Brand/><a className="quiet-link" href="/account">← Account</a></header>
     <main className="account-page insights-page">
-      <p className="eyebrow">SITE OWNER</p>
+      <p className="eyebrow">ANALYTICS</p>
       <h1>Product analytics</h1>
       <p className="intro">First-party counts stored in your database. Unique people use an anonymous browser id, not an IP address. Totals count every recorded action that day.</p>
       {today&&<div className="insights-today">{([['Visited',today.visit],['Dashboard',today.dashboard],['Searched a stock',today.stock_search],['Created a watchlist',today.watchlist_created],['Signed up',today.signup]] as const).map(([label,metric])=><article key={label}><span>{label}</span><strong>{metric.unique}</strong><small>{metric.total} events today</small></article>)}</div>}

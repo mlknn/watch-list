@@ -1,12 +1,12 @@
 import {test,before,after} from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp,rm,writeFile} from 'node:fs/promises';
+import {mkdtemp,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {localAuth,localUser,passwordHash,passwordMatches} from '../server/local-auth.mjs';
 import {localPg,localDatabase} from '../server/local-db.mjs';
 let directory;const request=cookie=>new Request('http://127.0.0.1:4317/api/local-auth',{headers:cookie?{cookie}:undefined});
-before(async()=>{directory=await mkdtemp(join(tmpdir(),'watchlist-auth-'));process.env.LOCAL_DATA_DIR=directory;process.env.LOCAL_AUTH_ENABLED='true';process.env.APP_URL='http://127.0.0.1:4317';await writeFile(join(directory,'bootstrap-admin.json'),JSON.stringify({email:'override@example.com',passwordHash:'not-used',name:'Override'}));});
+before(async()=>{directory=await mkdtemp(join(tmpdir(),'watchlist-auth-'));process.env.LOCAL_DATA_DIR=directory;process.env.LOCAL_AUTH_ENABLED='true';process.env.APP_URL='http://127.0.0.1:4317';});
 after(async()=>{await (await localPg()).close();await rm(directory,{recursive:true,force:true});});
 test('local signup requires single-use verification and creates an isolated Basic account',async()=>{
  const input={action:'signup',name:'Local Member',email:'member@example.com',password:'Test12'};

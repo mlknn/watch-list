@@ -1,5 +1,5 @@
 import { mkdir, readFile, open, rename, copyFile, unlink } from 'node:fs/promises';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { AppError, normalizeTicker, getQuote } from './quotes.mjs';
 
@@ -123,6 +123,3 @@ export function createStore({ directory, quote = getQuote }) {
   }
   return { read, action, file };
 }
-// Reuse the single write queue across development hot reloads.
-const key = Symbol.for('watch-list.store');
-export const store = globalThis[key] ??= createStore({ directory: resolve(process.env.WATCHLIST_DATA_DIR || 'data') });

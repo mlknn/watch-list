@@ -5,7 +5,7 @@ export const publicJson=(data,seconds=30)=>json(data,200,{'Cache-Control':`publi
 export function failure(e){if(e instanceof AppError)return json({error:e.message},e.status);console.error('Request failed:',e?.message);return json({error:'Something went wrong. Please try again.'},500);}
 const buckets=new Map();
 export function publicRate(request,key,limit=80,seconds=60){
-  const ip=request.headers.get('cf-connecting-ip')||request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()||'local';
+  const ip=request.headers.get('cf-connecting-ip')||'local';
   const id=key+':'+ip;const now=Date.now();const row=buckets.get(id)||{at:now,n:0};
   if(now-row.at>seconds*1000){row.at=now;row.n=0;}
   row.n+=1;buckets.set(id,row);if(buckets.size>4000)buckets.delete(buckets.keys().next().value);

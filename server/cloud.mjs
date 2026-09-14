@@ -7,6 +7,23 @@ import { AppError, getQuote, normalizeTicker } from './quotes.mjs';
 import {assertQuoteCurrency} from '../lib/portfolio-currency.mjs';
 
 export const authConfigured = () => localMode() || !!(process.env.SUPABASE_URL && process.env.SUPABASE_PUBLISHABLE_KEY && process.env.SUPABASE_SERVICE_ROLE_KEY);
+function jwtPayload(token){
+  const parts=String(token||'').split('.');
+  if(parts.length!==3)return null;
+  try{
+    const pad=parts[1].replace(/-/g,'+').replace(/_/g,'/');
+    return JSON.parse(Buffer.from(pad+'='.repeat((4-pad.length%4)%4),'base64').toString('utf8'));
+  }catch{return null;}
+}
+/** Browser-safe anon/publishable key only. Never return a service_role JWT. */
+export function browserSupabaseKey(key=process.env.SUPABASE_PUBLISHABLE_KEY||''){
+  const raw=String(key||'').trim();
+  if(!raw||/service_role/i.test(raw))return '';
+  const payload=jwtPayload(raw);
+  if(payload&&payload.role&&payload.role!=='anon'&&payload.role!=='authenticated')return '';
+  if(payload===null&&raw.split('.').length===3)return '';
+  return raw;
+}
 export const origin = () => (process.env.APP_URL || 'http://127.0.0.1:4317').replace(/\/$/, '');
 /** @returns {any} */
 export function database() {
