@@ -1,12 +1,12 @@
 import {test,before,after} from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp,rm} from 'node:fs/promises';
+import {mkdtemp,rm,writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {localAuth,localUser,passwordHash,passwordMatches} from '../server/local-auth.mjs';
 import {localPg,localDatabase} from '../server/local-db.mjs';
 let directory;const request=cookie=>new Request('http://127.0.0.1:4317/api/local-auth',{headers:cookie?{cookie}:undefined});
-before(async()=>{directory=await mkdtemp(join(tmpdir(),'watchlist-auth-'));process.env.LOCAL_DATA_DIR=directory;process.env.LOCAL_AUTH_ENABLED='true';process.env.APP_URL='http://127.0.0.1:4317';});
+before(async()=>{directory=await mkdtemp(join(tmpdir(),'watchlist-auth-'));process.env.LOCAL_DATA_DIR=directory;process.env.LOCAL_AUTH_ENABLED='true';process.env.APP_URL='http://127.0.0.1:4317';await writeFile(join(directory,'bootstrap-admin.json'),JSON.stringify({email:'override@example.com',passwordHash:'not-used',name:'Override'}));});
 after(async()=>{await (await localPg()).close();await rm(directory,{recursive:true,force:true});});
 test('local signup requires single-use verification and creates an isolated Basic account',async()=>{
  const input={action:'signup',name:'Local Member',email:'member@example.com',password:'Test12'};
@@ -16,6 +16,7 @@ test('local signup requires single-use verification and creates an isolated Basi
  await assert.rejects(localAuth(request(),{action:'verify',token}),/already used/);
  const user=await localUser(request(verified.cookie));assert.equal(user.email,input.email);
  const profile=await localDatabase().from('wl_profiles').select('*').eq('id',user.id).single();assert.equal(profile.data.subscription_status,'free');
+ assert.equal((await (await localPg()).query("select count(*)::int n from local_users where email='override@example.com'")).rows[0].n,0);
  await assert.rejects(localAuth(request(),{...input,action:'login',password:'wrong'}),e=>e.status===401);
  const reset=await localAuth(request(),{action:'reset',email:input.email});await localAuth(request(),{action:'updatePassword',token:reset.payload.localDelivery.url.split('token=')[1],password:'New456'});
  await assert.rejects(localUser(request(verified.cookie)),e=>e.status===401);

@@ -96,7 +96,7 @@ Chart requests are cached for one minute per symbol/range and fundamentals for f
 
 ## Local account service and advanced portfolios
 
-`server/local-auth.mjs` provides loopback-only local signup, simulated verification/reset delivery, scrypt password hashes, expiring single-use tokens and HttpOnly cookie sessions. Persisted rate limits restrict login attempts. The optional local seed account contains only a salted password hash and is ignored by Git. This does not verify ownership of email addresses and is disabled for a public APP_URL.
+`server/local-auth.mjs` provides loopback-only local signup, simulated verification/reset delivery, scrypt password hashes, expiring single-use tokens and HttpOnly cookie sessions. Persisted rate limits restrict login attempts. There is no seeded admin or Pro-override account. Local mode does not prove email ownership and is disabled unless APP_URL is loopback.
 
 `server/local-db.mjs` uses filesystem-backed PGlite with the same SQL migrations and ownership/plan RPCs as Supabase. It exports private watchlist JSON after changes; the password/session tables are excluded from the JSON export. Node filesystem storage is documented by [PGlite](https://pglite.dev/docs/filesystems).
 

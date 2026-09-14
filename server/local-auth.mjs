@@ -1,19 +1,11 @@
 import {randomBytes,randomUUID,createHash,scrypt as derive,timingSafeEqual} from 'node:crypto';
 import {promisify} from 'node:util';
-import {readFile} from 'node:fs/promises';
-import {resolve} from 'node:path';
 import {localPg,localMode,persistLocalDatabase} from './local-db.mjs';
 import {AppError} from './quotes.mjs';
 const scrypt=promisify(derive),hash=t=>createHash('sha256').update(t).digest('hex');
 export async function passwordHash(password){const salt=randomBytes(16).toString('hex');return salt+':'+Buffer.from(await scrypt(password,salt,64)).toString('hex');}
 export async function passwordMatches(password,encoded){const [salt,key]=encoded.split(':');const actual=Buffer.from(await scrypt(password,salt,64));const expected=Buffer.from(key,'hex');return expected.length===actual.length&&timingSafeEqual(actual,expected);}
 export function localRequest(request){if(!localMode())throw new AppError('Local accounts are disabled.',404);if(!['127.0.0.1','localhost','[::1]'].includes(new URL(request.url).hostname))throw new AppError('Local accounts are available on this computer only.',403);}
-let seedPromise;
-export async function seedLocalAdmin(){return seedPromise??=(async()=>{const pg=await localPg();let seed;try{seed=JSON.parse(await readFile(resolve(process.env.LOCAL_DATA_DIR||'data','bootstrap-admin.json'),'utf8'));}catch(e){if(e.code==='ENOENT')return;throw e;}
- if(!seed.email||!seed.passwordHash)return;
- const exists=(await pg.query('select id from local_users where email=$1',[seed.email])).rows[0];if(exists)return;
- const displayName=String(seed.name||'Local owner').slice(0,60);const id=randomUUID();await pg.transaction(async tx=>{await tx.query('insert into auth.users values($1)',[id]);await tx.query('insert into local_users(id,email,password_hash,name,verified_at) values($1,$2,$3,$4,now())',[id,seed.email,seed.passwordHash,displayName]);await tx.query('select wl_ensure_profile($1,$2,0)',[id,displayName]);await tx.query("update wl_profiles set subscription_status='active',pro_until=timestamptz '2099-01-01' where id=$1",[id]);});
- })().catch(e=>{seedPromise=null;throw e;});}
 const userView=u=>({id:u.id,email:u.email,email_confirmed_at:u.verified_at,user_metadata:{full_name:u.name},local:true});
 const cookieToken=request=>(request.headers.get('cookie')||'').split(';').map(s=>s.trim()).find(s=>s.startsWith('wl_session='))?.slice(11)||'';
 export async function localUser(request){localRequest(request);const token=cookieToken(request);if(!/^[\w-]{43}$/.test(token))throw new AppError('Please sign in to continue.',401);const pg=await localPg();const u=(await pg.query('select u.* from local_sessions s join local_users u on u.id=s.user_id where token_hash=$1 and expires_at>now()',[hash(token)])).rows[0];if(!u||!u.verified_at)throw new AppError('Your session expired. Please sign in again.',401);return userView(u);}
@@ -21,7 +13,7 @@ const sessionCookie=token=>`wl_session=${token}; Path=/; HttpOnly; SameSite=Stri
 async function session(pg,user){const token=randomBytes(32).toString('base64url');await pg.query("insert into local_sessions values($1,$2,now()+interval '7 days')",[hash(token),user.id]);return {payload:{user:userView(user)},cookie:sessionCookie(token)};}
 export async function localAuth(request,input){const result=await runLocalAuth(request,input);if(input.action!=='session')await persistLocalDatabase();return result;}
 async function runLocalAuth(request,input){
- localRequest(request);await seedLocalAdmin();const pg=await localPg();
+ localRequest(request);const pg=await localPg();
  const allowed=(await pg.query("select wl_rate('local-auth',120,60) ok")).rows[0].ok;if(!allowed)throw new AppError('Too many attempts. Try again in a minute.',429);
  const {action}=input;const email=String(input.email||'').trim().toLowerCase();const password=String(input.password||'');
  if(['login','signup','resend','reset'].includes(action)&&!(await pg.query('select wl_rate($1,10,300) ok',['auth:'+hash(email)])).rows[0].ok)throw new AppError('Too many attempts for this account. Try again in five minutes.',429);

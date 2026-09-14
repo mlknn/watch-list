@@ -78,7 +78,7 @@ export async function listViews(db,lists,refresh=false) {
   if(refresh){let i=0;await Promise.all(Array.from({length:Math.min(4,symbols.length)},async()=>{while(i<symbols.length){try{await cachedQuote(db,symbols[i++]);}catch{/* Preserve baseline when provider is unavailable. */}}}));}
   const quotes=symbols.length?dbResult(await db.from('wl_quotes').select('*').in('symbol',symbols)):[];
   const lookup=new Map(quotes.map(q=>[q.symbol,q]));
-  return lists.map(l=>({id:l.id,name:l.name,mode:l.mode||'basic',createdAt:l.created_at,shareToken:l.share_token,role:'admin',stocks:stocks.filter(s=>s.watchlist_id===l.id).map(s=>stockView(s,lookup.get(s.symbol)))}));
+  return lists.map(l=>({id:l.id,name:l.name,mode:l.mode||'basic',createdAt:l.created_at,shareToken:l.share_token,role:'owner',stocks:stocks.filter(s=>s.watchlist_id===l.id).map(s=>stockView(s,lookup.get(s.symbol)))}));
 }
 export async function accountState(db,user,refresh=false) {
   const profile=dbResult(await db.from('wl_profiles').select('*').eq('id',user.id).single());
