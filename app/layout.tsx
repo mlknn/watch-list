@@ -1,6 +1,5 @@
 import {LanguageProvider} from '@/components/product/language';
 import {Analytics} from '@/components/product/analytics';
-import {GoogleAdsTag} from '@/components/product/google-ads-tag';
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 export const metadata: Metadata = {
@@ -52,5 +51,14 @@ const softwareJsonLd = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return <html lang="en"><body><script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(softwareJsonLd).replace(/</g,'\\u003c')}} /><LanguageProvider><Analytics/><GoogleAdsTag/>{children}</LanguageProvider></body></html>;
+  return <html lang="en">
+    <head>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18447742703"/>
+      <script dangerouslySetInnerHTML={{__html:"window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','AW-18447742703');"}}/>
+    </head>
+    <body>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(softwareJsonLd).replace(/</g,'\\u003c')}} />
+      <LanguageProvider><Analytics/>{children}</LanguageProvider>
+    </body>
+  </html>;
 }
