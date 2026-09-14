@@ -1,5 +1,7 @@
-const ANALYTICS_EMAILS=new Set(['owner@example.com','ops@example.com']);
+function allowlist(){
+  return new Set(String(process.env.ANALYTICS_EMAILS||'').split(/[,;\s]+/).map(value=>value.trim().toLowerCase()).filter(Boolean));
+}
 
 export function canViewAnalytics(email){
-  return ANALYTICS_EMAILS.has(String(email||'').trim().toLowerCase());
+  return allowlist().has(String(email||'').trim().toLowerCase());
 }

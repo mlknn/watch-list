@@ -28,7 +28,7 @@ npm test
 npm run dev
 ```
 
-Hosted production uses Cloudflare. Keep `LOCAL_AUTH_ENABLED=false` on any public server.
+Hosted production uses Cloudflare. Keep `LOCAL_AUTH_ENABLED=false` on any public server. Put Stripe, Supabase, and `ANALYTICS_EMAILS` in runtime secrets, not in Git.
 
 ## License
 

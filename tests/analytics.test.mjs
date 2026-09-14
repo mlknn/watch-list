@@ -32,12 +32,20 @@ test('analytics counts unique visitors separately from repeat events',async()=>{
   assert.equal(today.signup.unique,0);
 });
 
-test('analytics access is limited to two owner emails',()=>{
-  assert.equal(canViewAnalytics('owner@example.com'),true);
-  assert.equal(canViewAnalytics('OPS@EXAMPLE.COM'),true);
-  assert.equal(canViewAnalytics('other@example.com'),false);
-  assert.equal(canViewAnalytics('stranger@example.com'),false);
-  assert.equal(canViewAnalytics(''),false);
+test('analytics access follows ANALYTICS_EMAILS',()=>{
+  const previous=process.env.ANALYTICS_EMAILS;
+  try{
+    process.env.ANALYTICS_EMAILS='owner@example.com,ops@example.com';
+    assert.equal(canViewAnalytics('owner@example.com'),true);
+    assert.equal(canViewAnalytics('OPS@example.com'),true);
+    assert.equal(canViewAnalytics('other@example.com'),false);
+    assert.equal(canViewAnalytics(''),false);
+    process.env.ANALYTICS_EMAILS='';
+    assert.equal(canViewAnalytics('owner@example.com'),false);
+  }finally{
+    if(previous===undefined)delete process.env.ANALYTICS_EMAILS;
+    else process.env.ANALYTICS_EMAILS=previous;
+  }
 });
 
 test('new profiles count as a signup once',async()=>{

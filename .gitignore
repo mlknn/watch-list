@@ -50,3 +50,8 @@ next-env.d.ts
 # Cloudflare local secrets and generated staging artifacts
 .dev.vars*
 /dist-staging/
+
+# Editor, agent, and personal launcher — keep on this machine, do not publish
+.cursor/
+.openai/
+Start Watchlist.command

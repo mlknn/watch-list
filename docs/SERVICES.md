@@ -77,7 +77,7 @@ The count is distinct verified accounts that have initialized an account workspa
 
 **Code:** `server/analytics.mjs`, `lib/analytics.ts`, `app/insights/page.tsx`, `supabase/migrations/202609110001_analytics.sql`.
 
-First-party counts live in Postgres. The browser keeps a random visitor id in local storage and posts allowlisted events (`visit`, `dashboard`, `stock_search`, `watchlist_created`). Sign-ups are recorded when a profile is created. Unique counts are per UTC day. The `/insights` page and `GET /api/analytics` are limited to two account emails. There is no admin account role.
+First-party counts live in Postgres. The browser keeps a random visitor id in local storage and posts allowlisted events (`visit`, `dashboard`, `stock_search`, `watchlist_created`). Sign-ups are recorded when a profile is created. Unique counts are per UTC day. The `/insights` page and `GET /api/analytics` are limited to emails in the server-only `ANALYTICS_EMAILS` environment variable. There is no admin account role.
 
 ## Operations
 

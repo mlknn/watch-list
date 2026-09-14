@@ -12,7 +12,7 @@ let seedPromise;
 export async function seedLocalAdmin(){return seedPromise??=(async()=>{const pg=await localPg();let seed;try{seed=JSON.parse(await readFile(resolve(process.env.LOCAL_DATA_DIR||'data','bootstrap-admin.json'),'utf8'));}catch(e){if(e.code==='ENOENT')return;throw e;}
  if(!seed.email||!seed.passwordHash)return;
  const exists=(await pg.query('select id from local_users where email=$1',[seed.email])).rows[0];if(exists)return;
- const id=randomUUID();await pg.transaction(async tx=>{await tx.query('insert into auth.users values($1)',[id]);await tx.query('insert into local_users(id,email,password_hash,name,verified_at) values($1,$2,$3,$4,now())',[id,seed.email,seed.passwordHash,'Local owner']);await tx.query('select wl_ensure_profile($1,$2,0)',[id,'Local owner']);await tx.query("update wl_profiles set subscription_status='active',pro_until=timestamptz '2099-01-01' where id=$1",[id]);});
+ const displayName=String(seed.name||'Local owner').slice(0,60);const id=randomUUID();await pg.transaction(async tx=>{await tx.query('insert into auth.users values($1)',[id]);await tx.query('insert into local_users(id,email,password_hash,name,verified_at) values($1,$2,$3,$4,now())',[id,seed.email,seed.passwordHash,displayName]);await tx.query('select wl_ensure_profile($1,$2,0)',[id,displayName]);await tx.query("update wl_profiles set subscription_status='active',pro_until=timestamptz '2099-01-01' where id=$1",[id]);});
  })().catch(e=>{seedPromise=null;throw e;});}
 const userView=u=>({id:u.id,email:u.email,email_confirmed_at:u.verified_at,user_metadata:{full_name:u.name},local:true});
 const cookieToken=request=>(request.headers.get('cookie')||'').split(';').map(s=>s.trim()).find(s=>s.startsWith('wl_session='))?.slice(11)||'';
