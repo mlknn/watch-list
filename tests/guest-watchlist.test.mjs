@@ -29,6 +29,12 @@ test('guest lists persist across reload and survive a failed save attempt',()=>{
   assert.equal(storage.getItem(GUEST_KEY),null);
 });
 
+test('legacy guest lists without a role can still be edited',()=>{
+  const storage=memory();
+  storage.setItem(GUEST_KEY,JSON.stringify({version:1,updatedAt:'2026-09-01T00:00:00.000Z',watchlists:[{id:'list-1',name:'Old list',mode:'advanced',createdAt:'2026-09-01T00:00:00.000Z',stocks:[],shareToken:null}]}));
+  assert.equal(readGuestState(storage).watchlists[0].role,'owner');
+});
+
 test('guest add requires a quote and keeps the draft when the action fails',()=>{
   const storage=memory();
   let state=applyGuestAction(emptyGuestState(),{action:'createList'});
