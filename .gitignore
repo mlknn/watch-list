@@ -54,6 +54,7 @@ next-env.d.ts
 # Editor, agent, and personal launcher — keep on this machine, do not publish
 .cursor/
 .openai/
+!.openai/hosting.json
 Start Watchlist.command
 
 # Local Supabase CLI config (may reference env-backed Apple secrets)
