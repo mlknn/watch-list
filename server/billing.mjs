@@ -27,10 +27,10 @@ export async function syncBilling(db,customer,eventId=null){
   const entitlement=subscriptionEntitlement(subscriptions,[priceIdFor('monthly'),priceIdFor('yearly')]);
   dbResult(await db.rpc('wl_apply_billing',{p_user:profile.id,p_customer:customer,p_status:entitlement.status,p_until:entitlement.until,p_checked:checked,p_event:eventId}));
 }
-export async function checkout(){
+export async function checkout(_db,_user,_cycle){
   throw new AppError('Billing is not available.',410);
 }
-export async function portal(){
+export async function portal(_db,_user){
   throw new AppError('Billing is not available.',410);
 }
 export async function proPrice(cycle='monthly'){
