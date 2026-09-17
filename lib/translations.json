@@ -3,6 +3,10 @@
     "İzleme listeleri",
     "Listas de seguimiento"
   ],
+  "per list": [
+    "liste başına",
+    "por lista"
+  ],
   "My watchlists": [
     "Listelerim",
     "Mis listas"
@@ -923,9 +927,9 @@
     "Herhangi bir hisse veya ETF ara, grafiğini ve şirket detayını aç, sektörleri kaydır. Kazanç raporları Pro’da.",
     "Busca cualquier acción o ETF, abre su gráfico y datos, y recorre sectores. Los resultados son Pro."
   ],
-  "Look up stocks from the US, Europe, Canada, and Turkey. Open a chart and company details, then scroll the sectors. Earnings reports stay with Pro.": [
-    "ABD, Avrupa, Kanada ve Türkiye hisselerini ara. Grafiği ve şirket detayını aç, sektörleri kaydır. Kazanç raporları Pro’da.",
-    "Busca valores de EE. UU., Europa, Canadá y Turquía. Abre el gráfico y los datos, y recorre sectores. Los resultados son Pro."
+  "Look up stocks from the US, Europe, Canada, and Turkey. Open a chart, company details, and quarterly earnings, then scroll the sectors.": [
+    "ABD, Avrupa, Kanada ve Türkiye hisselerini ara. Grafiği, şirket detayını ve çeyreklik sonuçları aç, sektörleri kaydır.",
+    "Busca valores de EE. UU., Europa, Canadá y Turquía. Abre el gráfico, los datos y los resultados trimestrales, y recorre sectores."
   ],
   "LEADERS": [
     "LİDERLER",
@@ -947,9 +951,9 @@
     "Yahoo Finance · Fiyatlar gecikmeli olabilir",
     "Yahoo Finance · Cotizaciones con retraso"
   ],
-  "Charts are for looking, not advice. Click any row for details; quarterly earnings need Pro.": [
-    "Grafikler bakmak içindir, tavsiye değildir. Detay için satıra tıkla; çeyreklik sonuçlar Pro’dur.",
-    "Los gráficos son para mirar, no un consejo. Pulsa una fila; los resultados trimestrales son Pro."
+  "Charts are for looking, not advice. Click any row for details and quarterly earnings.": [
+    "Grafikler bakmak içindir, tavsiye değildir. Detay ve çeyreklik sonuçlar için satıra tıkla.",
+    "Los gráficos son para mirar, no un consejo. Pulsa una fila para ver detalles y resultados trimestrales."
   ],
   "Technology": [
     "Teknoloji",

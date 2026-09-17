@@ -1,7 +1,6 @@
 const urls=[
   ['https://stockwatchlist.app/','daily','1.0'],
   ['https://stockwatchlist.app/dashboard','hourly','0.9'],
-  ['https://stockwatchlist.app/pricing','weekly','0.8'],
   ['https://stockwatchlist.app/compare','weekly','0.8'],
   ['https://stockwatchlist.app/open-source','monthly','0.7'],
   ['https://stockwatchlist.app/privacy','yearly','0.5'],

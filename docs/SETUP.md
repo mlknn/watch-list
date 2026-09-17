@@ -24,17 +24,9 @@ Open http://127.0.0.1:4317. Keep `LOCAL_AUTH_ENABLED=false` on any public server
 
 Google and Apple are optional. Set `GOOGLE_AUTH_ENABLED` / `APPLE_AUTH_ENABLED` after the provider credentials exist in Supabase. Do not put OAuth client secrets in this repository.
 
-## Stripe
+## Billing
 
-Hosted Checkout only. Put these in Worker secrets or `.env.local`, not in Git:
-
-- `STRIPE_SECRET_KEY`
-- `STRIPE_PRO_MONTHLY_PRICE_ID` (USD $2.99 / month)
-- `STRIPE_PRO_YEARLY_PRICE_ID` (USD $30 / year)
-- `STRIPE_WEBHOOK_SECRET`
-- `APP_URL` (your public HTTPS origin)
-
-Webhook URL: `https://YOUR_DOMAIN/api/billing/webhook`.
+Checkout is disabled. The product is free: 5 watchlists and 20 stocks each. Stripe environment variables are unused.
 
 ## Product analytics
 

@@ -5,7 +5,6 @@ User-agent: *
 Allow: /
 Allow: /llms.txt
 Allow: /privacy
-Allow: /pricing
 Allow: /dashboard
 Allow: /compare
 Allow: /open-source
@@ -17,7 +16,6 @@ User-agent: Googlebot
 Allow: /
 Allow: /llms.txt
 Allow: /privacy
-Allow: /pricing
 Allow: /dashboard
 Allow: /compare
 Allow: /open-source

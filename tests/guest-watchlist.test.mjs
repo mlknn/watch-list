@@ -86,3 +86,13 @@ test('guest lists lock to the first stock currency',()=>{
   canada=applyGuestAction(canada,{action:'addStock',listId:canada.watchlists[0].id,ticker:'RY.TO',quantity:1,costPerShare:140,acquiredAt:'2026-01-02T00:00:00.000Z'},ca);
   assert.throws(()=>applyGuestAction(canada,{action:'addStock',listId:canada.watchlists[0].id,ticker:'AAPL',quantity:1,costPerShare:190,acquiredAt:'2026-01-02T00:00:00.000Z'},us),/CAD only/);
 });
+
+test('guest workspaces allow five lists and twenty stocks',()=>{
+  let state=applyGuestAction(emptyGuestState(),{action:'createList'});
+  for(let i=1;i<5;i++)state=applyGuestAction(state,{action:'createList',name:'List '+i});
+  assert.throws(()=>applyGuestAction(state,{action:'createList',name:'List 6'}),/limit reached/);
+  const quote={symbol:'AAPL',companyName:'Apple',currency:'USD',exchange:'Nasdaq',price:190,quoteTime:'2026-09-11T20:00:00.000Z',checkedAt:'2026-09-11T20:00:00.000Z'};
+  const listId=state.watchlists[0].id;
+  for(let i=0;i<20;i++)state=applyGuestAction(state,{action:'addStock',listId,ticker:'T'+i,quantity:1,costPerShare:10,acquiredAt:'2026-01-02T00:00:00.000Z'},{...quote,symbol:'T'+i});
+  assert.throws(()=>applyGuestAction(state,{action:'addStock',listId,ticker:'T20',quantity:1,costPerShare:10,acquiredAt:'2026-01-02T00:00:00.000Z'},{...quote,symbol:'T20'}),/Stock limit reached/);
+});

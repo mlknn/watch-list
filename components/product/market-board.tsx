@@ -325,7 +325,7 @@ export function MarketBoard(){
       <div>
         <p className="eyebrow"><T text="MARKETS, IN ONE PLACE"/></p>
         <h1><T text="Today’s tape."/></h1>
-        <p className="intro"><T text="Look up stocks from the US, Europe, Canada, and Turkey. Open a chart and company details, then scroll the sectors. Earnings reports stay with Pro."/></p>
+        <p className="intro"><T text="Look up stocks from the US, Europe, Canada, and Turkey. Open a chart, company details, and quarterly earnings, then scroll the sectors."/></p>
       </div>
       <SessionBadge/>
     </div>
@@ -359,7 +359,7 @@ export function MarketBoard(){
           </div>
         </section>;
       })}
-      <p className="market-footnote">{t('Yahoo Finance · Quotes may be delayed')}{data.fetchedAt?` · ${new Date(data.fetchedAt).toLocaleString()}`:''}. {t('Charts are for looking, not advice. Click any row for details; quarterly earnings need Pro.')}</p>
+      <p className="market-footnote">{t('Yahoo Finance · Quotes may be delayed')}{data.fetchedAt?` · ${new Date(data.fetchedAt).toLocaleString()}`:''}. {t('Charts are for looking, not advice. Click any row for details and quarterly earnings.')}</p>
     </>
   </main></Favorites.Provider>;
 }

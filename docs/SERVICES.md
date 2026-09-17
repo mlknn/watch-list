@@ -33,7 +33,7 @@ Production dependencies: Supabase project; Google OAuth client; Apple Services I
 
 RLS permits signed-in database clients to read only their own profile/lists/stocks. Direct client writes are revoked. Service-only RPCs perform account mutations. Each mutation locks the owner's profile before checking plan limits, preventing concurrent additions from exceeding those limits. All list actions also check the owner.
 
-Free: 1 list, 10 stocks. Pro: 10 lists, 50 stocks each. The web table shows 25 stocks per page; the account API loads at most 500 stock rows. Existing data is preserved on downgrade; extra lists cannot accept new stocks. This is client-side pagination within a bounded account, not an unbounded database scan.
+Every account and guest workspace can create 5 lists and 20 stocks in each. The web table shows 25 stocks per page; the account API loads at most 500 stock rows. Existing extra lists or stocks above those limits stay readable; new additions stop at the cap. This is client-side pagination within a bounded account, not an unbounded database scan.
 
 The local `data/watchlists.json` and `.bak` from the original app are preserved but are no longer exposed by any API. They have not been assigned to a new account automatically. Import them into the intended verified owner account during setup, preserving their original timestamps and prices.
 
@@ -55,15 +55,9 @@ Tokens contain 32 random bytes encoded as URL-safe text. Friends do not need an 
 
 The owner copies the link or opens an email draft. The app does not send invitation mail automatically. Shared pages use no-referrer and noindex metadata. A recipient can forward the link or retain a copy of data already viewed; revocation controls future access.
 
-## 6. Billing — Stripe Checkout, webhooks, Customer Portal
+## 6. Billing
 
-**Code:** `server/billing.mjs`, `app/api/billing/`.
-
-The server selects the configured Pro Price ID; clients cannot select an arbitrary price or assign Pro. Stripe hosts the payment form, stores card details, and handles billing. The app stores only the customer association and entitlement status/expiry.
-
-A verified user starts Checkout. Customer creation and session creation use idempotency keys; open sessions are reused. The return page asks the server to reconcile the subscription. A successful redirect alone never activates Pro.
-
-Signed webhook deliveries trigger a fresh fetch of Stripe subscription state. Only an active, unexpired subscription containing the configured Pro price grants entitlement. Canceled, unpaid, past-due, expired, wrong-product, or pending subscriptions do not. Renewal/cancellation events keep entitlement current. Duplicate event IDs and older concurrent reconciliation results do not overwrite newer database state. Stripe Customer Portal handles cancellation and payment-method updates.
+Checkout, Customer Portal, and Pro pricing are disabled. Limits are the same for every user. Leftover Stripe tables and webhook routes do not start a subscription.
 
 No payments can be accepted until test/live keys, the recurring Price, webhook endpoint, and portal are configured. Never mix test and live keys or webhook signing secrets.
 
@@ -81,7 +75,7 @@ First-party counts live in Postgres. The browser keeps a random visitor id in lo
 
 ## Operations
 
-`/api/health` verifies the app process is running; it does not claim the database, sign-in or payment providers are configured. Use startup checks and real end-to-end tests after connections are added. Monitor server errors, Supabase database/auth usage and failed Stripe deliveries separately. Configure database backups in Supabase. Periodically remove old rate-limit rows and retain payment event IDs according to your billing/audit policy. Error logs omit tokens and payloads.
+`/api/health` verifies the app process is running; it does not claim the database or sign-in providers are configured. Use startup checks and real end-to-end tests after connections are added. Monitor server errors and Supabase database/auth usage separately. Configure database backups in Supabase. Periodically remove old rate-limit rows. Error logs omit tokens and payloads.
 
 ## 8. Stock charts and company details
 
@@ -103,5 +97,3 @@ Chart requests are cached for one minute per symbol/range and fundamentals for f
 `server/portfolio.mjs` fetches historical bars with bounded concurrency and aggregates quantities from entered acquisition dates. It keeps invested capital separate from market value, omits unknown positions explicitly and refuses incomplete provider history instead of inventing totals. The over-time percent follows price changes only, so adding stocks at cost does not look like a gain. It models current holdings only, not a brokerage transaction ledger. Advanced positions are USD-only to avoid summing currencies without an exchange-rate model.
 
 `server/showcase.mjs` fetches actual dated daily closes for TSLA/MU/NVDA, compares them with current quotes, and caches the result for 60 seconds. Source dates and split-adjustment methodology are visible in the welcome card.
-
-Stripe pricing is fixed to USD 299 cents per month and validated before starting Checkout. Reference: [Stripe product and price setup](https://docs.stripe.com/products-prices/manage-prices?dashboard-or-api=api).

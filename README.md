@@ -16,11 +16,11 @@ A what-if stock portfolio at [stockwatchlist.app](https://stockwatchlist.app). Y
 - Frozen add-price, optional shares, purchase date, cost basis, unrealized gain
 - Read-only share links
 - Dashboard for indexes and sectors
-- Free: 1 list / 10 stocks. Pro: $2.99/month or $30/year, 10 lists / 50 stocks each
+- Free for everyone: up to 5 lists and 20 stocks in each
 
 ## Self-host
 
-Node 22+. Copy `.env.example` to `.env.local`. See [docs/SETUP.md](docs/SETUP.md) for Supabase, OAuth, Stripe, and deploy.
+Node 22+. Copy `.env.example` to `.env.local`. See [docs/SETUP.md](docs/SETUP.md) for Supabase, OAuth, and deploy.
 
 ```bash
 npm ci
@@ -28,7 +28,7 @@ npm test
 npm run dev
 ```
 
-Hosted production uses Cloudflare. Keep `LOCAL_AUTH_ENABLED=false` on any public server. Put Stripe, Supabase, and `ANALYTICS_EMAILS` in runtime secrets, not in Git.
+Hosted production uses Cloudflare. Keep `LOCAL_AUTH_ENABLED=false` on any public server. Put Supabase and `ANALYTICS_EMAILS` in runtime secrets, not in Git.
 
 ## License
 

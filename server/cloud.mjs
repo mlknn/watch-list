@@ -5,6 +5,7 @@ import { randomBytes } from 'node:crypto';
 import {canViewAnalytics} from './analytics-access.mjs';
 import { AppError, getQuote, normalizeTicker } from './quotes.mjs';
 import {assertQuoteCurrency} from '../lib/portfolio-currency.mjs';
+import {OPEN_PLAN} from '../lib/plan.mjs';
 
 export const authConfigured = () => localMode() || !!(process.env.SUPABASE_URL && process.env.SUPABASE_PUBLISHABLE_KEY && process.env.SUPABASE_SERVICE_ROLE_KEY);
 function jwtPayload(token){
@@ -57,9 +58,8 @@ export async function requireUser(request) {
 export async function rate(db,key,max=60,seconds=60) {
   if(!dbResult(await db.rpc('wl_rate',{p_key:key,p_max:max,p_seconds:seconds}))) throw new AppError('Too many updates. Please wait a moment and try again.',429);
 }
-export function planFor(profile, now=Date.now()) {
-  const pro=profile.subscription_status==='active'&&Date.parse(profile.pro_until)>now;
-  return {id:pro?'pro':'free',maxLists:pro?10:1,maxStocks:pro?50:10,pageSize:25,trialEndsAt:profile.trial_ends_at,expired:!pro&&!!profile.trial_ends_at&&Date.parse(profile.trial_ends_at)<=now};
+export function planFor() {
+  return {...OPEN_PLAN};
 }
 export async function ownerList(db,userId,listId) {
   if(typeof listId!=='string'||! /^[0-9a-f-]{36}$/i.test(listId)) throw new AppError('Watchlist not found.',404);
