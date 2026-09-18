@@ -8,5 +8,5 @@ export function CompanyIcon({symbol}:{symbol:string}){
   useEffect(()=>{setIndex(0);},[symbol]);
   const src=sources[index];
   const initials=symbol.replace(/[^A-Za-z0-9]/g,'').slice(0,3)||'?';
-  return <span className="company-icon" aria-hidden="true">{src?<img src={src} alt="" width={32} height={32} loading="lazy" referrerPolicy="no-referrer" onError={()=>setIndex(i=>i+1)}/>:initials}</span>;
+  return <span className="company-icon" aria-hidden="true">{src?<img src={src} alt="" width={32} height={32} loading="lazy" referrerPolicy="no-referrer" style={{colorScheme:'light'}} onError={()=>setIndex(i=>i+1)}/>:initials}</span>;
 }
