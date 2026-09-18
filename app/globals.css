@@ -674,10 +674,16 @@ html.dark .earnings-day-note.is-error{color:#ff9aa4}
   .product-nav-link{padding:8px 10px}
 }
 @media(max-width:760px){
-  .topbar{height:auto;padding:10px 5%;flex-wrap:wrap;gap:8px;align-items:center}
-  .topbar .public-nav-main{gap:10px;flex-wrap:wrap;align-items:center}
-  .topbar .product-nav{order:3;flex:1 0 100%;width:100%;justify-content:space-between;flex-wrap:nowrap;overflow-x:auto}
-  .product-nav-link{flex:1 1 auto;text-align:center;font-size:13px}
+  .topbar{height:auto;padding:10px 14px;flex-wrap:wrap;gap:8px;align-items:center}
+  /* Brand and account actions keep the first row; the three tools get their own row below. */
+  .topbar .public-nav-main{display:contents}
+  .topbar .product-nav{order:3;flex:1 0 100%;width:100%;margin:0;justify-content:stretch;flex-wrap:nowrap;overflow:visible;gap:6px}
+  .product-nav-link{flex:1 1 0;min-width:0;text-align:center;font-size:13px;padding:8px 6px}
+  .topbar .brand{font-size:18px}
+  .topbar .brand-logo{width:30px;height:30px;margin-right:8px}
+  .topbar .account-nav,.topbar .nav-secondary{gap:8px;font-size:13px;flex-shrink:0}
+  .topbar .account-nav .solid-link{padding:7px 11px;font-size:12.5px}
+  .topbar .theme-toggle{width:34px;height:34px}
   .earnings-day-list{grid-template-columns:1fr}
   .earnings-toolbar{align-items:flex-start;flex-direction:column;gap:10px}
   .earnings-cal-nav{width:100%}
@@ -688,6 +694,12 @@ html.dark .earnings-day-note.is-error{color:#ff9aa4}
   .home-hero h1{font-size:30px;letter-spacing:-1.2px}
   .home-hero>p{font-size:16px}
   .earnings-cal-nav .outline-button{padding:0 10px;font-size:12px}
+  .topbar{padding:10px 12px}
+  .topbar .brand{font-size:17px}
+  .topbar .brand .brand-light{display:none}
+  .topbar .account-nav,.topbar .nav-secondary{gap:6px}
+  .topbar .account-nav .solid-link{padding:7px 9px;font-size:12px}
+  .product-nav-link{font-size:12.5px;padding:8px 4px}
 }
 
 

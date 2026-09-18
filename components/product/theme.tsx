@@ -7,13 +7,9 @@ export type Theme='dark'|'light';
 const KEY='watchlist-theme';
 const Ctx=createContext<{theme:Theme;toggle:()=>void}>({theme:'dark',toggle:()=>{}});
 
-function readTheme():Theme{
-  if(typeof document==='undefined')return 'dark';
-  return document.documentElement.classList.contains('dark')?'dark':'light';
-}
-
 export function ThemeProvider({children}:{children:React.ReactNode}){
-  const [theme,setTheme]=useState<Theme>(readTheme);
+  /* Start on the server default so hydration matches, then adopt the saved theme. */
+  const [theme,setTheme]=useState<Theme>('dark');
   useEffect(()=>{
     const saved=window.localStorage.getItem(KEY);
     const next=saved==='light'?'light':'dark';
