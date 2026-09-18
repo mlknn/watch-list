@@ -703,6 +703,12 @@ html.dark .earnings-day-note.is-error{color:#ff9aa4}
 .home-watchlist-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;color:#617189;padding-top:18px}
 .home-watchlist-footer button{background:none;border:0;padding:0;font:inherit}
 .home-watchlist-footer-links{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.home-watchlist-table .row-shares{display:none}
+.stock-page-hint{display:flex;align-items:center;gap:7px;margin:16px 0 0;font-size:12.5px;color:#617189}
+.stock-page-hint svg{flex-shrink:0;color:#2f6f4f}
+.watchlist-table-pane .stock-page-hint{margin:0 0 12px}
+html.dark .stock-page-hint{color:#bbcec3}
+html.dark .stock-page-hint svg{color:#5fe0a4}
 .home-watchlist-table{max-width:100%;overflow-x:auto;margin-top:20px}
 .home-watchlist-table table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
 .home-watchlist-table th,.home-watchlist-table td{text-align:right;padding:14px 10px;border-bottom:1px solid #e2e7ef;white-space:nowrap}
@@ -736,6 +742,9 @@ html.dark .home-watchlist-table th,html.dark .home-watchlist-table td{border-col
   .home-watchlist-table th,.home-watchlist-table td{padding:12px 6px;font-size:11px}
   .home-watchlist-table small{max-width:85px;font-size:10px}
   .home-watchlist-table .company-icon{display:none}
+  /* Share counts move under the company name so the row still fits a phone. */
+  .home-watchlist-table .shares-column{display:none}
+  .home-watchlist-table .row-shares{display:block}
   /* Zero the utility variables instead of `translate:none`, which the CSS minifier drops. */
   [data-slot=dialog-content],[data-slot=alert-dialog-content]{position:fixed!important;top:16px!important;left:16px!important;right:16px!important;bottom:auto!important;--tw-translate-x:0px!important;--tw-translate-y:0px!important;transform:none!important;width:auto!important;max-width:none!important;max-height:calc(100dvh - 32px)!important;margin:0!important;padding:22px 18px!important;animation:none!important}
   .add-stock-dialog .position-fields{grid-template-columns:repeat(2,minmax(0,1fr))}
