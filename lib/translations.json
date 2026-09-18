@@ -1535,6 +1535,10 @@
     "Henüz eklenmedi",
     "Aún no se ha añadido"
   ],
+  "Share a read-only link so a friend can follow this watchlist.": [
+    "Salt okunur bir bağlantı paylaş; arkadaşın bu listeyi takip edebilsin.",
+    "Comparte un enlace de solo lectura para que un amigo siga esta lista."
+  ],
   "Not added yet. Confirm to add this stock, or close to leave it off the list.": [
     "Henüz eklenmedi. Listeye koymak için onayla; vazgeçersen eklenmez.",
     "Aún no está en la lista. Confirma para añadirla o cierra para dejarla fuera."
