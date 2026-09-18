@@ -1,22 +1,23 @@
 'use client';
 import {useT} from '@/components/product/language';
 import {T} from '@/components/product/language';
-import {useEffect,useMemo,useState} from 'react';
+import {useCallback,useEffect,useMemo,useState} from 'react';
 import {useRouter,useSearchParams} from 'next/navigation';
 import {ChevronLeft,ChevronRight,LoaderCircle} from 'lucide-react';
 import {CompanyIcon} from './company-icon';
 import {Button} from '@/components/ui/button';
 
-type Company={symbol:string;name:string;when:string};
-type Day={date:string;companies:Company[]};
-type Week={weekStart:string;days:Day[]};
-type Board={weekStart:string;weeks:Week[];minWeek:string;maxWeek:string;todayMonday:string;fetchedAt:string};
+type Company={symbol:string;name:string;when:string;reported:boolean;eps:string;epsForecast:string};
+type Day={date:string;status:string;companies:Company[]};
+type Board={weekStart:string;weekEnd:string;days:Day[];minWeek:string;maxWeek:string;todayMonday:string;source:string;timezone:string;fetchedAt:string};
 
 function shiftWeek(monday:string,delta:number){
   const d=new Date(monday+'T12:00:00Z');
   d.setUTCDate(d.getUTCDate()+delta*7);
   return d.toISOString().slice(0,10);
 }
+const dayFormat=(iso:string,options:Intl.DateTimeFormatOptions)=>new Date(iso+'T12:00:00Z').toLocaleDateString(undefined,{...options,timeZone:'UTC'});
+const UNAVAILABLE='The earnings calendar is temporarily unavailable.';
 
 export function EarningsCalendar(){
   const t=useT();
@@ -26,74 +27,97 @@ export function EarningsCalendar(){
   const [data,setData]=useState<Board|null>(null);
   const [error,setError]=useState('');
   const [loading,setLoading]=useState(true);
+  const [attempt,setAttempt]=useState(0);
   const today=useMemo(()=>new Date().toISOString().slice(0,10),[]);
   useEffect(()=>{
     let alive=true;
     setLoading(true);setError('');
     const query=week?'?week='+encodeURIComponent(week):'';
-    void fetch('/api/earnings-calendar'+query,{cache:'no-store'}).then(async r=>{
+    void fetch('/api/earnings-calendar'+query).then(async r=>{
       const result=await r.json() as Board&{error?:string};
-      if(!r.ok)throw Error(result.error||'Unable to load the earnings calendar.');
+      if(!r.ok)throw Error(result.error||UNAVAILABLE);
       if(!alive)return;
       setData(result);
       setLoading(false);
-    }).catch(e=>{if(alive){setError(e.message);setLoading(false);}});
+    }).catch(e=>{if(alive){setError(e.message||UNAVAILABLE);setLoading(false);}});
     return()=>{alive=false;};
-  },[week]);
-  function go(next:string){
+  },[week,attempt]);
+  // Warm the next week at the edge so stepping forward feels instant.
+  useEffect(()=>{
     if(!data)return;
-    if(next<data.minWeek||next>data.maxWeek)return;
+    const upcoming=shiftWeek(data.weekStart,1);
+    if(upcoming>data.maxWeek)return;
+    const timer=window.setTimeout(()=>{void fetch('/api/earnings-calendar?week='+encodeURIComponent(upcoming)).catch(()=>{});},1200);
+    return()=>clearTimeout(timer);
+  },[data]);
+  const go=useCallback((next:string)=>{
+    if(!data||next<data.minWeek||next>data.maxWeek)return;
     router.push(next===data.todayMonday?'/earnings':'/earnings?week='+next);
-  }
-  const weekday=(iso:string)=>new Date(iso+'T12:00:00Z').toLocaleDateString(undefined,{weekday:'short',timeZone:'UTC'});
-  const monthDay=(iso:string)=>new Date(iso+'T12:00:00Z').toLocaleDateString(undefined,{month:'short',day:'numeric',timeZone:'UTC'});
-  const days=data?.weeks[0]?.days||[];
+  },[data,router]);
+  const timing=(row:Company)=>row.when==='bmo'?t('Before market open')
+    :row.when==='amc'?t('After market close')
+    :row.when==='during'?t('During market hours')
+    :t('Time not provided');
+  const days=data?.days||[];
   const prev=data?shiftWeek(data.weekStart,-1):'';
   const next=data?shiftWeek(data.weekStart,1):'';
   const canPrev=!!data&&prev>=data.minWeek;
   const canNext=!!data&&next<=data.maxWeek;
+  const range=data?`${dayFormat(data.weekStart,{month:'short',day:'numeric'})} – ${dayFormat(data.weekEnd,{month:'short',day:'numeric',year:'numeric'})}`:'';
+  const relative=!data?'':data.weekStart===data.todayMonday?t('This week')
+    :data.weekStart===shiftWeek(data.todayMonday,-1)?t('Last week')
+    :data.weekStart===shiftWeek(data.todayMonday,1)?t('Next week')
+    :data.weekStart<data.todayMonday?t('Past week'):t('Upcoming week');
   return <main className="earnings-cal-page">
-    <div className="page-heading market-heading">
-      <div>
-        <p className="eyebrow"><T text="US EARNINGS"/></p>
-        <h1><T text="Who reports, and when."/></h1>
-        <p className="intro"><T text="US companies reporting this week, one column per day. Open a ticker for the earnings story and company details."/></p>
+    <div className="earnings-cal-head">
+      <h1><T text="Earnings calendar"/></h1>
+      <p className="intro"><T text="Upcoming and recent earnings for US-listed companies."/></p>
+    </div>
+    <div className="earnings-toolbar">
+      <div className="earnings-range">
+        <strong>{range||'—'}</strong>
+        {relative&&<span className="earnings-range-tag">{relative}</span>}
       </div>
       <div className="earnings-cal-nav">
-        <Button variant="outline" className="outline-button" disabled={!canPrev} onClick={()=>go(prev)} aria-label={t('Previous week')}><ChevronLeft size={18}/></Button>
-        <Button variant="outline" className="outline-button" onClick={()=>go(data?.todayMonday||'')}><T text="This week"/></Button>
-        <Button variant="outline" className="outline-button" disabled={!canNext} onClick={()=>go(next)} aria-label={t('Next week')}><ChevronRight size={18}/></Button>
+        <Button variant="outline" className="outline-button" disabled={!canPrev} onClick={()=>go(prev)}><ChevronLeft size={16}/><T text="Previous week"/></Button>
+        <Button variant="outline" className="outline-button" disabled={!data||data.weekStart===data.todayMonday} onClick={()=>go(data?.todayMonday||'')}><T text="This week"/></Button>
+        <Button variant="outline" className="outline-button" disabled={!canNext} onClick={()=>go(next)}><T text="Next week"/><ChevronRight size={16}/></Button>
       </div>
     </div>
-    {error&&<p className="error-banner" role="alert">{error}</p>}
-    {loading||!data?<div className="earnings-empty" role="status"><LoaderCircle className="spin"/>{t('Loading the US earnings calendar…')}</div>:
-      <div className="earnings-week" role="list" aria-label={t('US earnings calendar')}>
+    {error&&<div className="error-banner" role="alert">{error===UNAVAILABLE?t(UNAVAILABLE):error}<Button variant="ghost" onClick={()=>setAttempt(n=>n+1)}><T text="Retry"/></Button></div>}
+    {loading?<div className="earnings-week is-loading" role="status">
+      {[0,1,2,3,4].map(i=><section key={i} className="earnings-day"><header><strong>&nbsp;</strong></header><p className="earnings-day-note"><LoaderCircle size={14} className="spin"/>{i===0?t('Loading earnings…'):''}</p></section>)}
+    </div>:!data?null:
+      <div className="earnings-week" aria-live="polite">
         {days.map(day=>{
           const isToday=day.date===today;
-          const isPast=day.date<today;
-          return <section key={day.date} className={'earnings-day'+(isToday?' is-today':'')+(isPast?' is-past':' is-future')} role="listitem">
+          return <section key={day.date} className={'earnings-day'+(isToday?' is-today':'')+(day.date<today?' is-past':'')}>
             <header>
-              <strong>{weekday(day.date)}</strong>
-              <span>{monthDay(day.date)}</span>
-              <small>{day.companies.length}</small>
+              <strong>{dayFormat(day.date,{weekday:'short'})}</strong>
+              <span>{dayFormat(day.date,{month:'short',day:'numeric'})}</span>
+              {isToday&&<em className="earnings-today-tag">{t('Today')}</em>}
+              {day.companies.length>0&&<small>{day.companies.length}</small>}
             </header>
-            <div className="earnings-day-list">
-              {day.companies.length?day.companies.map(row=>
-                <a key={row.symbol} href={'/stocks/'+encodeURIComponent(row.symbol)} className="earnings-chip">
-                  <CompanyIcon symbol={row.symbol}/>
-                  <span>
-                    <strong>{row.symbol}</strong>
-                    {row.when==='bmo'&&<em>{t('Before open')}</em>}
-                    {row.when==='amc'&&<em>{t('After close')}</em>}
-                    {row.when==='open'&&<em>{t('During the session')}</em>}
-                  </span>
-                </a>
-              ):<p className="earnings-day-empty">{isPast?t('No reports listed'):t('No reports scheduled')}</p>}
-            </div>
+            {day.status!=='ok'?<p className="earnings-day-note is-error">{t('Could not load this day.')}</p>
+              :day.companies.length?<ul className="earnings-day-list">
+                {day.companies.map(row=><li key={row.symbol}>
+                  <a href={'/stocks/'+encodeURIComponent(row.symbol)} className="earnings-chip">
+                    <CompanyIcon symbol={row.symbol}/>
+                    <span className="earnings-chip-text">
+                      <strong>{row.symbol}{row.reported&&<i className="earnings-reported">{t('Reported')}</i>}</strong>
+                      <small title={row.name}>{row.name}</small>
+                      <em>{row.reported&&row.eps?`${t('EPS')} ${row.eps}${row.epsForecast?` · ${t('est.')} ${row.epsForecast}`:''}`:timing(row)}</em>
+                    </span>
+                  </a>
+                </li>)}
+              </ul>:<p className="earnings-day-note">{t('No earnings scheduled')}</p>}
           </section>;
         })}
       </div>
     }
-    <p className="market-footnote"><T text="Nasdaq earnings calendar · US-listed names · Past weeks stop two quarters back · Quotes and reports may be delayed."/> {data?new Date(data.fetchedAt).toLocaleString():''}</p>
+    <p className="market-footnote">
+      <T text="Source: Nasdaq earnings calendar · Report times are New York time · US-listed companies above $2B."/>
+      {data?` ${t('Updated')} ${new Date(data.fetchedAt).toLocaleString()}.`:''} <T text="Past weeks go back two quarters."/>
+    </p>
   </main>;
 }

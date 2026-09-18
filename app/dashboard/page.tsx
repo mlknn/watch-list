@@ -4,7 +4,7 @@ import {PublicNav,PublicFooter} from '@/components/product/nav';
 import {MarketBoard} from '@/components/product/market-board';
 
 export const metadata: Metadata = {
-  title: 'Dashboard — Markets | StockWatchlist',
+  title: 'Markets | StockWatchlist',
   description: 'US, Europe, Canada, and Turkey markets. Search stocks and ETFs, read indexes, and open charts and company details.',
   alternates: {canonical: 'https://stockwatchlist.app/dashboard'},
 };

@@ -1986,5 +1986,161 @@
   "Open the calendar": [
     "Takvimi aç",
     "Abrir el calendario"
+  ],
+  "Your stocks. The markets. What’s next.": [
+    "Hisselerin. Piyasalar. Sırada ne var.",
+    "Tus acciones. Los mercados. Lo que viene."
+  ],
+  "Track your stock ideas, explore global markets, and see who reports earnings next.": [
+    "Hisse fikirlerini takip et, dünya piyasalarını incele, sırada kimin bilançosu var gör.",
+    "Sigue tus ideas, explora los mercados globales y mira quién presenta resultados."
+  ],
+  "Markets": [
+    "Piyasalar",
+    "Mercados"
+  ],
+  "Follow your stock ideas from the day you add them, with optional share counts and costs.": [
+    "Hisse fikirlerini eklediğin günden itibaren takip et; istersen adet ve maliyet de gir.",
+    "Sigue tus ideas desde el día que las añades, con acciones y costes opcionales."
+  ],
+  "Indexes, sectors and ETFs across the US, Europe, Canada and Turkey.": [
+    "ABD, Avrupa, Kanada ve Türkiye’de endeksler, sektörler ve ETF’ler.",
+    "Índices, sectores y ETFs de EE.UU., Europa, Canadá y Turquía."
+  ],
+  "See which US-listed companies report next, day by day.": [
+    "ABD’de işlem gören şirketlerin bilanço günlerini gün gün gör.",
+    "Mira qué empresas de EE.UU. publican resultados, día a día."
+  ],
+  "Build a watchlist": [
+    "İzleme listesi oluştur",
+    "Crea una lista"
+  ],
+  "Explore markets": [
+    "Piyasaları keşfet",
+    "Explora los mercados"
+  ],
+  "View earnings": [
+    "Bilançolara bak",
+    "Ver resultados"
+  ],
+  "Example watchlist · since 2021": [
+    "Örnek liste · 2021’den beri",
+    "Lista de ejemplo · desde 2021"
+  ],
+  "US ETFs today": [
+    "Bugün ABD ETF’leri",
+    "ETFs de EE.UU. hoy"
+  ],
+  "Loading prices…": [
+    "Fiyatlar yükleniyor…",
+    "Cargando precios…"
+  ],
+  "Loading quotes…": [
+    "Kotasyonlar yükleniyor…",
+    "Cargando cotizaciones…"
+  ],
+  "Loading the calendar…": [
+    "Takvim yükleniyor…",
+    "Cargando el calendario…"
+  ],
+  "No earnings scheduled this week.": [
+    "Bu hafta planlanan bilanço yok.",
+    "No hay resultados previstos esta semana."
+  ],
+  "One example, running since September 3, 2021.": [
+    "Tek bir örnek, 3 Eylül 2021’den beri sürüyor.",
+    "Un ejemplo, en marcha desde el 3 de septiembre de 2021."
+  ],
+  "Ten companies, an equal starting amount each, priced with real quotes. A watchlist keeps the price from the day you add a stock — earlier dates are not backtested.": [
+    "On şirket, her birine eşit başlangıç tutarı, gerçek fiyatlarla. İzleme listesi hisseyi eklediğin günün fiyatını saklar — daha eski tarihler geriye dönük test edilmez.",
+    "Diez empresas, un importe inicial igual para cada una y precios reales. Una lista guarda el precio del día en que añades la acción; no se simulan fechas anteriores."
+  ],
+  "Three tools, one place.": [
+    "Üç araç, tek yer.",
+    "Tres herramientas, un mismo sitio."
+  ],
+  "Watchlists keep the price from the day you add a stock, markets show today’s tape, and the calendar shows who reports next. Market data is delayed public quotes, not advice.": [
+    "İzleme listeleri hisseyi eklediğin günün fiyatını saklar, piyasalar bugünün tablosunu gösterir, takvim ise sırada kimin olduğunu. Piyasa verisi gecikmeli halka açık fiyatlardır, yatırım tavsiyesi değildir.",
+    "Las listas guardan el precio del día en que añades una acción, los mercados muestran la sesión de hoy y el calendario, quién presenta resultados. Los datos son cotizaciones públicas con retraso, no asesoramiento."
+  ],
+  "Name a watchlist": [
+    "Listeye ad ver",
+    "Nombra una lista"
+  ],
+  "Start with one watchlist. See where it leads.": [
+    "Tek bir listeyle başla. Nereye gittiğini gör.",
+    "Empieza con una lista. Mira a dónde llega."
+  ],
+  "Earnings calendar": [
+    "Bilanço takvimi",
+    "Calendario de resultados"
+  ],
+  "Upcoming and recent earnings for US-listed companies.": [
+    "ABD’de işlem gören şirketlerin yaklaşan ve yeni açıklanan bilançoları.",
+    "Resultados próximos y recientes de empresas de EE.UU."
+  ],
+  "Past week": [
+    "Geçmiş hafta",
+    "Semana anterior"
+  ],
+  "Upcoming week": [
+    "Gelecek hafta",
+    "Semana próxima"
+  ],
+  "Loading earnings…": [
+    "Bilançolar yükleniyor…",
+    "Cargando resultados…"
+  ],
+  "The earnings calendar is temporarily unavailable.": [
+    "Bilanço takvimi şu an kullanılamıyor.",
+    "El calendario de resultados no está disponible ahora."
+  ],
+  "Could not load this day.": [
+    "Bu gün yüklenemedi.",
+    "No se pudo cargar este día."
+  ],
+  "No earnings scheduled": [
+    "Planlanan bilanço yok",
+    "Sin resultados previstos"
+  ],
+  "Before market open": [
+    "Açılıştan önce",
+    "Antes de la apertura"
+  ],
+  "After market close": [
+    "Kapanıştan sonra",
+    "Tras el cierre"
+  ],
+  "During market hours": [
+    "Seans sırasında",
+    "Durante la sesión"
+  ],
+  "Time not provided": [
+    "Saat belirtilmemiş",
+    "Hora no indicada"
+  ],
+  "Reported": [
+    "Açıklandı",
+    "Publicado"
+  ],
+  "est.": [
+    "tahmin",
+    "est."
+  ],
+  "Updated": [
+    "Güncellendi",
+    "Actualizado"
+  ],
+  "Source: Nasdaq earnings calendar · Report times are New York time · US-listed companies above $2B.": [
+    "Kaynak: Nasdaq bilanço takvimi · Saatler New York saatiyle · 2 milyar doların üzerindeki ABD şirketleri.",
+    "Fuente: calendario de resultados de Nasdaq · Horas de Nueva York · Empresas de EE.UU. de más de 2000 M$."
+  ],
+  "Taking you to Markets…": [
+    "Piyasalar sayfasına gidiliyor…",
+    "Te llevamos a Mercados…"
+  ],
+  "Past weeks go back two quarters.": [
+    "Geçmiş haftalar iki çeyrek geriye gider.",
+    "Las semanas pasadas llegan hasta dos trimestres atrás."
   ]
 }

@@ -4,12 +4,12 @@ import {Analytics} from '@/components/product/analytics';
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 export const metadata: Metadata = {
-  title: 'StockWatchlist — What if you invested in your picks today?',
+  title: 'StockWatchlist — Watchlists, markets, and earnings',
   referrer: 'no-referrer',
   metadataBase: new URL('https://stockwatchlist.app'),
   openGraph: {
-    title: 'StockWatchlist — Build a what-if stock portfolio',
-    description: 'Build a portfolio, set starting amounts, and track what happens. No signup to start. Freeze the day you put a number on an idea.',
+    title: 'StockWatchlist — Watchlists, markets, and earnings',
+    description: 'Track your stock ideas, explore global markets, and see who reports earnings next. No account needed to start.',
     url: 'https://stockwatchlist.app',
     siteName: 'StockWatchlist',
     type: 'website',
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'StockWatchlist — Build a what-if stock portfolio',
-    description: 'Pick stocks, set starting amounts, and see how the portfolio performs. No signup to start.',
+    title: 'StockWatchlist — Watchlists, markets, and earnings',
+    description: 'Track your stock ideas, explore global markets, and see who reports earnings next. No account needed to start.',
     images: ['/og.jpg'],
   },
   icons: {
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico?v=6',
     apple: '/apple-touch-icon.png?v=6',
   },
-  description: 'Build a what-if stock portfolio and see how your picks perform over time. No signup to start.',
+  description: 'Track your stock ideas, explore global markets, and see who reports earnings next. No account needed to start.',
 };
 export const viewport: Viewport = {width:'device-width',initialScale:1,viewportFit:'cover'};
 const softwareJsonLd = {

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {averageImpact,eventWindows} from '../lib/earnings-impact.mjs';
-import {earningsWeek,mondayOnOrBefore,normalizeDayRows,toYahooSymbol,weekDays,clampMonday,earningsWindow,addDays} from '../server/earnings-calendar.mjs';
+import {earningsWeek,mondayOnOrBefore,normalizeDayRows,reportTiming,toYahooSymbol,weekDays,clampMonday,earningsWindow,addDays} from '../server/earnings-calendar.mjs';
 
 test('class shares map to Yahoo tickers',()=>{
   assert.equal(toYahooSymbol('BRK.B'),'BRK-B');
@@ -12,6 +12,26 @@ test('class shares map to Yahoo tickers',()=>{
 test('week starts Monday and has five weekday columns',()=>{
   assert.equal(mondayOnOrBefore('2026-09-18'),'2026-09-14');
   assert.deepEqual(weekDays('2026-09-14'),['2026-09-14','2026-09-15','2026-09-16','2026-09-17','2026-09-18']);
+});
+
+test('report times follow Nasdaq and are never guessed',()=>{
+  assert.equal(reportTiming('time-pre-market'),'bmo');
+  assert.equal(reportTiming('time-after-hours'),'amc');
+  assert.equal(reportTiming('time-during-market-hours'),'during');
+  assert.equal(reportTiming('time-not-supplied'),'unknown');
+  assert.equal(reportTiming(''),'unknown');
+});
+
+test('a quarter counts as reported only when Nasdaq has a real EPS',()=>{
+  const rows=normalizeDayRows([
+    {symbol:'AAA',name:'Alpha',marketCap:'$9,000,000,000',time:'time-not-supplied',eps:'$0.92',epsForecast:'$0.84'},
+    {symbol:'BBB',name:'Beta',marketCap:'$8,000,000,000',time:'time-pre-market',eps:'',epsForecast:'$1.10'},
+  ]);
+  assert.equal(rows[0].reported,true);
+  assert.equal(rows[0].eps,'$0.92');
+  assert.equal(rows[0].when,'unknown');
+  assert.equal(rows[1].reported,false);
+  assert.equal(rows[1].when,'bmo');
 });
 
 test('day rows sort by market cap and skip junk tickers',()=>{
@@ -43,10 +63,10 @@ test('small names are dropped so the tape stays large-cap',()=>{
     {symbol:'MID',name:'Mid',marketCap:'$2,500,000,000',time:'time-not-supplied'},
   ]);
   assert.deepEqual(rows.map(row=>row.symbol),['MSFT','MID']);
-  assert.equal(rows[1].when,'open');
+  assert.equal(rows[1].when,'unknown');
 });
 
-test('calendar fetch uses injected days and keeps column order',async()=>{
+test('one week is loaded, in weekday order, with a dated range',async()=>{
   const now=new Date('2026-09-18T16:00:00Z');
   const fetched=[];
   const data=await earningsWeek('2026-09-16',{now,loadDay:async date=>{
@@ -58,14 +78,22 @@ test('calendar fetch uses injected days and keeps column order',async()=>{
   }});
   assert.deepEqual([...fetched].sort(),['2026-09-14','2026-09-15','2026-09-16','2026-09-17','2026-09-18']);
   assert.equal(data.weekStart,'2026-09-14');
-  assert.equal(data.weeks.length,1);
-  assert.equal(data.weeks[0].days.length,5);
-  assert.equal(data.weeks[0].days[0].date,'2026-09-14');
-  assert.equal(data.weeks[0].days[0].companies[0].when,'bmo');
-  assert.equal(data.weeks[0].days[4].date,'2026-09-18');
-  assert.equal(data.weeks[0].days[4].companies[0].when,'amc');
-  assert.equal(data.weeks[0].days[2].date,'2026-09-16');
-  assert.equal(data.weeks[0].days[2].companies[0].symbol,'INTC');
+  assert.equal(data.weekEnd,'2026-09-18');
+  assert.equal(data.days.length,5);
+  assert.equal(data.days[0].companies[0].when,'bmo');
+  assert.equal(data.days[4].companies[0].when,'amc');
+  assert.equal(data.days[2].companies[0].symbol,'INTC');
+  assert.ok(data.days.every(day=>day.status==='ok'));
+});
+
+test('a day the source refuses is marked unavailable, not empty',async()=>{
+  const now=new Date('2026-09-18T16:00:00Z');
+  const data=await earningsWeek('2026-09-14',{now,loadDay:async date=>{
+    if(date==='2026-09-15')throw new Error('Nasdaq said no');
+    return [];
+  }});
+  assert.equal(data.days[1].status,'unavailable');
+  assert.equal(data.days[0].status,'ok');
 });
 
 test('past weeks stop two quarters back; future weeks stay in the window',()=>{
