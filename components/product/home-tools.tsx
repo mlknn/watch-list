@@ -53,13 +53,15 @@ export function HomeTools({showcase}:{showcase:ShowcaseData|null}){
   const picks=showcase?.stocks.slice(0,3)||[];
   const funds=(etfs||[]).filter(row=>row.chart).slice(0,3);
   const today=useMemo(()=>new Date().toISOString().slice(0,10),[]);
-  const upcoming=useMemo(()=>{
-    const all=(days||[]).filter(day=>day.status==='ok');
-    const ahead=all.filter(day=>day.date>=today).flatMap(day=>day.companies.map(row=>({...row,date:day.date})));
-    const behind=all.filter(day=>day.date<today).flatMap(day=>day.companies.map(row=>({...row,date:day.date})));
-    return (ahead.length?ahead:behind.reverse()).slice(0,3);
+  /* Show real upcoming dates first; only fall back to results, clearly labelled as already reported. */
+  const earnings=useMemo(()=>{
+    const rows=(days||[]).filter(day=>day.status==='ok').flatMap(day=>day.companies.map(row=>({...row,date:day.date})));
+    const ahead=rows.filter(row=>!row.reported&&row.date>=today);
+    if(ahead.length)return {reported:false,rows:ahead.slice(0,3)};
+    const done=rows.filter(row=>row.reported).sort((a,b)=>b.date.localeCompare(a.date));
+    return {reported:true,rows:done.slice(0,3)};
   },[days,today]);
-  const weekday=(iso:string)=>new Date(iso+'T12:00:00Z').toLocaleDateString(undefined,{weekday:'short',timeZone:'UTC'});
+  const dayLabel=(iso:string)=>new Date(iso+'T12:00:00Z').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',timeZone:'UTC'});
   return <section className="home-tools" aria-label={t('What you can do here')}>
     <article className="tool-card">
       <h2><T text="Watchlists"/></h2>
@@ -89,12 +91,11 @@ export function HomeTools({showcase}:{showcase:ShowcaseData|null}){
     <article className="tool-card">
       <h2><T text="Earnings"/></h2>
       <p><T text="See which US-listed companies report next, day by day."/></p>
-      <PreviewFrame label={t('This week')} ready={upcoming.length>0} empty={days?t('No earnings scheduled this week.'):t('Loading the calendar…')}>
-        {upcoming.map(row=><li key={row.symbol}>
+      <PreviewFrame label={earnings.reported?t('Reported this week'):t('Reporting next')} ready={earnings.rows.length>0} empty={days?t('No earnings scheduled this week.'):t('Loading the calendar…')}>
+        {earnings.rows.map(row=><li key={row.symbol}>
           <CompanyIcon symbol={row.symbol}/>
           <span className="tool-preview-name">{row.symbol}</span>
-          <span className="tool-preview-sub">{weekday(row.date)}</span>
-          {row.reported&&<span className="tool-preview-value">{t('Reported')}</span>}
+          <span className="tool-preview-sub">{dayLabel(row.date)}</span>
         </li>)}
       </PreviewFrame>
       <a className="tool-link" href="/earnings"><T text="View earnings"/><ArrowUpRight size={16}/></a>

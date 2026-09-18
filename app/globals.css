@@ -22,7 +22,7 @@ button { cursor:pointer; } button:disabled { cursor:wait; }
 button:focus-visible,a:focus-visible { outline:3px solid #8fa9ff; outline-offset:4px; }
 .topbar { height:86px; background:white; border-bottom:1px solid #e2e7ef; display:flex; align-items:center; justify-content:space-between; padding:0 5.3%; gap:20px; }
 .public-nav-main { display:flex; align-items:center; justify-content:space-between; flex:1; min-width:0; gap:20px; }
-.theme-toggle { display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:999px; border:1px solid #e2e7ef; background:transparent; color:#202b40; flex-shrink:0; }
+.theme-toggle { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:999px; border:1px solid #e2e7ef; background:transparent; color:#202b40; flex-shrink:0; }
 .theme-toggle:hover { background:#eef2f8; }
 .logo-mark { width:35px; height:35px; display:block; }
 .brand { display:flex; gap:0; align-items:center; text-decoration:none; color:#202b40; font-size:25px; font-weight:750; letter-spacing:-1px; }
@@ -397,23 +397,7 @@ html.dark .watchlist-invite-row p{color:#d5e6db}
   .public-nav .public-nav-main{flex:1 0 100%;width:100%;gap:8px}
   .public-nav>.theme-toggle{width:28px;height:28px;min-width:28px;min-height:28px;padding:0;margin-left:auto}
   .public-nav>.theme-toggle svg{width:14px;height:14px}
-  .add-stock-dialog[data-slot=dialog-content]{
-    top:auto!important;bottom:0!important;left:0!important;right:0!important;
-    translate:none!important;transform:none!important;
-    width:100vw!important;max-width:100vw!important;
-    min-height:min(78dvh,760px);max-height:92dvh!important;
-    border-radius:20px 20px 0 0!important;
-    padding:22px 18px calc(18px + env(safe-area-inset-bottom))!important;
-    gap:14px;display:flex;flex-direction:column;overflow-y:auto;
-  }
-  .add-stock-dialog form{display:flex;flex-direction:column;flex:1;min-height:0}
-  .add-stock-dialog .field-note{display:none}
-  .add-stock-dialog .add-quote-panel{flex-direction:column;align-items:flex-start;gap:12px}
-  .add-stock-dialog .add-quote-price{text-align:left}
-  .add-stock-dialog .add-quote-price strong{font-size:34px}
-  .add-stock-dialog .position-fields{grid-template-columns:1fr;gap:14px}
-  .add-stock-dialog .add-stock-actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:auto;position:sticky;bottom:0;padding-top:12px;background:inherit}
-  .add-stock-dialog .add-stock-actions .primary-button,.add-stock-dialog .add-stock-actions .outline-button{width:100%;min-height:48px}
+
 }
 [data-slot=tabs]{min-width:0;max-width:100%}
 #active-watchlist{scroll-margin-top:20px}
@@ -703,3 +687,58 @@ html.dark .earnings-day-note.is-error{color:#ff9aa4}
 }
 
 
+
+/* Welcome uses the same saved data and actions as the full watchlist workspace. */
+.home-hero{max-width:none;padding:30px 0 24px}
+.home-hero h1{font-size:clamp(26px,3vw,36px);letter-spacing:-1px;line-height:1.2}
+.home-hero>p{font-size:16px;margin-top:10px;max-width:none}
+.home-watchlist{margin:28px 0;border:1px solid #dce4f0;border-radius:16px;background:var(--card);padding:24px;min-width:0}
+.home-watchlist-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+.home-watchlist-heading h2{font-size:24px}
+.home-watchlist-heading p,.home-watchlist-empty{color:#617189;font-size:14px;margin:8px 0 0;line-height:1.6}
+.home-watchlist-search{display:flex;gap:10px}
+.home-watchlist-search .ticker-search-wrap{width:auto;flex:1;min-width:0}
+.home-watchlist-search .primary-button{min-height:44px}
+.home-watchlist-empty{padding:24px 0}
+.home-watchlist-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;color:#617189;padding-top:18px}
+.home-watchlist-footer button{background:none;border:0;padding:0;font:inherit}
+.home-watchlist-footer-links{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.home-watchlist-table{max-width:100%;overflow-x:auto;margin-top:20px}
+.home-watchlist-table table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.home-watchlist-table th,.home-watchlist-table td{text-align:right;padding:14px 10px;border-bottom:1px solid #e2e7ef;white-space:nowrap}
+.home-watchlist-table th:first-child{text-align:left;padding-left:0}
+.home-watchlist-table thead th{font-size:11px;color:#617189;font-weight:500}
+.home-watchlist-table a{display:flex;gap:9px;align-items:center;color:inherit;text-decoration:none}
+.home-watchlist-table small{display:block;font-weight:400;color:#617189;max-width:190px;text-overflow:ellipsis;overflow:hidden}
+.home-example{padding:12px 0;border-bottom:1px solid #dce4f0}
+.home-example summary{cursor:pointer;font-size:14px;font-weight:600;padding:12px 0}
+.home-about{padding:28px 0 34px;max-width:680px}
+.home-about p{font-size:14px;line-height:1.7;color:#617189;margin:10px 0 0}
+.topbar .nav-secondary,.topbar .account-nav{display:flex;align-items:center;gap:14px}
+.topbar .theme-toggle{width:32px;height:32px;min-width:32px;min-height:32px;margin:4px 2px;padding:0}
+/* Bound portalled dialogs to the viewport even after scrolling a long page. */
+[data-slot=dialog-content],[data-slot=alert-dialog-content]{max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;border:1px solid #d6deeb}
+html.dark [data-slot=dialog-content],html.dark [data-slot=alert-dialog-content]{border:1px solid #f1f5f9;box-shadow:0 0 0 1px #ffffff26,0 24px 80px #0009}
+html.dark [data-slot=dialog-overlay],html.dark [data-slot=alert-dialog-overlay]{background:#0009}
+html.dark .home-watchlist,html.dark .home-example{border-color:#345044}
+html.dark .home-watchlist-heading p,html.dark .home-watchlist-empty,html.dark .home-watchlist-footer,html.dark .home-watchlist-table small,html.dark .home-watchlist-table thead th,html.dark .home-about p{color:#bbcec3}
+html.dark .home-watchlist-table th,html.dark .home-watchlist-table td{border-color:#345044}
+@media(max-width:640px){
+  .home-hero{padding:24px 0 18px}
+  .home-hero h1{font-size:27px}
+  .home-watchlist{padding:18px 14px;margin:20px 0}
+  .home-watchlist-heading{align-items:flex-start;flex-direction:column;gap:8px}
+  .home-watchlist-heading h2{font-size:22px}
+  .home-watchlist-search{flex-wrap:wrap}
+  .home-watchlist-search .ticker-search-wrap{flex-basis:100%}
+  .home-watchlist-search .primary-button{width:100%}
+  .home-watchlist-footer{align-items:flex-start;flex-direction:column}
+  .home-watchlist-table th,.home-watchlist-table td{padding:12px 6px;font-size:11px}
+  .home-watchlist-table small{max-width:85px;font-size:10px}
+  .home-watchlist-table .company-icon{display:none}
+  [data-slot=dialog-content],[data-slot=alert-dialog-content]{position:fixed!important;top:16px!important;left:16px!important;right:16px!important;bottom:auto!important;translate:none!important;transform:none!important;width:auto!important;max-width:none!important;max-height:calc(100dvh - 32px)!important;margin:0!important;padding:22px 18px!important;animation:none!important}
+  .add-stock-dialog .position-fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .add-stock-dialog .add-quote-panel{padding:12px;gap:12px}
+  .add-stock-dialog .add-quote-price strong{font-size:26px}
+  [data-slot=dialog-content] input{font-size:16px}
+}

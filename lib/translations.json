@@ -2146,5 +2146,77 @@
   "Past weeks go back two quarters.": [
     "Geçmiş haftalar iki çeyrek geriye gider.",
     "Las semanas pasadas llegan hasta dos trimestres atrás."
+  ],
+  "Keep an eye on what matters.": [
+    "Önemli olanı gözden kaçırma.",
+    "No pierdas de vista lo que importa."
+  ],
+  "Your watchlist, market moves, and earnings — together.": [
+    "Listen, piyasa hareketleri ve bilanço takvimi tek yerde.",
+    "Tu lista, los movimientos del mercado y los resultados, en un solo lugar."
+  ],
+  "Start with one stock.": [
+    "Tek bir hisseyle başla.",
+    "Empieza con una acción."
+  ],
+  "Your watchlist": [
+    "Listen",
+    "Tu lista"
+  ],
+  "Add a company and follow its price from today.": [
+    "Bir şirket ekle, fiyatını bugünden itibaren takip et.",
+    "Añade una empresa y sigue su precio desde hoy."
+  ],
+  "Open full watchlist": [
+    "Tam listeyi aç",
+    "Abrir la lista completa"
+  ],
+  "Search for your first stock above. Your watchlist will appear here.": [
+    "Yukarıdan ilk hisseni ara. Listen burada görünecek.",
+    "Busca tu primera acción arriba. Tu lista aparecerá aquí."
+  ],
+  "Save with a free account": [
+    "Ücretsiz hesapla kaydet",
+    "Guarda con una cuenta gratuita"
+  ],
+  "View all": [
+    "Tümünü gör",
+    "Ver todo"
+  ],
+  "Starting price": [
+    "Başlangıç fiyatı",
+    "Precio inicial"
+  ],
+  "Since added": [
+    "Eklendiğinden beri",
+    "Desde que se añadió"
+  ],
+  "Stock limit reached.": [
+    "Hisse sınırına ulaşıldı.",
+    "Has alcanzado el límite de acciones."
+  ],
+  "See an example watchlist": [
+    "Örnek bir liste gör",
+    "Ver una lista de ejemplo"
+  ],
+  "Start with one watchlist on this device. Create a free account for up to five lists and access across devices.": [
+    "Bu cihazda tek listeyle başla. Ücretsiz hesapla beş listeye çık ve tüm cihazlarından eriş.",
+    "Empieza con una lista en este dispositivo. Crea una cuenta gratuita para tener hasta cinco listas y acceder desde cualquier dispositivo."
+  ],
+  "Make room for more ideas": [
+    "Yeni fikirlere yer aç",
+    "Haz sitio para más ideas"
+  ],
+  "Guests get one watchlist. Create a free account for up to five, and keep the stocks you have already added.": [
+    "Misafirler tek liste kullanır. Ücretsiz hesapla beşe çık; şimdiye kadar eklediğin hisseler de seninle gelir.",
+    "Los invitados tienen una lista. Crea una cuenta gratuita para tener hasta cinco y conserva las acciones que ya añadiste."
+  ],
+  "Reporting next": [
+    "Sırada bilanço açıklayacaklar",
+    "Próximos resultados"
+  ],
+  "Reported this week": [
+    "Bu hafta açıklananlar",
+    "Publicados esta semana"
   ]
 }

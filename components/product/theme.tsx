@@ -5,25 +5,23 @@ import {useT} from '@/components/product/language';
 
 export type Theme='dark'|'light';
 const KEY='watchlist-theme';
-const Ctx=createContext<{theme:Theme;toggle:()=>void}>({theme:'dark',toggle:()=>{}});
+const Ctx=createContext<{theme:Theme;toggle:()=>void}>({theme:'light',toggle:()=>{}});
 
 export function ThemeProvider({children}:{children:React.ReactNode}){
   /* Start on the server default so hydration matches, then adopt the saved theme. */
-  const [theme,setTheme]=useState<Theme>('dark');
+  const [theme,setTheme]=useState<Theme>('light');
   useEffect(()=>{
-    const saved=window.localStorage.getItem(KEY);
-    const next=saved==='light'?'light':'dark';
+    let next:Theme='light';
+    try{next=window.localStorage.getItem(KEY)==='dark'?'dark':'light';}catch{/* Light also works when storage is blocked. */}
     setTheme(next);
     document.documentElement.classList.toggle('dark',next==='dark');
   },[]);
   const toggle=useCallback(()=>{
-    setTheme(current=>{
-      const next=current==='dark'?'light':'dark';
-      window.localStorage.setItem(KEY,next);
-      document.documentElement.classList.toggle('dark',next==='dark');
-      return next;
-    });
-  },[]);
+    const next=theme==='dark'?'light':'dark';
+    setTheme(next);
+    document.documentElement.classList.toggle('dark',next==='dark');
+    try{window.localStorage.setItem(KEY,next);}catch{/* Keep the control usable without persistence. */}
+  },[theme]);
   return <Ctx.Provider value={{theme,toggle}}>{children}</Ctx.Provider>;
 }
 
@@ -41,6 +39,6 @@ export function ThemeToggle(){
   const t=useT();
   const label=theme==='dark'?t('Switch to light theme'):t('Switch to dark theme');
   return <button type="button" className="theme-toggle" aria-label={label} title={label} onClick={toggle}>
-    {theme==='dark'?<Sun size={18} aria-hidden="true"/>:<Moon size={18} aria-hidden="true"/>}
+    {theme==='dark'?<Sun size={15} aria-hidden="true"/>:<Moon size={15} aria-hidden="true"/>}
   </button>;
 }
