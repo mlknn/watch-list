@@ -632,6 +632,21 @@ html.dark .earnings-day-note.is-error{color:#ff9aa4}
 
 @media(max-width:1100px){
   .home-sample-body{grid-template-columns:minmax(0,1fr)}
+}
+/* Narrow the weekday columns instead of scrolling: a full week still fits on a small laptop. */
+@media(max-width:1240px){
+  .earnings-cal-page{padding:24px 3% 70px}
+  .earnings-week{gap:8px}
+  .earnings-day header{padding:9px 10px;gap:5px}
+  .earnings-day-list{padding:5px}
+  .earnings-chip{gap:7px;padding:6px}
+  .earnings-chip .company-icon{flex:0 0 24px;width:24px;height:24px}
+  .earnings-chip-text strong{font-size:12px;gap:5px}
+  .earnings-chip-text small{font-size:11px}
+  .earnings-chip-text em{font-size:10px}
+  .earnings-reported{font-size:8px;padding:2px 5px}
+}
+@media(max-width:860px){
   .earnings-week{grid-template-columns:1fr}
   .earnings-day header{align-items:center}
   .earnings-day-list{grid-template-columns:repeat(2,minmax(0,1fr))}
