@@ -218,7 +218,7 @@ function StockRow({row,pending}:{row:Row;pending:boolean}){
   const chart=row.chart;
   const href='/stocks/'+encodeURIComponent(row.symbol);
   return <div className="market-table-row">
-    <span className="market-table-name"><FavoriteStar symbol={row.symbol}/><a href={href}><CompanyIcon symbol={row.symbol}/><span><strong>{chart?.companyName||row.name||row.symbol}</strong><small>{row.symbol}</small></span></a></span>
+    <span className="market-table-name"><FavoriteStar symbol={row.symbol}/><a href={href}><CompanyIcon symbol={row.symbol}/><span className="market-table-copy"><strong>{chart?.companyName||row.name||row.symbol}</strong><small>{row.symbol}</small></span></a></span>
     <a className="market-table-price" href={href}>{chart?price(chart.quote.price,chart.currency):'—'}</a>
     <a className="market-table-change" href={href}>{chart?<Change chart={chart}/>:pending?<span className="market-card-pending">{t('Loading…')}</span>:<span className="market-card-error">{row.error||'—'}</span>}</a>
     <a className="market-table-open" href={href}>{t('Details')}</a>
