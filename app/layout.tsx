@@ -58,7 +58,7 @@ const softwareJsonLd = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return <html lang="en" className="dark">
+  return <html lang="en" className="dark" suppressHydrationWarning>
     <head>
       <script dangerouslySetInnerHTML={{__html:"(function(){try{var t=localStorage.getItem('watchlist-theme');if(t==='light')document.documentElement.classList.remove('dark');else document.documentElement.classList.add('dark');}catch(e){document.documentElement.classList.add('dark');}})();"}}/>
       <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18447742703"/>

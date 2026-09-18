@@ -276,85 +276,88 @@ h2 { font-size:19px; margin:0; letter-spacing:-.3px; font-weight:600; }
 .insights-table small{color:#8a97ab}
 
 /* Night market UI — scoped so light theme can restore the previous surface */
-html.dark{
-  --background:#07110d; --foreground:#ffffff; --card:#141f1a; --primary:#3dff8f; color-scheme:dark;
+html.dark{--background:#07110d; --foreground:#ffffff; --card:#141f1a; --primary:#3dff8f; color-scheme:dark;
   --color-primary:#3dff8f; --color-primary-foreground:#062014; --color-secondary:#15241e; --color-secondary-foreground:#ffffff;
   --color-muted:#15241e; --color-muted-foreground:#d5e6db; --color-accent:#15241e; --color-accent-foreground:#ffffff;
-  --color-destructive:#ff4458; --color-border:#2a4438; --color-input:#2a4438; --color-ring:#3dff8f;
-  *{border-color:#2a4438}
-  body{background:radial-gradient(1200px 560px at 85% -8%,#143628 0%,transparent 58%),radial-gradient(900px 480px at 0% 110%,#0c2218 0%,transparent 52%),#07110d;color:#ffffff}
-  .logo-mark-dark{display:block}.logo-mark-light{display:none}
-  .theme-toggle{border-color:#2a4438;background:#101a16;color:#ffffff}
-  .theme-toggle:hover{background:#15241e;color:#3dff8f}
-  .topbar,.public-footer{background:#0b1612;border-color:#2a4438}
-  .brand{color:#ffffff}.brand-light{color:#7cffb4;font-weight:500}
-  .quiet-link,.save-state,.account-nav,.nav-signout,.public-nav nav,.footer-tagline,.workspace-footer,.intro,.eyebrow,.card-heading p,.refresh-state,.date-added,.quote-time,.company-name{color:#d5e6db}
-  .solid-link,.primary-button,.join-banner .solid-link{background:#3dff8f;color:#062014;border-radius:999px;box-shadow:0 8px 24px #3dff8f33}
-  .solid-link:hover,.primary-button:hover{background:#7cffb4;color:#062014}
-  .outline-link,.outline-button,.refresh-button{background:#101a16;color:#ffffff;border:1px solid #2a4438;border-radius:999px}
-  .outline-link:hover,.outline-button:hover,.refresh-button:hover,.new-tab:hover,.icon-button:hover{background:#15241e;color:#3dff8f}
-  .watch-card,.auth-card,.account-card,.price-card,.statistics-panel,.company-panel,.history-panel,.earnings-panel,.stock-summary-card,.showcase-performance,.hero-preview,.market-session,.market-movers,.market-index-hero,.market-table,.market-index-card,.purpose-points li,.join-banner,.insights-today article,.community-countries li,.empty-icon,.ticker-suggestions,.stock-search-popover,.stock-hover-card,.company-about-content{background:#141f1a;border-color:#2a4438;color:#ffffff}
-  .page-heading.dashboard-heading,.portfolio-panel,.watchlist-chart-pane,.watchlist-summary,.workspace .add-bar,.column-preview,.stock-table th,.history-panel th,.earnings-table thead,.market-table-head,.showcase-performance{background:#101a16;border-color:#2a4438}
-  .tab-strip [data-slot=tabs-trigger][data-active],.stock-detail-link:hover strong,.privacy-page a,.auth-bottom a,.auth-privacy a,.hero-note a,.purpose-points a,.email-invite,.note-toggle,.advanced-upgrade a,.market-table-open,.market-sort.is-on{color:#3dff8f}
-  .tab-strip [data-slot=tabs-trigger]:after{background:#3dff8f}
-  .tab-count{background:#15241e;color:#d5e6db}[data-active] .tab-count{background:#123528;color:#3dff8f}
-  .watchlist-index thead th,.watchlist-index tbody th,.watchlist-index td{border-color:#2a4438;color:#ffffff}
-  .watchlist-index tbody tr:hover,.watchlist-index tbody tr.is-active,.stock-table tbody tr:hover,.market-table-row:hover,.earnings-table tbody tr:hover{background:#12301f}
-  .stock-table td,.stock-table th,.market-table-row,.earnings-table th,.earnings-table td,.metric-list>div,.statistics-grid>div{border-color:#2a4438;color:#ffffff}
-  .stock-monogram,.company-icon,.suggestion-symbol,.sample-symbol{background:#15241e;border-color:#2a4438;color:#7cffb4}
-  .up,.change-pill.up,.save-state svg,.hero-note svg,.verified-label,.share-notice,.community-number strong,.market-ticker a.is-up,.market-ticker a.is-up small,.market-index-quote .up,.watchlist-index .up,.stock-table .up,.mobile-stock-values .up,.chart-period-return.up strong,.showcase-total.up,.sample-return.up,.detail-price .up{color:#3dff8f!important;font-weight:700}
-  .down,.change-pill.down,.market-ticker a.is-down,.market-ticker a.is-down small,.market-index-quote .down,.watchlist-index .down,.stock-table .down,.mobile-stock-values .down,.chart-period-return.down strong,.showcase-total.down,.sample-return.down,.detail-price .down{color:#ff4458!important;font-weight:700}
-  .change-pill.up{background:#0f3d28;color:#3dff8f}.change-pill.down{background:#3a1218;color:#ff4458}.change-pill.flat{background:#15241e;color:#d5e6db}
-  .flat{color:#d5e6db}
-  input:not([type=radio]):not([type=checkbox]),textarea,select,[data-slot=select-trigger],.language-select,.table-controls>input,.table-controls input,.ticker-field input,.workspace .add-bar input{background:#0b1612;color:#ffffff;border-color:#2a4438}
-  .ticker-suggestions button,.stock-search-options [role=option]{color:#ffffff}
-  .ticker-suggestions button:hover,.stock-search-options [aria-selected=true],.stock-search-options [role=option]:hover{background:#12301f}
-  .error-banner{background:#2a1418;border-color:#5a2430;color:#ffb4bb}
-  .success-banner{background:#123528;border-color:#1f4a38;color:#7cffb4}
-  .quote-warning,.market-lock-banner{background:#241c10;border-color:#4a3a18;color:#e2c48a}
-  .detail-overview,.main-chart-panel,.earnings-table-scroll{background:#141f1a;border-color:#2a4438;color:#ffffff}
-  .chart-ranges [data-active]{background:#123528!important;color:#3dff8f!important}
-  .workspace-plan,.pro-badge{background:#123528;color:#3dff8f}
-  .mobile-holding-gain,.allocation-strip span,.mode-picker label,.billing-cycle,.five-year-badge,.company-about summary{background:#15241e;border-color:#2a4438;color:#ffffff}
-  .public-nav .solid-link,.hero-actions .solid-link{color:#062014}
-  .favorite-star.is-on{color:#3dff8f}
-  .market-ticker{background:#0b1612;border-color:#2a4438}
-  .market-ticker a{background:#141f1a;border-color:#2a4438;color:#ffffff}
-  .market-ticker a.is-up{background:#0f3d28;border-color:#1f4a38}
-  .market-ticker a.is-down{background:#3a1218;border-color:#5a2430}
-  .market-group{border-color:#2a4438}
-  .recharts-cartesian-axis-tick-value,.recharts-legend-item-text{fill:#d5e6db!important}
-  .recharts-default-tooltip{background:#101a16!important;border-color:#2a4438!important;color:#ffffff!important}
-  [data-slot=dialog-content],[data-slot=alert-dialog-content],[data-slot=popover-content]{background:#141f1a;color:#ffffff;border-color:#2a4438}
-  .floating-note{background:#123528;color:#ffffff}
-  .share-link-field input{background:#0b1612}
-  .watchlist-compose-row>.watchlist-summary,.table-controls .watchlist-summary{background:#101a16;border-color:#2a4438;color:#ffffff}
-  .workspace-summary,.workspace-summary span,.workspace-summary strong,.watchlist-index tbody th,.watchlist-summary dd,.portfolio-metrics strong,.metric-list dd,.statistics-grid strong,.detail-price strong,.hover-price strong,.stock-detail-link strong{color:#ffffff}
-  .community-countries li:before{background:#3dff8f}
-  .index-expand:hover{background:#123528;color:#3dff8f}
-  .ticker-hints button{background:#101a16;color:#ffffff;border-color:#2a4438}
-  .ticker-hints button:hover{background:#123528;color:#3dff8f}
-  .owner-label{border-color:#2a4438;color:#d5e6db}
-  button:focus-visible,a:focus-visible{outline-color:#3dff8f}
-  .plan-badge{background:#123528;color:#3dff8f}
-  .auth-card-icon,.earnings-icon{background:#123528;color:#3dff8f}
-  .auth-divider:before,.auth-divider:after{background:#2a4438}
-  .privacy-page p,.privacy-page li,.compare-table th,.compare-table td{color:#d5e6db}
-  .compare-table th,.compare-table td{border-color:#2a4438}
-  .compare-table thead th,.compare-table tbody th{background:#101a16;color:#ffffff}
-  .mobile-stock-list,.mobile-stock-card{border-color:#2a4438;color:#ffffff}
-  .local-workspace-note,.field-note,.showcase-source,.earnings-note,.market-footnote,.pricing-footnote,.map-attribution{color:#d5e6db}
-  .hero-copy>p,.feature-grid p,.purpose-section>div>p:not(.eyebrow){color:#e8f3ec}
-  .hero-copy h1,.purpose-section h2,.how-section h2,.hero-brand-mark{color:#ffffff}
-  .dashboard-heading{background:linear-gradient(115deg,#141f1a 35%,#123528)!important;border-color:#2a4438!important;color:#ffffff}
-  .dashboard-heading .watchlist-index{background:#101a16;border-color:#2a4438}
-  .watchlist-index caption,.watchlist-index thead th{color:#d5e6db;background:#101a16}
-  .sample-row{border-color:#2a4438}
-  .preview-caption,.preview-bottom,.showcase-performance-foot{border-color:#2a4438;color:#d5e6db}
-  .symbol-nvda,.symbol-mu,.symbol-tsla,.symbol-aapl,.symbol-msft,.symbol-amzn{background:#15241e;color:#7cffb4}
-  .sent-panel .solid-link{color:#062014}
-  .chart-period-return span{color:#d5e6db;font-weight:500}
-}
+  --color-destructive:#ff4458; --color-border:#2a4438; --color-input:#2a4438; --color-ring:#3dff8f;}
+html.dark *{border-color:#2a4438}
+html.dark body{background:radial-gradient(1200px 560px at 85% -8%,#143628 0%,transparent 58%),radial-gradient(900px 480px at 0% 110%,#0c2218 0%,transparent 52%),#07110d;color:#ffffff}
+html.dark .logo-mark-dark{display:block}
+html.dark .logo-mark-light{display:none}
+html.dark .theme-toggle{border-color:#2a4438;background:#101a16;color:#ffffff}
+html.dark .theme-toggle:hover{background:#15241e;color:#3dff8f}
+html.dark .topbar,html.dark .public-footer{background:#0b1612;border-color:#2a4438}
+html.dark .brand{color:#ffffff}
+html.dark .brand-light{color:#7cffb4;font-weight:500}
+html.dark .quiet-link,html.dark .save-state,html.dark .account-nav,html.dark .nav-signout,html.dark .public-nav nav,html.dark .footer-tagline,html.dark .workspace-footer,html.dark .intro,html.dark .eyebrow,html.dark .card-heading p,html.dark .refresh-state,html.dark .date-added,html.dark .quote-time,html.dark .company-name{color:#d5e6db}
+html.dark .solid-link,html.dark .primary-button,html.dark .join-banner .solid-link{background:#3dff8f;color:#062014;border-radius:999px;box-shadow:0 8px 24px #3dff8f33}
+html.dark .solid-link:hover,html.dark .primary-button:hover{background:#7cffb4;color:#062014}
+html.dark .outline-link,html.dark .outline-button,html.dark .refresh-button{background:#101a16;color:#ffffff;border:1px solid #2a4438;border-radius:999px}
+html.dark .outline-link:hover,html.dark .outline-button:hover,html.dark .refresh-button:hover,html.dark .new-tab:hover,html.dark .icon-button:hover{background:#15241e;color:#3dff8f}
+html.dark .watch-card,html.dark .auth-card,html.dark .account-card,html.dark .price-card,html.dark .statistics-panel,html.dark .company-panel,html.dark .history-panel,html.dark .earnings-panel,html.dark .stock-summary-card,html.dark .showcase-performance,html.dark .hero-preview,html.dark .market-session,html.dark .market-movers,html.dark .market-index-hero,html.dark .market-table,html.dark .market-index-card,html.dark .purpose-points li,html.dark .join-banner,html.dark .insights-today article,html.dark .community-countries li,html.dark .empty-icon,html.dark .ticker-suggestions,html.dark .stock-search-popover,html.dark .stock-hover-card,html.dark .company-about-content{background:#141f1a;border-color:#2a4438;color:#ffffff}
+html.dark .page-heading.dashboard-heading,html.dark .portfolio-panel,html.dark .watchlist-chart-pane,html.dark .watchlist-summary,html.dark .workspace .add-bar,html.dark .column-preview,html.dark .stock-table th,html.dark .history-panel th,html.dark .earnings-table thead,html.dark .market-table-head,html.dark .showcase-performance{background:#101a16;border-color:#2a4438}
+html.dark .tab-strip [data-slot=tabs-trigger][data-active],html.dark .stock-detail-link:hover strong,html.dark .privacy-page a,html.dark .auth-bottom a,html.dark .auth-privacy a,html.dark .hero-note a,html.dark .purpose-points a,html.dark .email-invite,html.dark .note-toggle,html.dark .advanced-upgrade a,html.dark .market-table-open,html.dark .market-sort.is-on{color:#3dff8f}
+html.dark .tab-strip [data-slot=tabs-trigger]:after{background:#3dff8f}
+html.dark .tab-count{background:#15241e;color:#d5e6db}
+html.dark [data-active] .tab-count{background:#123528;color:#3dff8f}
+html.dark .watchlist-index thead th,html.dark .watchlist-index tbody th,html.dark .watchlist-index td{border-color:#2a4438;color:#ffffff}
+html.dark .watchlist-index tbody tr:hover,html.dark .watchlist-index tbody tr.is-active,html.dark .stock-table tbody tr:hover,html.dark .market-table-row:hover,html.dark .earnings-table tbody tr:hover{background:#12301f}
+html.dark .stock-table td,html.dark .stock-table th,html.dark .market-table-row,html.dark .earnings-table th,html.dark .earnings-table td,html.dark .metric-list>div,html.dark .statistics-grid>div{border-color:#2a4438;color:#ffffff}
+html.dark .stock-monogram,html.dark .company-icon,html.dark .suggestion-symbol,html.dark .sample-symbol{background:#15241e;border-color:#2a4438;color:#7cffb4}
+html.dark .up,html.dark .change-pill.up,html.dark .save-state svg,html.dark .hero-note svg,html.dark .verified-label,html.dark .share-notice,html.dark .community-number strong,html.dark .market-ticker a.is-up,html.dark .market-ticker a.is-up small,html.dark .market-index-quote .up,html.dark .watchlist-index .up,html.dark .stock-table .up,html.dark .mobile-stock-values .up,html.dark .chart-period-return.up strong,html.dark .showcase-total.up,html.dark .sample-return.up,html.dark .detail-price .up{color:#3dff8f!important;font-weight:700}
+html.dark .down,html.dark .change-pill.down,html.dark .market-ticker a.is-down,html.dark .market-ticker a.is-down small,html.dark .market-index-quote .down,html.dark .watchlist-index .down,html.dark .stock-table .down,html.dark .mobile-stock-values .down,html.dark .chart-period-return.down strong,html.dark .showcase-total.down,html.dark .sample-return.down,html.dark .detail-price .down{color:#ff4458!important;font-weight:700}
+html.dark .change-pill.up{background:#0f3d28;color:#3dff8f}
+html.dark .change-pill.down{background:#3a1218;color:#ff4458}
+html.dark .change-pill.flat{background:#15241e;color:#d5e6db}
+html.dark .flat{color:#d5e6db}
+html.dark input:not([type=radio]):not([type=checkbox]),html.dark textarea,html.dark select,html.dark [data-slot=select-trigger],html.dark .language-select,html.dark .table-controls>input,html.dark .table-controls input,html.dark .ticker-field input,html.dark .workspace .add-bar input{background:#0b1612;color:#ffffff;border-color:#2a4438}
+html.dark .ticker-suggestions button,html.dark .stock-search-options [role=option]{color:#ffffff}
+html.dark .ticker-suggestions button:hover,html.dark .stock-search-options [aria-selected=true],html.dark .stock-search-options [role=option]:hover{background:#12301f}
+html.dark .error-banner{background:#2a1418;border-color:#5a2430;color:#ffb4bb}
+html.dark .success-banner{background:#123528;border-color:#1f4a38;color:#7cffb4}
+html.dark .quote-warning,html.dark .market-lock-banner{background:#241c10;border-color:#4a3a18;color:#e2c48a}
+html.dark .detail-overview,html.dark .main-chart-panel,html.dark .earnings-table-scroll{background:#141f1a;border-color:#2a4438;color:#ffffff}
+html.dark .chart-ranges [data-active]{background:#123528!important;color:#3dff8f!important}
+html.dark .workspace-plan,html.dark .pro-badge{background:#123528;color:#3dff8f}
+html.dark .mobile-holding-gain,html.dark .allocation-strip span,html.dark .mode-picker label,html.dark .billing-cycle,html.dark .five-year-badge,html.dark .company-about summary{background:#15241e;border-color:#2a4438;color:#ffffff}
+html.dark .public-nav .solid-link,html.dark .hero-actions .solid-link{color:#062014}
+html.dark .favorite-star.is-on{color:#3dff8f}
+html.dark .market-ticker{background:#0b1612;border-color:#2a4438}
+html.dark .market-ticker a{background:#141f1a;border-color:#2a4438;color:#ffffff}
+html.dark .market-ticker a.is-up{background:#0f3d28;border-color:#1f4a38}
+html.dark .market-ticker a.is-down{background:#3a1218;border-color:#5a2430}
+html.dark .market-group{border-color:#2a4438}
+html.dark .recharts-cartesian-axis-tick-value,html.dark .recharts-legend-item-text{fill:#d5e6db!important}
+html.dark .recharts-default-tooltip{background:#101a16!important;border-color:#2a4438!important;color:#ffffff!important}
+html.dark [data-slot=dialog-content],html.dark [data-slot=alert-dialog-content],html.dark [data-slot=popover-content]{background:#141f1a;color:#ffffff;border-color:#2a4438}
+html.dark .floating-note{background:#123528;color:#ffffff}
+html.dark .share-link-field input{background:#0b1612}
+html.dark .watchlist-compose-row>.watchlist-summary,html.dark .table-controls .watchlist-summary{background:#101a16;border-color:#2a4438;color:#ffffff}
+html.dark .workspace-summary,html.dark .workspace-summary span,html.dark .workspace-summary strong,html.dark .watchlist-index tbody th,html.dark .watchlist-summary dd,html.dark .portfolio-metrics strong,html.dark .metric-list dd,html.dark .statistics-grid strong,html.dark .detail-price strong,html.dark .hover-price strong,html.dark .stock-detail-link strong{color:#ffffff}
+html.dark .community-countries li:before{background:#3dff8f}
+html.dark .index-expand:hover{background:#123528;color:#3dff8f}
+html.dark .ticker-hints button{background:#101a16;color:#ffffff;border-color:#2a4438}
+html.dark .ticker-hints button:hover{background:#123528;color:#3dff8f}
+html.dark .owner-label{border-color:#2a4438;color:#d5e6db}
+html.dark button:focus-visible,html.dark a:focus-visible{outline-color:#3dff8f}
+html.dark .plan-badge{background:#123528;color:#3dff8f}
+html.dark .auth-card-icon,html.dark .earnings-icon{background:#123528;color:#3dff8f}
+html.dark .auth-divider:before,html.dark .auth-divider:after{background:#2a4438}
+html.dark .privacy-page p,html.dark .privacy-page li,html.dark .compare-table th,html.dark .compare-table td{color:#d5e6db}
+html.dark .compare-table th,html.dark .compare-table td{border-color:#2a4438}
+html.dark .compare-table thead th,html.dark .compare-table tbody th{background:#101a16;color:#ffffff}
+html.dark .mobile-stock-list,html.dark .mobile-stock-card{border-color:#2a4438;color:#ffffff}
+html.dark .local-workspace-note,html.dark .field-note,html.dark .showcase-source,html.dark .earnings-note,html.dark .market-footnote,html.dark .pricing-footnote,html.dark .map-attribution{color:#d5e6db}
+html.dark .hero-copy>p,html.dark .feature-grid p,html.dark .purpose-section>div>p:not(.eyebrow){color:#e8f3ec}
+html.dark .hero-copy h1,html.dark .purpose-section h2,html.dark .how-section h2,html.dark .hero-brand-mark{color:#ffffff}
+html.dark .dashboard-heading{background:linear-gradient(115deg,#141f1a 35%,#123528)!important;border-color:#2a4438!important;color:#ffffff}
+html.dark .dashboard-heading .watchlist-index{background:#101a16;border-color:#2a4438}
+html.dark .watchlist-index caption,html.dark .watchlist-index thead th{color:#d5e6db;background:#101a16}
+html.dark .sample-row{border-color:#2a4438}
+html.dark .preview-caption,html.dark .preview-bottom,html.dark .showcase-performance-foot{border-color:#2a4438;color:#d5e6db}
+html.dark .symbol-nvda,html.dark .symbol-mu,html.dark .symbol-tsla,html.dark .symbol-aapl,html.dark .symbol-msft,html.dark .symbol-amzn{background:#15241e;color:#7cffb4}
+html.dark .sent-panel .solid-link{color:#062014}
+html.dark .chart-period-return span{color:#d5e6db;font-weight:500}
 html:not(.dark) .logo-mark-dark{display:none}
 html:not(.dark) .logo-mark-light{display:block}
 
