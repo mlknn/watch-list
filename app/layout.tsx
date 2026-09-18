@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     icon: [
       { url: '/favicon.ico?v=4', sizes: '16x16 32x32 48x48' },
       { url: '/favicon-32.png?v=4', type: 'image/png', sizes: '32x32' },
-      { url: '/favicon.svg?v=4', type: 'image/svg+xml', sizes: 'any' },
+      { url: '/favicon.svg?v=5', type: 'image/svg+xml', sizes: 'any' },
     ],
     shortcut: '/favicon.ico?v=4',
     apple: '/apple-touch-icon.png?v=4',
@@ -57,7 +57,7 @@ const softwareJsonLd = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return <html lang="en">
+  return <html lang="en" className="dark">
     <head>
       <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18447742703"/>
       <script dangerouslySetInnerHTML={{__html:"window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','AW-18447742703');"}}/>

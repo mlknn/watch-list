@@ -8,7 +8,7 @@ import { ArrowUpRight } from 'lucide-react';
 import {LanguageSelect} from './language';
 import {LogoMark} from './logo';
 
-export function Brand() { return <><a className="brand" href="/"><span className="brand-logo"><LogoMark/></span>watch<span className="brand-light">list</span></a></>; }
+export function Brand() { return <><a className="brand" href="/"><span className="brand-logo"><LogoMark/></span>StockWatchlist<span className="brand-light">.app</span></a></>; }
 
 function useMember(){
  const epoch=useAccessRefresh();
