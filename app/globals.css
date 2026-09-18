@@ -25,7 +25,6 @@ button:focus-visible,a:focus-visible { outline:3px solid #8fa9ff; outline-offset
 .theme-toggle { display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:999px; border:1px solid #e2e7ef; background:transparent; color:#202b40; flex-shrink:0; }
 .theme-toggle:hover { background:#eef2f8; }
 .logo-mark { width:35px; height:35px; display:block; }
-.logo-mark-light { display:none; }
 .brand { display:flex; gap:0; align-items:center; text-decoration:none; color:#202b40; font-size:25px; font-weight:750; letter-spacing:-1px; }
 .brand-icon { background:#365bd8; color:white; width:35px; height:35px; border-radius:10px; margin-right:11px; display:grid; place-items:center; }
 .brand-light { color:#66738a; font-weight:400; }
@@ -284,8 +283,6 @@ html.dark{--background:#07110d; --foreground:#ffffff; --card:#141f1a; --primary:
   --color-destructive:#ff4458; --color-border:#2a4438; --color-input:#2a4438; --color-ring:#3dff8f;}
 html.dark *{border-color:#2a4438}
 html.dark body{background:radial-gradient(1200px 560px at 85% -8%,#143628 0%,transparent 58%),radial-gradient(900px 480px at 0% 110%,#0c2218 0%,transparent 52%),#07110d;color:#ffffff}
-html.dark .logo-mark-dark{display:block}
-html.dark .logo-mark-light{display:none}
 html.dark .theme-toggle{border-color:#2a4438;background:#101a16;color:#ffffff}
 html.dark .theme-toggle:hover{background:#15241e;color:#3dff8f}
 html.dark .topbar,html.dark .public-footer{background:#0b1612;border-color:#2a4438}

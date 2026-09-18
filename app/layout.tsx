@@ -23,12 +23,12 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon.ico?v=4', sizes: '16x16 32x32 48x48' },
-      { url: '/favicon-32.png?v=4', type: 'image/png', sizes: '32x32' },
-      { url: '/favicon.svg?v=5', type: 'image/svg+xml', sizes: 'any' },
+      { url: '/favicon.ico?v=6', sizes: '16x16 32x32 48x48' },
+      { url: '/favicon-32.png?v=6', type: 'image/png', sizes: '32x32' },
+      { url: '/favicon.svg?v=6', type: 'image/svg+xml', sizes: 'any' },
     ],
-    shortcut: '/favicon.ico?v=4',
-    apple: '/apple-touch-icon.png?v=4',
+    shortcut: '/favicon.ico?v=6',
+    apple: '/apple-touch-icon.png?v=6',
   },
   description: 'Build a what-if stock portfolio and see how your picks perform over time. No signup to start.',
 };
