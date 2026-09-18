@@ -469,7 +469,10 @@ html.dark .favorite-star{color:#d7e6dc;opacity:.95}
 
 .earnings-cal-page{max-width:1280px;margin:0 auto;padding:28px 5% 70px}
 .earnings-cal-nav{display:flex;gap:8px;flex-wrap:wrap}
-.earnings-week{display:grid;grid-template-columns:repeat(7,minmax(140px,1fr));gap:10px;overflow-x:auto;padding-bottom:8px}
+.earnings-week-block{margin:0 0 22px}
+.earnings-week-block h2{font-size:18px;letter-spacing:-.4px;margin:0 0 10px}
+.earnings-day.is-past{opacity:.78}
+.earnings-day.is-future:not(.is-today){border-color:#cdeadb}
 .earnings-day{min-width:140px;border:1px solid #e1e7f0;border-radius:16px;background:#fff;display:flex;flex-direction:column;max-height:72vh}
 .earnings-day header{display:flex;align-items:baseline;gap:6px;padding:12px 12px 8px;border-bottom:1px solid #eef2f8}
 .earnings-day header strong{font-size:13px;text-transform:uppercase;letter-spacing:.4px}
@@ -509,6 +512,7 @@ html.dark .favorite-star{color:#d7e6dc;opacity:.95}
 .stock-facts-list dt{color:#7a889e}
 .stock-facts-list dd{font-weight:650;text-align:right}
 html.dark .earnings-day,html.dark .story-card,html.dark .stock-facts-rail{background:#141f1a;border-color:#2a4438}
+html.dark .earnings-day.is-future:not(.is-today){border-color:#2f6a4c}
 html.dark .earnings-chip:hover{background:#12301f}
 html.dark .story-pills article,html.dark .story-line-bar,html.dark .stock-facts-list>div{border-color:#2a4438}
 html.dark .story-line-bar{background:#101a16}

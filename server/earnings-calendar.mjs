@@ -1,6 +1,7 @@
 import {AppError,normalizeTicker} from './quotes.mjs';
 
 const cache=new Map();
+const dayCache=new Map();
 const NY='America/New_York';
 
 export function toYahooSymbol(value){
@@ -35,6 +36,32 @@ export function weekDays(monday){
   });
 }
 
+export function addDays(iso,n){
+  const d=new Date(String(iso).slice(0,10)+'T12:00:00Z');
+  d.setUTCDate(d.getUTCDate()+n);
+  return d.toISOString().slice(0,10);
+}
+
+const LOOKBACK_WEEKS=26;
+const LOOKAHEAD_WEEKS=26;
+
+export function earningsWindow(now=new Date()){
+  const todayMonday=mondayOnOrBefore(ymdInZone(now));
+  return {
+    todayMonday,
+    minWeek:addDays(todayMonday,-LOOKBACK_WEEKS*7),
+    maxWeek:addDays(todayMonday,LOOKAHEAD_WEEKS*7),
+  };
+}
+
+export function clampMonday(week,now=new Date()){
+  const {minWeek,maxWeek,todayMonday}=earningsWindow(now);
+  const monday=mondayOnOrBefore(week||todayMonday);
+  if(monday<minWeek)throw new AppError('Past earnings only go back two quarters.',400);
+  if(monday>maxWeek)throw new AppError('That week is too far ahead.',400);
+  return monday;
+}
+
 export function normalizeDayRows(rows){
   const seen=new Set();
   const companies=[];
@@ -54,16 +81,21 @@ export function normalizeDayRows(rows){
 }
 
 async function nasdaqDay(date,{fetchImpl=fetch}={}){
+  const saved=dayCache.get(date);
+  if(saved&&Date.now()-saved.at<30*60*1000)return saved.companies;
   const response=await fetchImpl('https://api.nasdaq.com/api/calendar/earnings?date='+encodeURIComponent(date),{
     headers:{
       Accept:'application/json,text/plain,*/*',
       'User-Agent':'Mozilla/5.0 (compatible; StockWatchlist/1.0; +https://stockwatchlist.app)',
     },
-    signal:AbortSignal.timeout(12000),
+    signal:AbortSignal.timeout(8000),
   });
   if(!response.ok)throw new AppError('US earnings calendar is temporarily unavailable.',502);
   const body=await response.json();
-  return normalizeDayRows(body?.data?.rows||[]);
+  const companies=normalizeDayRows(body?.data?.rows||[]);
+  dayCache.set(date,{at:Date.now(),companies});
+  if(dayCache.size>80)dayCache.delete(dayCache.keys().next().value);
+  return companies;
 }
 
 async function mapLimit(items,limit,fn){
@@ -79,16 +111,17 @@ async function mapLimit(items,limit,fn){
   return out;
 }
 
-export async function earningsWeek(week,{loadDay=nasdaqDay}={}){
-  const monday=mondayOnOrBefore(week);
+export async function earningsWeek(week,{loadDay=nasdaqDay,now=new Date()}={}){
+  const monday=clampMonday(week,now);
+  const {minWeek,maxWeek,todayMonday}=earningsWindow(now);
   const saved=cache.get(monday);
   if(saved&&Date.now()-saved.at<30*60*1000)return saved.data;
-  const days=await mapLimit(weekDays(monday),3,async date=>{
+  const days=await mapLimit(weekDays(monday),7,async date=>{
     try{return {date,companies:await loadDay(date)};}
     catch{return {date,companies:[]};}
   });
-  const data={weekStart:monday,days,source:'Nasdaq',fetchedAt:new Date().toISOString()};
+  const data={weekStart:monday,weeks:[{weekStart:monday,days}],minWeek,maxWeek,todayMonday,source:'Nasdaq',fetchedAt:new Date().toISOString()};
   cache.set(monday,{at:Date.now(),data});
-  if(cache.size>24)cache.delete(cache.keys().next().value);
+  if(cache.size>40)cache.delete(cache.keys().next().value);
   return data;
 }

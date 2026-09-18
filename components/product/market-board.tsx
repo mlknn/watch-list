@@ -370,7 +370,7 @@ export function MarketBoard(){
         <article>
           <p className="eyebrow"><T text="3 · EARNINGS"/></p>
           <h2><T text="US earnings calendar"/></h2>
-          <p><T text="See who reports each day this week. Tap a ticker for the earnings story and company details."/></p>
+          <p><T text="See who reports next Monday, Wednesday, and the rest of the week — and who already reported in the last two quarters."/></p>
           <a className="outline-button" href="/earnings"><T text="Open the calendar"/></a>
         </article>
       </div>

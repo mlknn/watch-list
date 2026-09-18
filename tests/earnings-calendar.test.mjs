@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {averageImpact,eventWindows} from '../lib/earnings-impact.mjs';
-import {earningsWeek,mondayOnOrBefore,normalizeDayRows,toYahooSymbol,weekDays} from '../server/earnings-calendar.mjs';
+import {earningsWeek,mondayOnOrBefore,normalizeDayRows,toYahooSymbol,weekDays,clampMonday,earningsWindow,addDays} from '../server/earnings-calendar.mjs';
 
 test('class shares map to Yahoo tickers',()=>{
   assert.equal(toYahooSymbol('BRK.B'),'BRK-B');
@@ -27,10 +27,23 @@ test('day rows sort by market cap and skip junk tickers',()=>{
 });
 
 test('calendar fetch uses injected days and keeps column order',async()=>{
-  const data=await earningsWeek('2026-09-16',{loadDay:async date=>date==='2026-09-16'?[{symbol:'INTC',name:'Intel',marketCap:1e11,when:''}]:[]});
+  const now=new Date('2026-09-18T16:00:00Z');
+  const data=await earningsWeek('2026-09-16',{now,loadDay:async date=>date==='2026-09-16'?[{symbol:'INTC',name:'Intel',marketCap:1e11,when:''}]:[]});
   assert.equal(data.weekStart,'2026-09-14');
-  assert.equal(data.days[2].date,'2026-09-16');
-  assert.equal(data.days[2].companies[0].symbol,'INTC');
+  assert.equal(data.weeks.length,1);
+  assert.equal(data.weeks[0].days[2].date,'2026-09-16');
+  assert.equal(data.weeks[0].days[2].companies[0].symbol,'INTC');
+});
+
+test('past weeks stop two quarters back; future weeks stay in the window',()=>{
+  const now=new Date('2026-09-18T16:00:00Z');
+  const {minWeek,maxWeek,todayMonday}=earningsWindow(now);
+  assert.equal(todayMonday,'2026-09-14');
+  assert.equal(minWeek,addDays(todayMonday,-26*7));
+  assert.equal(clampMonday('',now),'2026-09-14');
+  assert.equal(clampMonday('2026-09-23',now),'2026-09-21');
+  assert.throws(()=>clampMonday('2025-01-06',now),e=>e.status===400);
+  assert.throws(()=>clampMonday(addDays(maxWeek,7),now),e=>e.status===400);
 });
 
 test('average path is relative to the earnings close',()=>{

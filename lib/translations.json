@@ -1747,9 +1747,25 @@
     "Bu haftanın raporları.",
     "Informes de esta semana."
   ],
+  "Who reports, and when.": [
+    "Kim, ne zaman raporlar.",
+    "Quién reporta, y cuándo."
+  ],
+  "Upcoming US earnings by weekday — next Monday, Wednesday, and the rest of the week — plus who already reported. History only goes back two quarters.": [
+    "Gelecek ABD kazançları gün gün — sonraki Pazartesi, Çarşamba ve haftanın geri kalanı — ve kimlerin raporladığı. Geçmiş yalnızca son iki çeyrek.",
+    "Próximos resultados de EE.UU. por día — el lunes, el miércoles y el resto de la semana — y quién ya reportó. El historial cubre solo dos trimestres."
+  ],
   "US companies reporting this week, one column per day. Open a ticker for the earnings story and company details.": [
     "Bu hafta raporlayan ABD şirketleri, her gün bir sütun. Hikâye ve şirket detayı için sembole tıkla.",
     "Empresas de EE.UU. que reportan esta semana, una columna por día. Abre un ticker para la historia y los detalles."
+  ],
+  "Last week": [
+    "Geçen hafta",
+    "Semana pasada"
+  ],
+  "Week of": [
+    "Hafta",
+    "Semana del"
   ],
   "Previous week": [
     "Önceki hafta",
@@ -1783,9 +1799,13 @@
     "Listelenen rapor yok",
     "No hay informes"
   ],
-  "Nasdaq earnings calendar · US-listed names · Quotes and reports may be delayed.": [
-    "Nasdaq kazanç takvimi · ABD’de işlem görenler · Fiyat ve raporlar gecikebilir.",
-    "Calendario Nasdaq · Valores de EE.UU. · Cotizaciones e informes pueden retrasarse."
+  "No reports scheduled": [
+    "Planlanan rapor yok",
+    "Ningún informe programado"
+  ],
+  "Nasdaq earnings calendar · US-listed names · Past weeks stop two quarters back · Quotes and reports may be delayed.": [
+    "Nasdaq kazanç takvimi · ABD’de işlem görenler · Geçmiş haftalar iki çeyrek geri gider · Fiyat ve raporlar gecikebilir.",
+    "Calendario Nasdaq · Valores de EE.UU. · Las semanas pasadas se detienen dos trimestres atrás · Cotizaciones e informes pueden retrasarse."
   ],
   "EARNINGS STORY": [
     "KAZANÇ HİKÂYESİ",
@@ -1955,9 +1975,9 @@
     "3 · KAZANÇLAR",
     "3 · RESULTADOS"
   ],
-  "See who reports each day this week. Tap a ticker for the earnings story and company details.": [
-    "Bu hafta kim hangi gün raporluyor. Hikâye ve şirket detayı için sembole dokun.",
-    "Quién reporta cada día esta semana. Toca un ticker para la historia y los detalles."
+  "See who reports next Monday, Wednesday, and the rest of the week — and who already reported in the last two quarters.": [
+    "Kim gelecek Pazartesi, Çarşamba ve haftanın diğer günlerinde raporluyor — ve son iki çeyrekte kim raporladı.",
+    "Quién reporta el lunes, el miércoles y el resto de la semana — y quién ya reportó en los últimos dos trimestres."
   ],
   "Open the calendar": [
     "Takvimi aç",

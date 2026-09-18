@@ -5,7 +5,7 @@ import {EarningsCalendar} from '@/components/product/earnings-calendar';
 
 export const metadata: Metadata = {
   title: 'US earnings calendar | StockWatchlist',
-  description: 'US stock earnings this week, one column per day. Open a ticker for quarterly results and company details.',
+  description: 'US stock earnings this week and next, one column per weekday. See who already reported in the last two quarters, then open a ticker for details.',
   alternates: {canonical: 'https://stockwatchlist.app/earnings'},
 };
 
