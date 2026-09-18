@@ -736,7 +736,8 @@ html.dark .home-watchlist-table th,html.dark .home-watchlist-table td{border-col
   .home-watchlist-table th,.home-watchlist-table td{padding:12px 6px;font-size:11px}
   .home-watchlist-table small{max-width:85px;font-size:10px}
   .home-watchlist-table .company-icon{display:none}
-  [data-slot=dialog-content],[data-slot=alert-dialog-content]{position:fixed!important;top:16px!important;left:16px!important;right:16px!important;bottom:auto!important;translate:none!important;transform:none!important;width:auto!important;max-width:none!important;max-height:calc(100dvh - 32px)!important;margin:0!important;padding:22px 18px!important;animation:none!important}
+  /* Zero the utility variables instead of `translate:none`, which the CSS minifier drops. */
+  [data-slot=dialog-content],[data-slot=alert-dialog-content]{position:fixed!important;top:16px!important;left:16px!important;right:16px!important;bottom:auto!important;--tw-translate-x:0px!important;--tw-translate-y:0px!important;transform:none!important;width:auto!important;max-width:none!important;max-height:calc(100dvh - 32px)!important;margin:0!important;padding:22px 18px!important;animation:none!important}
   .add-stock-dialog .position-fields{grid-template-columns:repeat(2,minmax(0,1fr))}
   .add-stock-dialog .add-quote-panel{padding:12px;gap:12px}
   .add-stock-dialog .add-quote-price strong{font-size:26px}
