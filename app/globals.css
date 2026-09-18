@@ -358,6 +358,22 @@ html.dark .preview-caption,html.dark .preview-bottom,html.dark .showcase-perform
 html.dark .symbol-nvda,html.dark .symbol-mu,html.dark .symbol-tsla,html.dark .symbol-aapl,html.dark .symbol-msft,html.dark .symbol-amzn{background:#15241e;color:#7cffb4}
 html.dark .sent-panel .solid-link{color:#062014}
 html.dark .chart-period-return span{color:#d5e6db;font-weight:500}
+html.dark .watchlist-table-pane,html.dark .desktop-stock-list,html.dark .stock-table,html.dark .mobile-stock-list,html.dark .mobile-stock-card,html.dark .watchlist-index,html.dark .dashboard-heading .watchlist-index{background:#1c2f27}
+html.dark .stock-table th,html.dark .watchlist-index thead th,html.dark .watchlist-index caption,html.dark .column-preview{background:#20362d!important;color:#e8f3ec}
+html.dark .stock-table td,html.dark .watchlist-index td,html.dark .watchlist-index tbody th{background:transparent}
+html.dark .watchlist-index tbody tr:hover,html.dark .watchlist-index tbody tr.is-active,html.dark .stock-table tbody tr:hover{background:#274438}
+.add-quote-panel{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:16px 18px;border:1px solid #d6deed;border-radius:14px;margin:4px 0 14px;background:#f5f8fd}
+.add-quote-identity{display:flex;align-items:center;gap:12px;min-width:0}
+.add-quote-identity strong{display:block;font-size:20px;letter-spacing:-.4px}
+.add-quote-identity span,.add-quote-identity small{display:block;font-size:13px;color:#6a7990}
+.add-quote-price{text-align:right}
+.add-quote-price span{display:block;font-size:12px;color:#6a7990;margin-bottom:4px}
+.add-quote-price strong{font-size:28px;letter-spacing:-.8px}
+.not-added-note{margin:0 0 16px;font-size:13px;font-weight:700;color:#c34851}
+.add-stock-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+html.dark .add-quote-panel{background:#1c2f27;border-color:#2f4a3e;color:#ffffff}
+html.dark .add-quote-identity span,html.dark .add-quote-identity small,html.dark .add-quote-price span{color:#d5e6db}
+html.dark .not-added-note{color:#ff8a94}
 html:not(.dark) .logo-mark-dark{display:none}
 html:not(.dark) .logo-mark-light{display:block}
 
