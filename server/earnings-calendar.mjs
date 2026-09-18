@@ -16,7 +16,6 @@ export function parseMarketCap(value){
 }
 
 const MIN_MARKET_CAP=2_000_000_000;
-const MAX_PER_DAY=10;
 
 export function ymdInZone(date,tz=NY){
   return new Intl.DateTimeFormat('en-CA',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'}).format(date);
@@ -82,8 +81,7 @@ export function normalizeDayRows(rows){
   }
   return companies
     .filter(row=>row.marketCap>=MIN_MARKET_CAP)
-    .sort((a,b)=>b.marketCap-a.marketCap)
-    .slice(0,MAX_PER_DAY);
+    .sort((a,b)=>b.marketCap-a.marketCap);
 }
 
 async function nasdaqDay(date,{fetchImpl=fetch}={}){

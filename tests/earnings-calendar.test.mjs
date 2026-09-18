@@ -26,6 +26,16 @@ test('day rows sort by market cap and skip junk tickers',()=>{
   assert.equal(rows.length,1);
 });
 
+test('busy days keep every large name instead of cutting the list',()=>{
+  const rows=normalizeDayRows(Array.from({length:15},(_,i)=>({
+    symbol:'T'+String(i+10),
+    name:'Co '+i,
+    marketCap:String(3_000_000_000+i),
+    time:'time-amc',
+  })));
+  assert.equal(rows.length,15);
+});
+
 test('small names are dropped so the tape stays large-cap',()=>{
   const rows=normalizeDayRows([
     {symbol:'TINY',name:'Tiny',marketCap:'$500,000,000',time:'time-amc'},

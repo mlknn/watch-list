@@ -37,17 +37,6 @@ export function EarningsCalendar(){
       if(!alive)return;
       setData(result);
       setLoading(false);
-      const upcoming=shiftWeek(result.weekStart,1);
-      if(upcoming>result.maxWeek)return;
-      const extra=await fetch('/api/earnings-calendar?week='+encodeURIComponent(upcoming),{cache:'no-store'});
-      const more=await extra.json() as Board&{error?:string};
-      if(!alive||!extra.ok||!more.weeks?.[0])return;
-      setData(current=>{
-        if(!current||current.weekStart!==result.weekStart)return current;
-        const seen=new Set(current.weeks.map(block=>block.weekStart));
-        if(seen.has(more.weeks[0].weekStart))return current;
-        return {...current,weeks:[...current.weeks,more.weeks[0]]};
-      });
     }).catch(e=>{if(alive){setError(e.message);setLoading(false);}});
     return()=>{alive=false;};
   },[week]);
@@ -58,7 +47,7 @@ export function EarningsCalendar(){
   }
   const weekday=(iso:string)=>new Date(iso+'T12:00:00Z').toLocaleDateString(undefined,{weekday:'short',timeZone:'UTC'});
   const monthDay=(iso:string)=>new Date(iso+'T12:00:00Z').toLocaleDateString(undefined,{month:'short',day:'numeric',timeZone:'UTC'});
-  const days=data?data.weeks.flatMap(block=>block.days):[];
+  const days=data?.weeks[0]?.days||[];
   const prev=data?shiftWeek(data.weekStart,-1):'';
   const next=data?shiftWeek(data.weekStart,1):'';
   const canPrev=!!data&&prev>=data.minWeek;
@@ -68,7 +57,7 @@ export function EarningsCalendar(){
       <div>
         <p className="eyebrow"><T text="US EARNINGS"/></p>
         <h1><T text="Who reports, and when."/></h1>
-        <p className="intro"><T text="Upcoming US earnings by weekday — next Monday, Wednesday, and the rest of the week — plus who already reported. History only goes back two quarters."/></p>
+        <p className="intro"><T text="US companies reporting this week, one column per day. Open a ticker for the earnings story and company details."/></p>
       </div>
       <div className="earnings-cal-nav">
         <Button variant="outline" className="outline-button" disabled={!canPrev} onClick={()=>go(prev)} aria-label={t('Previous week')}><ChevronLeft size={18}/></Button>
