@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
 import {Brand,PublicFooter} from '@/components/product/nav';
+import {ThemeToggle} from '@/components/product/theme';
 import {apiJson} from '@/lib/auth-client';
 type Metric={unique:number;total:number};
 type Day={day:string;visit:Metric;dashboard:Metric;stock_search:Metric;watchlist_created:Metric;signup:Metric};
@@ -8,8 +9,8 @@ export default function Insights(){
   const [days,setDays]=useState<Day[]|null>(null),[error,setError]=useState('');
   useEffect(()=>{void apiJson<{days:Day[]}>('/api/analytics?days=14').then(data=>setDays(data.days||[])).catch(e=>{const message=(e as Error).message;if(/sign in|owner/i.test(message)){window.location.replace('/account');return;}setError(message);});},[]);
   const today=days?.[0];
-  if(!days)return <><header className="topbar"><Brand/><a className="quiet-link" href="/account">← Account</a></header><main className="account-page insights-page">{error?<p className="error-banner" role="alert">{error}</p>:<p>Loading analytics…</p>}</main><PublicFooter/></>;
-  return <><header className="topbar"><Brand/><a className="quiet-link" href="/account">← Account</a></header>
+  if(!days)return <><header className="topbar"><Brand/><div className="account-nav"><ThemeToggle/><a className="quiet-link" href="/account">← Account</a></div></header><main className="account-page insights-page">{error?<p className="error-banner" role="alert">{error}</p>:<p>Loading analytics…</p>}</main><PublicFooter/></>;
+  return <><header className="topbar"><Brand/><div className="account-nav"><ThemeToggle/><a className="quiet-link" href="/account">← Account</a></div></header>
     <main className="account-page insights-page">
       <p className="eyebrow">ANALYTICS</p>
       <h1>Product analytics</h1>

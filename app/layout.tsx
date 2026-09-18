@@ -1,4 +1,5 @@
 import {LanguageProvider} from '@/components/product/language';
+import {ThemeProvider} from '@/components/product/theme';
 import {Analytics} from '@/components/product/analytics';
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
@@ -59,12 +60,13 @@ const softwareJsonLd = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return <html lang="en" className="dark">
     <head>
+      <script dangerouslySetInnerHTML={{__html:"(function(){try{var t=localStorage.getItem('watchlist-theme');if(t==='light')document.documentElement.classList.remove('dark');else document.documentElement.classList.add('dark');}catch(e){document.documentElement.classList.add('dark');}})();"}}/>
       <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18447742703"/>
       <script dangerouslySetInnerHTML={{__html:"window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','AW-18447742703');"}}/>
     </head>
     <body>
       <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(softwareJsonLd).replace(/</g,'\\u003c')}} />
-      <LanguageProvider><Analytics/>{children}</LanguageProvider>
+      <LanguageProvider><ThemeProvider><Analytics/>{children}</ThemeProvider></LanguageProvider>
     </body>
   </html>;
 }

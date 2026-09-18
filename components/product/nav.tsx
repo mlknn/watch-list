@@ -7,6 +7,7 @@ import {useAccessRefresh} from '@/lib/access-refresh';
 import { ArrowUpRight } from 'lucide-react';
 import {LanguageSelect} from './language';
 import {LogoMark} from './logo';
+import {ThemeToggle} from './theme';
 
 export function Brand() { return <><a className="brand" href="/"><span className="brand-logo"><LogoMark/></span>StockWatchlist<span className="brand-light">.app</span></a></>; }
 
@@ -28,7 +29,7 @@ function SignOutButton(){
 
 export function PublicNav() {
  const member=useMember();
- return <header className="topbar public-nav"><Brand/><nav aria-label="Main navigation">{member?<a className="solid-link" href="/watchlists"><T text="My watchlists"/></a>:<><a className="nav-extra" href="/dashboard"><T text="Dashboard"/></a><a className="nav-extra" href="/#about"><T text="About"/></a><a className="nav-extra" href="/privacy"><T text="Privacy"/></a><a className="nav-extra" href="/login"><T text="Log in"/></a><a className="solid-link" href="/watchlists"><T text="Build a portfolio"/><ArrowUpRight size={16}/></a></>}</nav></header>;
+ return <header className="topbar public-nav"><Brand/><nav aria-label="Main navigation"><ThemeToggle/>{member?<a className="solid-link" href="/watchlists"><T text="My watchlists"/></a>:<><a className="nav-extra" href="/dashboard"><T text="Dashboard"/></a><a className="nav-extra" href="/#about"><T text="About"/></a><a className="nav-extra" href="/privacy"><T text="Privacy"/></a><a className="nav-extra" href="/login"><T text="Log in"/></a><a className="solid-link" href="/watchlists"><T text="Build a portfolio"/><ArrowUpRight size={16}/></a></>}</nav></header>;
 }
 
 export function PublicFooter() {

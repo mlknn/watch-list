@@ -6,6 +6,7 @@ import {Eye,LockKeyhole,Link2,TrendingUp,ArrowUpRight} from 'lucide-react';
 import {Area,AreaChart,CartesianGrid,ReferenceLine,Tooltip,XAxis,YAxis} from 'recharts';
 import {ChartContainer} from '@/components/ui/chart';
 import {price} from '@/lib/watchlist';
+import {useChartPalette} from '@/components/product/theme';
 type Row={symbol:string;name:string;companyName:string;date:string;addedPrice:number;currentPrice:number;currency:string;changePercent:number;quoteTime:string};
 type ShowcaseData={stocks:Row[];method:string;performance:{startDate:string;initialValue:number;currentValue:number;changePercent:number;investmentPerStock:number;quoteTime:string;points:{time:number;value:number;changePercent:number}[]}};
 
@@ -59,6 +60,7 @@ function SampleRow({stock}:{stock:Row}){
 
 export function Showcase(){
  const t=useT();
+ const palette=useChartPalette();
  const [data,setData]=useState<ShowcaseData|null>(null),[error,setError]=useState('');
  const id=useId().replace(/:/g,'');
  useEffect(()=>{
@@ -77,7 +79,7 @@ export function Showcase(){
   const timer=setInterval(()=>{if(!document.hidden)void load();},15000);
   return()=>{alive=false;clearInterval(timer);};
  },[]);
- const performance=data?.performance,up=(performance?.changePercent??0)>=0,color=up?'#3dff8f':'#ff6b78';
+ const performance=data?.performance,up=(performance?.changePercent??0)>=0,color=up?palette.up:palette.down;
  return <><div className="hero-preview real-preview expanded-preview">
   <div className="preview-caption"><span><Eye size={16}/><T text="The long view"/></span><span className="sample-label"><T text="10 companies · Since 2021"/></span></div>
   <div className="example-column-labels"><span><T text="Company / starting price"/></span><span><T text="Change / latest price"/></span></div>
@@ -87,7 +89,7 @@ export function Showcase(){
  <section className="showcase-performance" aria-label="Example watchlist performance since 2021">
   <div className="showcase-performance-heading"><div><p className="eyebrow"><T text="TEN IDEAS. FIVE YEARS OF PERSPECTIVE."/></p><h2><T text="Watchlist performance since 2021."/></h2><p className="performance-subtitle"><T text="An equal starting investment. A story that keeps unfolding."/></p></div><span className="five-year-badge"><T text="5-year view"/></span></div>
   {performance?<><div className="showcase-results"><div><span className="performance-label"><T text="Since September 3, 2021"/></span><strong className={`showcase-total ${up?'up':'down'}`}><LivePercent value={performance.changePercent}/><TrendingUp aria-hidden="true"/></strong><span className="performance-label">{up?t("Cumulative gain"):t("Cumulative loss")} · {t("Illustrative watchlist")}</span></div><div className="showcase-value-summary"><div><span><T text="Starting value"/></span><strong>{price(performance.initialValue,'USD')}</strong></div><div><span><T text="Latest value"/></span><strong><LivePrice value={performance.currentValue} currency="USD"/></strong></div></div></div>
-  <ChartContainer className="showcase-performance-chart" config={{changePercent:{label:'Watchlist return',color}}}><AreaChart accessibilityLayer data={performance.points} margin={{top:16,left:0,right:8,bottom:4}}><defs><linearGradient id={'showcase-'+id} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={color} stopOpacity={.22}/><stop offset="1" stopColor={color} stopOpacity={.01}/></linearGradient></defs><CartesianGrid vertical={false} stroke="#1e322a"/><XAxis dataKey="time" type="number" domain={['dataMin','dataMax']} tickCount={6} minTickGap={40} tickFormatter={v=>String(new Date(v).getFullYear())} axisLine={false} tickLine={false}/><YAxis orientation="right" width={65} tickFormatter={v=>`${v}%`} axisLine={false} tickLine={false}/><ReferenceLine y={0} stroke="#3a5248" strokeDasharray="4 4"/><Tooltip labelFormatter={v=>new Date(Number(v)).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})} formatter={v=>[`${Number(v)>=0?'+':''}${Number(v).toFixed(2)}%`,'Watchlist return']} contentStyle={{borderRadius:10,border:'1px solid #dfe8e5'}}/><Area dataKey="changePercent" type="linear" stroke={color} strokeWidth={2.5} fill={`url(#showcase-${id})`} isAnimationActive={false}/></AreaChart></ChartContainer>
+  <ChartContainer className="showcase-performance-chart" config={{changePercent:{label:'Watchlist return',color}}}><AreaChart accessibilityLayer data={performance.points} margin={{top:16,left:0,right:8,bottom:4}}><defs><linearGradient id={'showcase-'+id} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={color} stopOpacity={.22}/><stop offset="1" stopColor={color} stopOpacity={.01}/></linearGradient></defs><CartesianGrid vertical={false} stroke={palette.grid}/><XAxis dataKey="time" type="number" domain={['dataMin','dataMax']} tickCount={6} minTickGap={40} tickFormatter={v=>String(new Date(v).getFullYear())} axisLine={false} tickLine={false}/><YAxis orientation="right" width={65} tickFormatter={v=>`${v}%`} axisLine={false} tickLine={false}/><ReferenceLine y={0} stroke={palette.ref} strokeDasharray="4 4"/><Tooltip labelFormatter={v=>new Date(Number(v)).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})} formatter={v=>[`${Number(v)>=0?'+':''}${Number(v).toFixed(2)}%`,'Watchlist return']} contentStyle={{background:palette.tooltipBg,border:`1px solid ${palette.tooltipBorder}`,borderRadius:10,color:palette.tooltipFg}}/><Area dataKey="changePercent" type="linear" stroke={color} strokeWidth={2.5} fill={`url(#showcase-${id})`} isAnimationActive={false}/></AreaChart></ChartContainer>
   <div className="showcase-performance-foot"><p>{data!.method}<br/>Yahoo Finance · Monthly historical samples plus latest quotes · As of {new Date(performance.quoteTime).toLocaleString()}. Quotes may be delayed.{error&&<><br/><span className="quote-failed">{error} Last loaded data is shown.</span></>}</p><a className="quiet-link" href="/watchlists"><T text="Start your own story"/><ArrowUpRight size={16}/></a></div></>:<div className="chart-empty" role="status">{error||t("Calculating the watchlist’s five-year performance…")}</div>}
  </section></>;
 }

@@ -875,9 +875,17 @@
     "Bir portföyle başla. Nereye gittiğini gör.",
     "Empieza con una cartera. Mira a dónde llega."
   ],
-  "No signup to build · 1 portfolio · 10 stocks · Save with a free account when you are ready": [
-    "Oluşturmak ücretsiz · 1 portföy · 10 hisse · Hazır olunca ücretsiz hesapla kaydet",
-    "Sin registro para crear · 1 cartera · 10 acciones · Guárdala con una cuenta gratis cuando quieras"
+  "No signup to build · 5 watchlists · 20 stocks each · Save with a free account when you are ready": [
+    "Oluşturmak ücretsiz · 5 izleme listesi · her birinde 20 hisse · Hazır olunca ücretsiz hesapla kaydet",
+    "Sin registro para crear · 5 listas · 20 acciones cada una · Guárdala con una cuenta gratis cuando quieras"
+  ],
+  "Switch to light theme": [
+    "Açık temaya geç",
+    "Cambiar a tema claro"
+  ],
+  "Switch to dark theme": [
+    "Koyu temaya geç",
+    "Cambiar a tema oscuro"
   ],
   "CURIOSITY HAS NO BORDERS": [
     "MERAKIN SINIRI YOK",
