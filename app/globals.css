@@ -704,11 +704,18 @@ html.dark .earnings-day-note.is-error{color:#ff9aa4}
 .home-watchlist-footer button{background:none;border:0;padding:0;font:inherit}
 .home-watchlist-footer-links{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .home-watchlist-table .row-shares{display:none}
-.stock-page-hint{display:flex;align-items:center;gap:7px;margin:16px 0 0;font-size:12.5px;color:#617189}
-.stock-page-hint svg{flex-shrink:0;color:#2f6f4f}
-.watchlist-table-pane .stock-page-hint{margin:0 0 12px}
-html.dark .stock-page-hint{color:#bbcec3}
-html.dark .stock-page-hint svg{color:#5fe0a4}
+/* A nudging arrow beside the first ticker, so guests notice a row opens the company page. */
+.stock-page-hint{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:#2f6f4f;white-space:nowrap}
+.stock-page-hint svg{flex-shrink:0;animation:hint-nudge 1.6s ease-in-out infinite}
+.stock-page-hint .hint-text{animation:hint-pulse 2.6s ease-in-out infinite}
+.stock-page-hint.hint-inline{margin-left:12px}
+.stock-page-hint.hint-above{display:none;margin:14px 0 0}
+.company-cell .stock-page-hint{margin-left:14px}
+.mobile-stock-card>.stock-page-hint{margin:10px 0 0;white-space:normal}
+@keyframes hint-nudge{0%,100%{transform:translateX(4px)}50%{transform:translateX(-3px)}}
+@keyframes hint-pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@media(prefers-reduced-motion:reduce){.stock-page-hint svg,.stock-page-hint .hint-text{animation:none}}
+html.dark .stock-page-hint{color:#5fe0a4}
 .home-watchlist-table{max-width:100%;overflow-x:auto;margin-top:20px}
 .home-watchlist-table table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
 .home-watchlist-table th,.home-watchlist-table td{text-align:right;padding:14px 10px;border-bottom:1px solid #e2e7ef;white-space:nowrap}
@@ -745,6 +752,9 @@ html.dark .home-watchlist-table th,html.dark .home-watchlist-table td{border-col
   /* Share counts move under the company name so the row still fits a phone. */
   .home-watchlist-table .shares-column{display:none}
   .home-watchlist-table .row-shares{display:block}
+  /* A phone row is too narrow for the inline hint, so it sits above the table instead. */
+  .home-watchlist-table .stock-page-hint.hint-inline{display:none}
+  .home-watchlist .stock-page-hint.hint-above{display:inline-flex}
   /* Zero the utility variables instead of `translate:none`, which the CSS minifier drops. */
   [data-slot=dialog-content],[data-slot=alert-dialog-content]{position:fixed!important;top:16px!important;left:16px!important;right:16px!important;bottom:auto!important;--tw-translate-x:0px!important;--tw-translate-y:0px!important;transform:none!important;width:auto!important;max-width:none!important;max-height:calc(100dvh - 32px)!important;margin:0!important;padding:22px 18px!important;animation:none!important}
   .add-stock-dialog .position-fields{grid-template-columns:repeat(2,minmax(0,1fr))}
