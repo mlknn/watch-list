@@ -1730,5 +1730,237 @@
   "Navigating to the dashboard page…": [
     "Gösterge panosuna yönlendiriliyorsunuz…",
     "Yendo al panel…"
+  ],
+  "Earnings": [
+    "Kazançlar",
+    "Resultados"
+  ],
+  "Earnings calendar": [
+    "Kazanç takvimi",
+    "Calendario de resultados"
+  ],
+  "US EARNINGS": [
+    "ABD KAZANÇLARI",
+    "RESULTADOS EE.UU."
+  ],
+  "This week’s reports.": [
+    "Bu haftanın raporları.",
+    "Informes de esta semana."
+  ],
+  "US companies reporting this week, one column per day. Open a ticker for the earnings story and company details.": [
+    "Bu hafta raporlayan ABD şirketleri, her gün bir sütun. Hikâye ve şirket detayı için sembole tıkla.",
+    "Empresas de EE.UU. que reportan esta semana, una columna por día. Abre un ticker para la historia y los detalles."
+  ],
+  "Previous week": [
+    "Önceki hafta",
+    "Semana anterior"
+  ],
+  "This week": [
+    "Bu hafta",
+    "Esta semana"
+  ],
+  "Next week": [
+    "Sonraki hafta",
+    "Semana siguiente"
+  ],
+  "Loading the US earnings calendar…": [
+    "ABD kazanç takvimi yükleniyor…",
+    "Cargando el calendario de resultados de EE.UU.…"
+  ],
+  "US earnings calendar": [
+    "ABD kazanç takvimi",
+    "Calendario de resultados de EE.UU."
+  ],
+  "Before open": [
+    "Açılış öncesi",
+    "Antes de la apertura"
+  ],
+  "After close": [
+    "Kapanış sonrası",
+    "Después del cierre"
+  ],
+  "No reports listed": [
+    "Listelenen rapor yok",
+    "No hay informes"
+  ],
+  "Nasdaq earnings calendar · US-listed names · Quotes and reports may be delayed.": [
+    "Nasdaq kazanç takvimi · ABD’de işlem görenler · Fiyat ve raporlar gecikebilir.",
+    "Calendario Nasdaq · Valores de EE.UU. · Cotizaciones e informes pueden retrasarse."
+  ],
+  "EARNINGS STORY": [
+    "KAZANÇ HİKÂYESİ",
+    "HISTORIA DE RESULTADOS"
+  ],
+  "Historical earnings impact": [
+    "Tarihsel kazanç etkisi",
+    "Impacto histórico de resultados"
+  ],
+  "Average path of the split-adjusted close around each reported quarter-end, using the last five years of daily prices.": [
+    "Son beş yılın günlük fiyatlarıyla, her çeyrek sonu çevresindeki temettü ayarlı kapanışın ortalama yolu.",
+    "Recorrido medio del cierre ajustado alrededor de cada cierre de trimestre, con los precios diarios de cinco años."
+  ],
+  "Based on": [
+    "Dayanak",
+    "Según"
+  ],
+  "quarter-ends": [
+    "çeyrek sonu",
+    "cierres de trimestre"
+  ],
+  "Average return before and after quarter-end": [
+    "Çeyrek sonu öncesi ve sonrası ortalama getiri",
+    "Rentabilidad media antes y después del cierre de trimestre"
+  ],
+  "Report": [
+    "Rapor",
+    "Informe"
+  ],
+  "Avg. return": [
+    "Ort. getiri",
+    "Rent. media"
+  ],
+  "Quarter-end": [
+    "Çeyrek sonu",
+    "Cierre de trimestre"
+  ],
+  "sessions": [
+    "seans",
+    "sesiones"
+  ],
+  "Avg. return · report day": [
+    "Ort. getiri · rapor günü",
+    "Rent. media · día del informe"
+  ],
+  "Avg. return · 3 sessions later": [
+    "Ort. getiri · 3 seans sonra",
+    "Rent. media · 3 sesiones después"
+  ],
+  "Avg. return · 30 sessions later": [
+    "Ort. getiri · 30 seans sonra",
+    "Rent. media · 30 sesiones después"
+  ],
+  "Positive 30-session quarters": [
+    "Pozitif 30 seanslık çeyrekler",
+    "Trimestres positivos a 30 sesiones"
+  ],
+  "Best": [
+    "En iyi",
+    "Mejor"
+  ],
+  "Worst": [
+    "En kötü",
+    "Peor"
+  ],
+  "REPORTED RESULTS": [
+    "RAPORLANAN SONUÇLAR",
+    "RESULTADOS REPORTADOS"
+  ],
+  "Revenue, income, and EPS": [
+    "Gelir, kâr ve EPS",
+    "Ingresos, beneficio y BPA"
+  ],
+  "The latest six reported quarters": [
+    "Son altı raporlanan çeyrek",
+    "Los últimos seis trimestres reportados"
+  ],
+  "Quarterly revenue": [
+    "Çeyreklik gelir",
+    "Ingresos trimestrales"
+  ],
+  "Quarter-end dates follow each company’s fiscal calendar. Missing values are blank, never plotted as zero.": [
+    "Çeyrek sonu tarihleri şirketin mali takvimine göre. Eksik değerler boş kalır, sıfır çizilmez.",
+    "Las fechas de cierre siguen el calendario fiscal. Los valores ausentes quedan en blanco, nunca como cero."
+  ],
+  "COMPANY": [
+    "ŞİRKET",
+    "EMPRESA"
+  ],
+  "A company description is not currently available.": [
+    "Şirket açıklaması şu an yok.",
+    "La descripción de la empresa no está disponible."
+  ],
+  "Hide statistics": [
+    "İstatistikleri gizle",
+    "Ocultar estadísticas"
+  ],
+  "Show statistics": [
+    "İstatistikleri göster",
+    "Mostrar estadísticas"
+  ],
+  "means unavailable.": [
+    "anlamı: yok.",
+    "significa no disponible."
+  ],
+  "No quarterly reports are available for this symbol yet.": [
+    "Bu sembol için henüz çeyreklik rapor yok.",
+    "Aún no hay informes trimestrales para este símbolo."
+  ],
+  "Historical price · Split-adjusted close": [
+    "Tarihsel fiyat · Temettü ayarlı kapanış",
+    "Precio histórico · Cierre ajustado"
+  ],
+  "Company fundamentals. Reporting periods vary.": [
+    "Şirket temel verileri. Rapor dönemleri değişir.",
+    "Fundamentales de la empresa. Los periodos de reporte varían."
+  ],
+  "Some company statistics are unavailable from the provider.": [
+    "Bazı şirket istatistikleri sağlayıcıda yok.",
+    "Algunas estadísticas no están disponibles en el proveedor."
+  ],
+  "What you can do here": [
+    "Burada neler yapabilirsin",
+    "Qué puedes hacer aquí"
+  ],
+  "THREE WAYS TO USE IT": [
+    "ÜÇ KULLANIM",
+    "TRES FORMAS DE USARLO"
+  ],
+  "Watchlists, markets, and earnings.": [
+    "Listeler, piyasalar ve kazançlar.",
+    "Listas, mercados y resultados."
+  ],
+  "StockWatchlist is three tools. Pick the one you need, or use all of them.": [
+    "StockWatchlist üç araç. İhtiyacın olanı seç, ya da hepsini kullan.",
+    "StockWatchlist son tres herramientas. Elige la que necesitas, o usa las tres."
+  ],
+  "1 · WHAT-IF": [
+    "1 · YA OLSAYDI",
+    "1 · Y SI"
+  ],
+  "Add stocks, freeze the price from the day you add them, and see what happens after that.": [
+    "Hisse ekle, eklediğin günün fiyatını sabitle, sonrasını izle.",
+    "Añade acciones, congela el precio del día que las añades y mira qué pasa después."
+  ],
+  "Open watchlists": [
+    "Listeleri aç",
+    "Abrir listas"
+  ],
+  "2 · MARKETS": [
+    "2 · PİYASALAR",
+    "2 · MERCADOS"
+  ],
+  "Follow the tape": [
+    "Bandı takip et",
+    "Sigue la cinta"
+  ],
+  "Indexes, sectors, ETFs, and a market switcher for the US, Europe, Canada, and Turkey.": [
+    "Endeksler, sektörler, ETF’ler ve ABD, Avrupa, Kanada, Türkiye için piyasa seçici.",
+    "Índices, sectores, ETFs y un selector para EE.UU., Europa, Canadá y Turquía."
+  ],
+  "Stay on the dashboard": [
+    "Gösterge panelinde kal",
+    "Quédate en el panel"
+  ],
+  "3 · EARNINGS": [
+    "3 · KAZANÇLAR",
+    "3 · RESULTADOS"
+  ],
+  "See who reports each day this week. Tap a ticker for the earnings story and company details.": [
+    "Bu hafta kim hangi gün raporluyor. Hikâye ve şirket detayı için sembole dokun.",
+    "Quién reporta cada día esta semana. Toca un ticker para la historia y los detalles."
+  ],
+  "Open the calendar": [
+    "Takvimi aç",
+    "Abrir el calendario"
   ]
 }

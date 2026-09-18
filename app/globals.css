@@ -411,6 +411,23 @@ html.dark .watchlist-index tbody tr:focus-visible{outline-color:#3dff8f}
 html.dark .market-switch{color:#d5e6db}
 html.dark .market-switch select{background:#101a16;border-color:#2a4438;color:#ffffff}
 .market-page{padding-bottom:40px}
+.market-goals{margin:0 0 22px;padding:24px 26px;border:1px solid #e1e8f3;border-radius:20px;background:#fff}
+.market-goals>h1{font-size:32px;letter-spacing:-1.1px;margin:0}
+.market-goals>.intro{max-width:560px}
+.market-goal-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:20px}
+.market-goal-grid article{border:1px solid #e7edf5;border-radius:14px;padding:16px 16px 18px;display:flex;flex-direction:column;gap:8px;min-width:0;background:#f8fafc}
+.market-goal-grid h2{font-size:18px;letter-spacing:-.3px}
+.market-goal-grid p{font-size:13px;line-height:1.55;color:#627391;margin:0}
+.market-goal-grid .eyebrow{margin:0}
+.market-goal-grid a{margin-top:auto;align-self:flex-start;display:inline-flex;align-items:center;min-height:42px;padding:0 14px;border-radius:9px;font-size:14px;font-weight:650;text-decoration:none}
+.market-heading h2{font-size:28px;letter-spacing:-.8px;margin:0}
+#todays-tape{scroll-margin-top:20px}
+html.dark .market-goals,html.dark .market-goal-grid article{background:#141f1a;border-color:#2a4438}
+html.dark .market-goal-grid .outline-button{background:#101a16;color:#ffffff;border:1px solid #2a4438}
+html.dark .market-goal-grid p{color:#d5e6db}
+@media(max-width:900px){
+  .market-goal-grid{grid-template-columns:1fr}
+}
 .market-heading{margin-bottom:16px}
 .market-page .intro{max-width:520px;margin-top:10px}
 .market-index-hero{margin:0 0 16px;padding:14px 14px 8px}
@@ -449,4 +466,65 @@ html.dark .market-tape .market-movers{background:transparent;border:0}
 .stock-table [data-slot=table-head]{overflow:visible;text-overflow:unset;color:inherit}
 html.dark .stock-table th,html.dark .watchlist-index thead th,html.dark .watchlist-index caption,html.dark .column-preview,html.dark .market-table-head{color:#f4fff8!important}
 html.dark .favorite-star{color:#d7e6dc;opacity:.95}
+
+.earnings-cal-page{max-width:1280px;margin:0 auto;padding:28px 5% 70px}
+.earnings-cal-nav{display:flex;gap:8px;flex-wrap:wrap}
+.earnings-week{display:grid;grid-template-columns:repeat(7,minmax(140px,1fr));gap:10px;overflow-x:auto;padding-bottom:8px}
+.earnings-day{min-width:140px;border:1px solid #e1e7f0;border-radius:16px;background:#fff;display:flex;flex-direction:column;max-height:72vh}
+.earnings-day header{display:flex;align-items:baseline;gap:6px;padding:12px 12px 8px;border-bottom:1px solid #eef2f8}
+.earnings-day header strong{font-size:13px;text-transform:uppercase;letter-spacing:.4px}
+.earnings-day header span{font-size:12px;color:#6d7d94}
+.earnings-day header small{margin-left:auto;font-size:11px;color:#8b96a9}
+.earnings-day.is-today{border-color:#3dff8f}
+.earnings-day-list{overflow:auto;padding:8px;display:flex;flex-direction:column;gap:6px}
+.earnings-chip{display:flex;align-items:center;gap:8px;padding:8px;border-radius:10px;text-decoration:none;color:inherit}
+.earnings-chip:hover{background:#f3f7ff}
+.earnings-chip .company-icon{flex:0 0 32px;width:32px;height:32px}
+.earnings-chip strong{display:block;font-size:13px}
+.earnings-chip em{display:block;font-style:normal;font-size:10px;color:#7a889e}
+.earnings-day-empty{font-size:12px;color:#8b96a9;padding:18px 8px}
+.stock-back-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.stock-happening{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,320px);gap:18px;align-items:start}
+.stock-happening.is-collapsed{grid-template-columns:minmax(0,1fr) 52px}
+.stock-happening-main{min-width:0;display:grid;gap:16px}
+.story-card{border:1px solid #e1e8f3;border-radius:16px;padding:22px;background:#fff}
+.story-card h2{font-size:22px;letter-spacing:-.5px;margin:0 0 8px}
+.story-card>p{font-size:13px;color:#74839a;line-height:1.6}
+.story-meta{font-size:11px!important;letter-spacing:.4px;text-transform:uppercase}
+.story-chart{height:280px;margin:12px 0 8px}
+.story-pills{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.story-pills article{border:1px solid #e7edf5;border-radius:12px;padding:12px}
+.story-pills strong{display:block;font-size:22px;letter-spacing:-.6px}
+.story-pills span{display:block;margin-top:6px;font-size:11px;color:#7a889e;line-height:1.4}
+.story-lines{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:10px}
+.story-lines li{display:grid;grid-template-columns:110px minmax(0,1fr) auto auto;gap:10px;align-items:center;font-size:13px}
+.story-line-label small{display:block;color:#8b96a9;font-size:11px}
+.story-line-bar{height:8px;background:#eef2f8;border-radius:99px;overflow:hidden}
+.story-line-bar i{display:block;height:100%;background:#3dff8f;border-radius:99px}
+.stock-facts-rail{border:1px solid #e1e8f3;border-radius:16px;background:#fff;padding:16px;position:sticky;top:16px}
+.stock-facts-toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.stock-facts-toolbar h2{font-size:16px}
+.stock-facts-list{margin:12px 0 0;display:grid;gap:10px}
+.stock-facts-list>div{display:flex;justify-content:space-between;gap:12px;font-size:13px;border-bottom:1px solid #eef2f8;padding-bottom:8px}
+.stock-facts-list dt{color:#7a889e}
+.stock-facts-list dd{font-weight:650;text-align:right}
+html.dark .earnings-day,html.dark .story-card,html.dark .stock-facts-rail{background:#141f1a;border-color:#2a4438}
+html.dark .earnings-chip:hover{background:#12301f}
+html.dark .story-pills article,html.dark .story-line-bar,html.dark .stock-facts-list>div{border-color:#2a4438}
+html.dark .story-line-bar{background:#101a16}
+html.light .story-line-bar i,html:not(.dark) .story-line-bar i{background:#14845b}
+@media(max-width:960px){
+  .stock-happening,.stock-happening.is-collapsed{grid-template-columns:1fr}
+  .stock-facts-rail{position:static}
+  .story-pills{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .story-lines li{grid-template-columns:1fr auto;gap:6px}
+  .story-line-bar{grid-column:1/-1}
+}
+@media(max-width:640px){
+  .earnings-cal-page{padding:16px 12px 92px}
+  .earnings-week{grid-template-columns:repeat(7,minmax(132px,1fr))}
+  .story-chart{height:220px}
+  .story-pills{grid-template-columns:1fr 1fr}
+}
+
 

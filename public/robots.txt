@@ -6,6 +6,7 @@ Allow: /
 Allow: /llms.txt
 Allow: /privacy
 Allow: /dashboard
+Allow: /earnings
 Allow: /compare
 Allow: /open-source
 Disallow: /watchlists
@@ -17,6 +18,7 @@ Allow: /
 Allow: /llms.txt
 Allow: /privacy
 Allow: /dashboard
+Allow: /earnings
 Allow: /compare
 Allow: /open-source
 
