@@ -23,7 +23,17 @@ test('day rows sort by market cap and skip junk tickers',()=>{
   ]);
   assert.equal(rows[0].symbol,'AAPL');
   assert.equal(rows[0].when,'amc');
-  assert.equal(rows.length,2);
+  assert.equal(rows.length,1);
+});
+
+test('small names are dropped so the tape stays large-cap',()=>{
+  const rows=normalizeDayRows([
+    {symbol:'TINY',name:'Tiny',marketCap:'$500,000,000',time:'time-amc'},
+    {symbol:'MSFT',name:'Microsoft',marketCap:'$3,000,000,000,000',time:'time-bmo'},
+    {symbol:'MID',name:'Mid',marketCap:'$2,500,000,000',time:'time-not-supplied'},
+  ]);
+  assert.deepEqual(rows.map(row=>row.symbol),['MSFT','MID']);
+  assert.equal(rows[1].when,'open');
 });
 
 test('calendar fetch uses injected days and keeps column order',async()=>{

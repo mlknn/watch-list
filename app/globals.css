@@ -474,19 +474,17 @@ html.dark .favorite-star{color:#d7e6dc;opacity:.95}
 
 .earnings-cal-page{max-width:1280px;margin:0 auto;padding:28px 5% 70px}
 .earnings-cal-nav{display:flex;gap:8px;flex-wrap:wrap}
-.earnings-week-block{margin:0 0 22px}
-.earnings-week-block h2{font-size:18px;letter-spacing:-.4px;margin:0 0 10px}
-.earnings-week{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;overflow-x:auto}
+.earnings-week{display:flex;flex-direction:row;flex-wrap:nowrap;gap:12px;overflow-x:auto;padding-bottom:10px;scroll-snap-type:x proximity}
 .earnings-day.is-past{opacity:.78}
 .earnings-day.is-future:not(.is-today){border-color:#cdeadb}
-.earnings-day{min-width:140px;border:1px solid #e1e7f0;border-radius:16px;background:#fff;display:flex;flex-direction:column;max-height:72vh}
+.earnings-day{flex:0 0 280px;width:280px;min-width:280px;max-height:none;border:1px solid #e1e7f0;border-radius:16px;background:#fff;display:flex;flex-direction:column;scroll-snap-align:start}
 .earnings-day header{display:flex;align-items:baseline;gap:6px;padding:12px 12px 8px;border-bottom:1px solid #eef2f8}
 .earnings-day header strong{font-size:13px;text-transform:uppercase;letter-spacing:.4px}
 .earnings-day header span{font-size:12px;color:#6d7d94}
 .earnings-day header small{margin-left:auto;font-size:11px;color:#8b96a9}
 .earnings-day.is-today{border-color:#3dff8f}
-.earnings-day-list{overflow:auto;padding:8px;display:flex;flex-direction:column;gap:6px}
-.earnings-chip{display:flex;align-items:center;gap:8px;padding:8px;border-radius:10px;text-decoration:none;color:inherit}
+.earnings-day-list{overflow:visible;padding:8px;display:flex;flex-direction:row;flex-wrap:wrap;gap:6px}
+.earnings-chip{display:flex;align-items:center;gap:8px;padding:8px;border-radius:10px;text-decoration:none;color:inherit;flex:1 1 46%;min-width:118px}
 .earnings-chip:hover{background:#f3f7ff}
 .earnings-chip .company-icon{flex:0 0 32px;width:32px;height:32px}
 .earnings-chip strong{display:block;font-size:13px}
@@ -532,7 +530,7 @@ html.light .story-line-bar i,html:not(.dark) .story-line-bar i{background:#14845
 }
 @media(max-width:640px){
   .earnings-cal-page{padding:16px 12px 92px}
-  .earnings-week{grid-template-columns:repeat(7,minmax(132px,1fr))}
+  .earnings-day{flex-basis:240px;width:240px;min-width:240px}
   .story-chart{height:220px}
   .story-pills{grid-template-columns:1fr 1fr}
 }

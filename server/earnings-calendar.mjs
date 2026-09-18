@@ -15,6 +15,9 @@ export function parseMarketCap(value){
   return Number.isFinite(n)?n:0;
 }
 
+const MIN_MARKET_CAP=2_000_000_000;
+const MAX_PER_DAY=10;
+
 export function ymdInZone(date,tz=NY){
   return new Intl.DateTimeFormat('en-CA',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'}).format(date);
 }
@@ -74,28 +77,43 @@ export function normalizeDayRows(rows){
       symbol,
       name:String(row.name||symbol),
       marketCap:parseMarketCap(row.marketCap),
-      when:time.includes('bmo')?'bmo':time.includes('amc')?'amc':'',
+      when:time.includes('bmo')?'bmo':time.includes('amc')?'amc':'open',
     });
   }
-  return companies.sort((a,b)=>b.marketCap-a.marketCap);
+  return companies
+    .filter(row=>row.marketCap>=MIN_MARKET_CAP)
+    .sort((a,b)=>b.marketCap-a.marketCap)
+    .slice(0,MAX_PER_DAY);
 }
 
 async function nasdaqDay(date,{fetchImpl=fetch}={}){
   const saved=dayCache.get(date);
-  if(saved&&Date.now()-saved.at<30*60*1000)return saved.companies;
-  const response=await fetchImpl('https://api.nasdaq.com/api/calendar/earnings?date='+encodeURIComponent(date),{
-    headers:{
-      Accept:'application/json,text/plain,*/*',
-      'User-Agent':'Mozilla/5.0 (compatible; StockWatchlist/1.0; +https://stockwatchlist.app)',
-    },
-    signal:AbortSignal.timeout(8000),
-  });
-  if(!response.ok)throw new AppError('US earnings calendar is temporarily unavailable.',502);
-  const body=await response.json();
-  const companies=normalizeDayRows(body?.data?.rows||[]);
-  dayCache.set(date,{at:Date.now(),companies});
-  if(dayCache.size>80)dayCache.delete(dayCache.keys().next().value);
-  return companies;
+  if(saved&&Date.now()-saved.at<15*60*1000)return saved.companies;
+  let last=null;
+  for(let attempt=0;attempt<2;attempt++){
+    try{
+      const response=await fetchImpl('https://api.nasdaq.com/api/calendar/earnings?date='+encodeURIComponent(date),{
+        headers:{
+          Accept:'application/json, text/javascript, */*; q=0.01',
+          'Accept-Language':'en-US,en;q=0.9',
+          Origin:'https://www.nasdaq.com',
+          Referer:'https://www.nasdaq.com/market-activity/earnings',
+          'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+        },
+        signal:AbortSignal.timeout(10000),
+      });
+      if(!response.ok)throw new AppError('US earnings calendar is temporarily unavailable.',502);
+      const body=await response.json();
+      const companies=normalizeDayRows(body?.data?.rows||[]);
+      dayCache.set(date,{at:Date.now(),companies});
+      if(dayCache.size>80)dayCache.delete(dayCache.keys().next().value);
+      return companies;
+    }catch(e){
+      last=e;
+      if(attempt===0)await new Promise(resolve=>setTimeout(resolve,400));
+    }
+  }
+  throw last||new AppError('US earnings calendar is temporarily unavailable.',502);
 }
 
 async function mapLimit(items,limit,fn){
@@ -115,11 +133,14 @@ export async function earningsWeek(week,{loadDay=nasdaqDay,now=new Date()}={}){
   const monday=clampMonday(week,now);
   const {minWeek,maxWeek,todayMonday}=earningsWindow(now);
   const saved=cache.get(monday);
-  if(saved&&Date.now()-saved.at<30*60*1000)return saved.data;
-  const days=await mapLimit(weekDays(monday),5,async date=>{
-    try{return {date,companies:await loadDay(date)};}
-    catch{return {date,companies:[]};}
+  if(saved&&Date.now()-saved.at<15*60*1000)return saved.data;
+  const dates=weekDays(monday);
+  const loaded=await mapLimit(dates,5,async date=>{
+    try{return {date,companies:await loadDay(date),ok:true};}
+    catch(e){return {date,companies:[],ok:false,error:e};}
   });
+  if(loaded.every(row=>!row.ok))throw new AppError('US earnings calendar is temporarily unavailable.',502);
+  const days=loaded.map(({date,companies})=>({date,companies}));
   const data={weekStart:monday,weeks:[{weekStart:monday,days}],minWeek,maxWeek,todayMonday,source:'Nasdaq',fetchedAt:new Date().toISOString()};
   cache.set(monday,{at:Date.now(),data});
   if(cache.size>40)cache.delete(cache.keys().next().value);

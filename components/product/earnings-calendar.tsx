@@ -58,17 +58,11 @@ export function EarningsCalendar(){
   }
   const weekday=(iso:string)=>new Date(iso+'T12:00:00Z').toLocaleDateString(undefined,{weekday:'short',timeZone:'UTC'});
   const monthDay=(iso:string)=>new Date(iso+'T12:00:00Z').toLocaleDateString(undefined,{month:'short',day:'numeric',timeZone:'UTC'});
+  const days=data?data.weeks.flatMap(block=>block.days):[];
   const prev=data?shiftWeek(data.weekStart,-1):'';
   const next=data?shiftWeek(data.weekStart,1):'';
   const canPrev=!!data&&prev>=data.minWeek;
   const canNext=!!data&&next<=data.maxWeek;
-  function weekTitle(start:string){
-    if(!data)return t('This week');
-    if(start===data.todayMonday)return t('This week');
-    if(start===shiftWeek(data.todayMonday,1))return t('Next week');
-    if(start===shiftWeek(data.todayMonday,-1))return t('Last week');
-    return t('Week of')+' '+monthDay(start);
-  }
   return <main className="earnings-cal-page">
     <div className="page-heading market-heading">
       <div>
@@ -84,36 +78,32 @@ export function EarningsCalendar(){
     </div>
     {error&&<p className="error-banner" role="alert">{error}</p>}
     {loading||!data?<div className="earnings-empty" role="status"><LoaderCircle className="spin"/>{t('Loading the US earnings calendar…')}</div>:
-      data.weeks.map(block=>
-        <section key={block.weekStart} className="earnings-week-block">
-          <h2>{weekTitle(block.weekStart)}</h2>
-          <div className="earnings-week" role="table" aria-label={weekTitle(block.weekStart)}>
-            {block.days.map(day=>{
-              const isToday=day.date===today;
-              const isPast=day.date<today;
-              return <section key={day.date} className={'earnings-day'+(isToday?' is-today':'')+(isPast?' is-past':' is-future')} role="columnheader">
-                <header>
-                  <strong>{weekday(day.date)}</strong>
-                  <span>{monthDay(day.date)}</span>
-                  <small>{day.companies.length}</small>
-                </header>
-                <div className="earnings-day-list">
-                  {day.companies.length?day.companies.map(row=>
-                    <a key={row.symbol} href={'/stocks/'+encodeURIComponent(row.symbol)} className="earnings-chip">
-                      <CompanyIcon symbol={row.symbol}/>
-                      <span>
-                        <strong>{row.symbol}</strong>
-                        {row.when==='bmo'&&<em>{t('Before open')}</em>}
-                        {row.when==='amc'&&<em>{t('After close')}</em>}
-                      </span>
-                    </a>
-                  ):<p className="earnings-day-empty">{isPast?t('No reports listed'):t('No reports scheduled')}</p>}
-                </div>
-              </section>;
-            })}
-          </div>
-        </section>
-      )
+      <div className="earnings-week" role="list" aria-label={t('US earnings calendar')}>
+        {days.map(day=>{
+          const isToday=day.date===today;
+          const isPast=day.date<today;
+          return <section key={day.date} className={'earnings-day'+(isToday?' is-today':'')+(isPast?' is-past':' is-future')} role="listitem">
+            <header>
+              <strong>{weekday(day.date)}</strong>
+              <span>{monthDay(day.date)}</span>
+              <small>{day.companies.length}</small>
+            </header>
+            <div className="earnings-day-list">
+              {day.companies.length?day.companies.map(row=>
+                <a key={row.symbol} href={'/stocks/'+encodeURIComponent(row.symbol)} className="earnings-chip">
+                  <CompanyIcon symbol={row.symbol}/>
+                  <span>
+                    <strong>{row.symbol}</strong>
+                    {row.when==='bmo'&&<em>{t('Before open')}</em>}
+                    {row.when==='amc'&&<em>{t('After close')}</em>}
+                    {row.when==='open'&&<em>{t('During the session')}</em>}
+                  </span>
+                </a>
+              ):<p className="earnings-day-empty">{isPast?t('No reports listed'):t('No reports scheduled')}</p>}
+            </div>
+          </section>;
+        })}
+      </div>
     }
     <p className="market-footnote"><T text="Nasdaq earnings calendar · US-listed names · Past weeks stop two quarters back · Quotes and reports may be delayed."/> {data?new Date(data.fetchedAt).toLocaleString():''}</p>
   </main>;
