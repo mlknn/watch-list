@@ -1,13 +1,14 @@
 import type {Metadata} from 'next';
+import {Suspense} from 'react';
 import {PublicNav,PublicFooter} from '@/components/product/nav';
 import {MarketBoard} from '@/components/product/market-board';
 
 export const metadata: Metadata = {
   title: 'Dashboard — Markets | StockWatchlist',
-  description: 'Search any stock, read the S&P 500, Nasdaq, Gold, Dow Jones and Bitcoin, and browse industries. Charts, company details, and quarterly earnings are free.',
+  description: 'US, Europe, Canada, and Turkey markets. Search stocks and ETFs, read indexes, and open charts and company details.',
   alternates: {canonical: 'https://stockwatchlist.app/dashboard'},
 };
 
 export default function Dashboard(){
-  return <><PublicNav/><MarketBoard/><PublicFooter/></>;
+  return <><PublicNav/><Suspense fallback={<main className="market-page"><p>Loading markets…</p></main>}><MarketBoard/></Suspense><PublicFooter/></>;
 }

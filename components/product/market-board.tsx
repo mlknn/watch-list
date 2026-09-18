@@ -1,9 +1,8 @@
 'use client';
-import {createContext,useContext,useEffect,useRef,useState} from 'react';
+import {createContext,useContext,useEffect,useMemo,useRef,useState} from 'react';
 import {T,useT} from '@/components/product/language';
-import {useRouter} from 'next/navigation';
+import {useRouter,useSearchParams} from 'next/navigation';
 import {LoaderCircle,Maximize2,Search,Star} from 'lucide-react';
-import catalog from '@/lib/market-dashboard.json';
 import {PriceChart,type ChartStyle} from './price-chart';
 import {CompanyIcon} from './company-icon';
 import {StockSearch} from './stock-search';
@@ -13,13 +12,16 @@ import {Tabs,TabsList,TabsTrigger} from '@/components/ui/tabs';
 import {price} from '@/lib/watchlist';
 import {marketChart,type MarketChart} from '@/lib/market';
 import {chartPeriodStats} from '@/lib/chart-period.mjs';
-import {nyseSession,sectorAverage,tapeMovers} from '@/lib/market-tape.mjs';
+import {exchangeSession,sectorAverage,tapeMovers} from '@/lib/market-tape.mjs';
+import {getMarket,groupsFor,listMarkets} from '@/lib/markets.mjs';
 import {resolveStockInput} from '@/lib/stock-search.mjs';
 import {apiJson} from '@/lib/auth-client';
 
 type Row={symbol:string;name?:string;short?:string;chart:MarketChart|null;error:string|null};
-type Board={fetchedAt:string;indices:(Row&{name:string})[];groups:{id:string;title:string;blurb:string;stocks:Row[]}[]};
+type Group={id:string;title:string;blurb:string;stocks:Row[];kind?:string};
+type Board={fetchedAt:string;indices:(Row&{name:string})[];groups:Group[]};
 type FavoriteState={signedIn:boolean;ids:Set<string>;rows:Row[];toggle:(symbol:string)=>void};
+type Market=ReturnType<typeof getMarket>;
 
 const Favorites=createContext<FavoriteState>({signedIn:false,ids:new Set(),rows:[],toggle:()=>{}});
 type Sort={key:'name'|'price'|'change';dir:1|-1};
@@ -27,15 +29,15 @@ type Sort={key:'name'|'price'|'change';dir:1|-1};
 function dayPct(row:Row){return typeof row.chart?.quote.changePercent==='number'?row.chart.quote.changePercent:null;}
 function fmtPct(pct:number|null){return pct===null||pct===undefined?'—':`${pct>=0?'+':''}${pct.toFixed(2)}%`;}
 
-function LiveTicker({groups,ready}:{groups:Board['groups'];ready:Record<string,boolean>}){
+function LiveTicker({market,groups,ready}:{market:Market;groups:Board['groups'];ready:Record<string,boolean>}){
   const [indexes,setIndexes]=useState<(Row&{name:string;short?:string})[]>([]);
   useEffect(()=>{
     let alive=true;
-    void Promise.all(catalog.indices.map(item=>marketChart(item.symbol,'1d').then(chart=>({...item,chart,error:null} as Row&{name:string}),()=>({...item,chart:null,error:null} as Row&{name:string})))).then(rows=>{if(alive)setIndexes(rows);});
+    void Promise.all(market.indices.map(item=>marketChart(item.symbol,'1d').then(chart=>({...item,chart,error:null} as Row&{name:string}),()=>({...item,chart:null,error:null} as Row&{name:string})))).then(rows=>{if(alive)setIndexes(rows);});
     return()=>{alive=false;};
-  },[]);
+  },[market]);
   const items=[
-    ...(indexes.length?indexes:catalog.indices.map(item=>({...item,chart:null,error:null}))).map(row=>{
+    ...(indexes.length?indexes:market.indices.map(item=>({...item,chart:null,error:null}))).map(row=>{
       const slug=String(row.short||row.name).replace(/[^a-zA-Z]/g,'').toLowerCase();
       return {key:'i-'+row.symbol,href:'#index-'+slug,label:row.short||row.name,price:row.chart?price(row.chart.quote.price,row.chart.currency):null,pct:dayPct(row)};
     }),
@@ -59,23 +61,23 @@ function LiveTicker({groups,ready}:{groups:Board['groups'];ready:Record<string,b
   </nav>;
 }
 
-function SessionBadge(){
+function SessionBadge({market}:{market:Market}){
   const t=useT();
   const [now,setNow]=useState(()=>new Date());
   useEffect(()=>{const id=window.setInterval(()=>setNow(new Date()),30000);return()=>clearInterval(id);},[]);
-  const session=nyseSession(now);
-  const clock=new Intl.DateTimeFormat(undefined,{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}).format(now);
+  const session=exchangeSession(now,market.session);
+  const clock=new Intl.DateTimeFormat(undefined,{timeZone:market.session.tz,hour:'numeric',minute:'2-digit'}).format(now);
   const label=session.code==='open'?t('Session open'):t(session.label);
   return <aside className={'market-session is-'+session.code} aria-live="polite">
     <strong><span className="market-session-dot" aria-hidden="true"/>{label}</strong>
     <span>{session.detail}</span>
-    <small>{clock} ET</small>
+    <small>{clock} · {market.session.venue}</small>
   </aside>;
 }
 
 function TapeStrip({rows}:{rows:Row[]}){
   const t=useT();
-  const {gainers,losers}=tapeMovers(rows,5);
+  const {gainers,losers}=tapeMovers(rows,4);
   if(!gainers.length&&!losers.length)return null;
   return <section className="market-tape" aria-label={t('Today')}>
     <div className="market-movers">
@@ -113,11 +115,11 @@ function SortHead({label,k,sort,onSort}:{label:string;k:Sort['key'];sort:Sort|nu
   return <button type="button" className={'market-sort'+(on?' is-on':'')} onClick={()=>onSort(k)}>{label}{on?(sort!.dir>0?' ↑':' ↓'):''}</button>;
 }
 
-function skeleton():Board{
+function skeleton(market:Market):Board{
   return {
     fetchedAt:'',
-    indices:catalog.indices.map(item=>({...item,chart:null,error:null})),
-    groups:catalog.groups.map(group=>({id:group.id,title:group.title,blurb:group.blurb,stocks:group.symbols.map(symbol=>({symbol,chart:null,error:null}))})),
+    indices:market.indices.map(item=>({...item,chart:null,error:null})),
+    groups:groupsFor(market).map(group=>({id:group.id,title:group.title,blurb:group.blurb,kind:group.kind,stocks:group.symbols.map((symbol:string)=>({symbol,chart:null,error:null}))})),
   };
 }
 
@@ -230,7 +232,6 @@ function FavoritesBoard({rows}:{rows:Row[]}){
     <div className="market-group-copy">
       <p className="eyebrow"><T text="SAVED FOR THE TAPE"/></p>
       <h2><T text="Favorites"/></h2>
-      <p><T text="Stocks you star on this dashboard. They stay here, separate from your watchlists."/></p>
     </div>
     <div className="market-table" role="table" aria-label={t('Favorites')}>
       <div className="market-table-head" role="row">
@@ -241,20 +242,43 @@ function FavoritesBoard({rows}:{rows:Row[]}){
   </section>;
 }
 
+function GroupTable({group,ready,sort,onSort}:{group:Group;ready:boolean;sort:Sort|null;onSort:(key:Sort['key'])=>void}){
+  const t=useT();
+  const avg=ready?sectorAverage(group.stocks):null;
+  return <section id={group.id} className={'market-group'+(group.kind==='etfs'?' is-etfs':'')}>
+    <div className="market-group-copy">
+      <h2>{t(group.title)}{avg!==null&&<span className={avg>=0?'up':'down'}>{fmtPct(avg)}</span>}</h2>
+      <p>{t(group.blurb)}</p>
+    </div>
+    <div className="market-table" role="table" aria-label={group.title+' stocks'}>
+      <div className="market-table-head" role="row">
+        <SortHead label={t('Company')} k="name" sort={sort} onSort={onSort}/>
+        <SortHead label={t('Price')} k="price" sort={sort} onSort={onSort}/>
+        <SortHead label={t('Today')} k="change" sort={sort} onSort={onSort}/>
+        <span></span>
+      </div>
+      {sortRows(group.stocks,sort).map(row=><StockRow key={row.symbol} row={row} pending={!ready}/>)}
+    </div>
+  </section>;
+}
+
 export function MarketBoard(){
   const t=useT();
   const router=useRouter();
+  const params=useSearchParams();
+  const market=useMemo(()=>getMarket(params.get('market')),[params]);
   const inputRef=useRef<HTMLInputElement>(null);
   const [query,setQuery]=useState('');
   const [searchError,setSearchError]=useState('');
   const [searching,setSearching]=useState(false);
-  const [data,setData]=useState<Board>(skeleton),[error,setError]=useState(''),[ready,setReady]=useState<Record<string,boolean>>({});
+  const [data,setData]=useState<Board>(()=>skeleton(market)),[error,setError]=useState(''),[ready,setReady]=useState<Record<string,boolean>>({});
   const [signedIn,setSignedIn]=useState(false);
   const [favoriteRows,setFavoriteRows]=useState<Row[]>([]);
   const [sorts,setSorts]=useState<Record<string,Sort|null>>({});
+  useEffect(()=>{setData(skeleton(market));setReady({});setError('');},[market]);
   useEffect(()=>{let alive=true;
     const loaded=new Set<string>();
-    const queue=catalog.groups.map(group=>group.id);
+    const queue=groupsFor(market).map(group=>group.id);
     async function fetchGroup(id:string){
       const response=await fetch('/api/market?group='+encodeURIComponent(id),{cache:'no-store'});
       const result=await response.json() as {fetchedAt:string;group:{id:string;stocks:Row[]};error?:string};
@@ -282,11 +306,11 @@ export function MarketBoard(){
       }
     },{rootMargin:'800px 0px'});
     const timer=window.setTimeout(()=>{
-      for(const group of catalog.groups){const node=document.getElementById(group.id);if(node)observer.observe(node);}
+      for(const group of groupsFor(market)){const node=document.getElementById(group.id);if(node)observer.observe(node);}
     },0);
     void pump();
     return()=>{alive=false;observer.disconnect();clearTimeout(timer);};
-  },[]);
+  },[market]);
   useEffect(()=>{let alive=true;void apiJson<{signedIn:boolean;favorites:Row[]}>('/api/favorites',undefined,false).then(result=>{if(!alive)return;setSignedIn(!!result.signedIn);setFavoriteRows(result.favorites||[]);}).catch(()=>{if(alive){setSignedIn(false);setFavoriteRows([]);}});return()=>{alive=false;};},[]);
   async function openStock(symbol:string){
     router.push('/stocks/'+encodeURIComponent(symbol));
@@ -295,7 +319,7 @@ export function MarketBoard(){
     e.preventDefault();
     if(!query.trim()){inputRef.current?.focus();return;}
     setSearching(true);setSearchError('');
-    try{await openStock(await resolveStockInput(query));}
+    try{await openStock(await resolveStockInput(query,market.currency));}
     catch(err){setSearchError((err as Error).message);}
     finally{setSearching(false);}
   }
@@ -312,6 +336,8 @@ export function MarketBoard(){
   }
   const favoriteState:FavoriteState={signedIn,ids:new Set(favoriteRows.map(row=>row.symbol)),rows:favoriteRows,toggle};
   const quotedRows=data.groups.flatMap(group=>group.stocks);
+  const etfGroup=data.groups.find(group=>group.kind==='etfs');
+  const stockGroups=data.groups.filter(group=>group.kind!=='etfs');
   function cycleSort(id:string,key:Sort['key']){
     setSorts(prev=>{
       const cur=prev[id];
@@ -319,47 +345,40 @@ export function MarketBoard(){
       return {...prev,[id]:{key,dir:cur.dir===1?-1:1}};
     });
   }
+  function changeMarket(id:string){
+    router.push(id==='us'?'/dashboard':'/dashboard?market='+id);
+  }
   return <Favorites.Provider value={favoriteState}><main className="market-page">
-    <LiveTicker groups={data.groups} ready={ready}/>
+    <LiveTicker market={market} groups={data.groups} ready={ready}/>
     <div className="page-heading market-heading">
       <div>
         <p className="eyebrow"><T text="MARKETS, IN ONE PLACE"/></p>
         <h1><T text="Today’s tape."/></h1>
-        <p className="intro"><T text="Look up stocks from the US, Europe, Canada, and Turkey. Open a chart, company details, and quarterly earnings, then scroll the sectors."/></p>
+        <p className="intro"><T text="Pick a market, then look up stocks, ETFs, charts, and company details."/></p>
+        <label className="market-switch">
+          <span><T text="Change the market"/></span>
+          <select aria-label={t('Change the market')} value={market.id} onChange={e=>changeMarket(e.target.value)}>
+            {listMarkets().map(item=><option key={item.id} value={item.id}>{t(item.label)}</option>)}
+          </select>
+        </label>
       </div>
-      <SessionBadge/>
+      <SessionBadge market={market}/>
     </div>
     <form className="market-search" onSubmit={e=>void search(e)} role="search">
-      <StockSearch value={query} onChange={v=>{setQuery(v);setSearchError('');}} inputRef={inputRef} onPick={symbol=>void openStock(symbol)}/>
+      <StockSearch value={query} onChange={v=>{setQuery(v);setSearchError('');}} inputRef={inputRef} onPick={symbol=>void openStock(symbol)} currency={market.currency}/>
       <Button type="submit" className="primary-button" disabled={searching}>{searching?<LoaderCircle className="spin"/>:<Search/>}<span className="market-search-label">{t('Search')}</span></Button>
     </form>
     {searchError&&<p className="form-error" role="alert">{searchError}</p>}
     {error&&<p className="error-banner" role="alert">{error}</p>}
-    <>
-      <IndexHero indices={data.indices}/>
+    <IndexHero indices={data.indices}/>
+    <div className="market-top-grid">
+      {etfGroup&&<GroupTable group={etfGroup} ready={!!ready[etfGroup.id]} sort={sorts[etfGroup.id]||null} onSort={key=>cycleSort(etfGroup.id,key)}/>}
       <TapeStrip rows={quotedRows}/>
-      <FavoritesBoard rows={favoriteRows}/>
-      {data.groups.map((group,index)=>{
-        const avg=ready[group.id]?sectorAverage(group.stocks):null;
-        const sort=sorts[group.id]||null;
-        return <section key={group.id} id={group.id} className="market-group">
-          <div className="market-group-copy">
-            <p className="eyebrow">{String(index+1).padStart(2,'0')}</p>
-            <h2>{t(group.title)}{avg!==null&&<span className={avg>=0?'up':'down'}>{fmtPct(avg)}</span>}</h2>
-            <p>{t(group.blurb)}</p>
-          </div>
-          <div className="market-table" role="table" aria-label={group.title+' stocks'}>
-            <div className="market-table-head" role="row">
-              <SortHead label={t('Company')} k="name" sort={sort} onSort={key=>cycleSort(group.id,key)}/>
-              <SortHead label={t('Price')} k="price" sort={sort} onSort={key=>cycleSort(group.id,key)}/>
-              <SortHead label={t('Today')} k="change" sort={sort} onSort={key=>cycleSort(group.id,key)}/>
-              <span></span>
-            </div>
-            {sortRows(group.stocks,sort).map(row=><StockRow key={row.symbol} row={row} pending={!ready[group.id]}/>)}
-          </div>
-        </section>;
-      })}
-      <p className="market-footnote">{t('Yahoo Finance · Quotes may be delayed')}{data.fetchedAt?` · ${new Date(data.fetchedAt).toLocaleString()}`:''}. {t('Charts are for looking, not advice. Click any row for details and quarterly earnings.')}</p>
-    </>
+    </div>
+    <FavoritesBoard rows={favoriteRows}/>
+    <div className="market-sector-grid">
+      {stockGroups.map(group=><GroupTable key={group.id} group={group} ready={!!ready[group.id]} sort={sorts[group.id]||null} onSort={key=>cycleSort(group.id,key)}/>)}
+    </div>
+    <p className="market-footnote">{t('Yahoo Finance · Quotes may be delayed')}{data.fetchedAt?` · ${new Date(data.fetchedAt).toLocaleString()}`:''}. {t('Charts are for looking, not advice. Click any row for details and quarterly earnings.')}</p>
   </main></Favorites.Provider>;
 }

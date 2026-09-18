@@ -939,6 +939,62 @@
     "ABD, Avrupa, Kanada ve Türkiye hisselerini ara. Grafiği, şirket detayını ve çeyreklik sonuçları aç, sektörleri kaydır.",
     "Busca valores de EE. UU., Europa, Canadá y Turquía. Abre el gráfico, los datos y los resultados trimestrales, y recorre sectores."
   ],
+  "Pick a market, then look up stocks, ETFs, charts, and company details.": [
+    "Bir piyasa seç, sonra hisse, ETF, grafik ve şirket detayına bak.",
+    "Elige un mercado y busca acciones, ETF, gráficos y datos de la empresa."
+  ],
+  "Change the market": [
+    "Piyasayı değiştir",
+    "Cambiar el mercado"
+  ],
+  "United States": [
+    "Amerika Birleşik Devletleri",
+    "Estados Unidos"
+  ],
+  "Europe": [
+    "Avrupa",
+    "Europa"
+  ],
+  "Canada": [
+    "Kanada",
+    "Canadá"
+  ],
+  "Turkey": [
+    "Türkiye",
+    "Turquía"
+  ],
+  "Key ETFs": [
+    "Önemli ETF’ler",
+    "ETF clave"
+  ],
+  "Major ETFs in this market.": [
+    "Bu piyasadaki önemli ETF’ler.",
+    "Los ETF principales de este mercado."
+  ],
+  "European leaders": [
+    "Avrupa liderleri",
+    "Líderes europeos"
+  ],
+  "Large listed names across the euro area, the UK and Switzerland.": [
+    "Euro bölgesi, İngiltere ve İsviçre’deki büyük şirketler.",
+    "Grandes cotizadas de la eurozona, el Reino Unido y Suiza."
+  ],
+  "Canadian leaders": [
+    "Kanada liderleri",
+    "Líderes canadienses"
+  ],
+  "Banks, energy, rails and the large names on the TSX.": [
+    "Bankalar, enerji, demiryolu ve TSX’teki büyük isimler.",
+    "Bancos, energía, ferrocarriles y los grandes nombres del TSX."
+  ],
+  "BIST leaders": [
+    "BIST liderleri",
+    "Líderes de BIST"
+  ],
+  "Banks, industry, airlines and the large names on Borsa Istanbul.": [
+    "Bankalar, sanayi, havayolları ve Borsa İstanbul’daki büyük isimler.",
+    "Bancos, industria, aerolíneas y los grandes nombres de Borsa Istanbul."
+  ],
   "LEADERS": [
     "LİDERLER",
     "LÍDERES"

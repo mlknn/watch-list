@@ -1,10 +1,7 @@
-import catalog from '../lib/market-dashboard.json' with {type:'json'};
+import {allMarketSymbols,findGroup} from '../lib/markets.mjs';
 import {getQuote,AppError} from './quotes.mjs';
 
-const publicSymbols=new Set([
-  ...catalog.indices.map(item=>item.symbol),
-  ...catalog.groups.flatMap(group=>group.symbols),
-]);
+const publicSymbols=new Set(allMarketSymbols());
 const quoteCache=new Map();
 
 export function isPublicMarketSymbol(symbol){
@@ -71,7 +68,7 @@ export async function quotesForSymbols(symbols){
 }
 
 export async function marketGroup(id){
-  const group=catalog.groups.find(item=>item.id===id);
+  const group=findGroup(id);
   if(!group)throw new AppError('Unknown market group.',404);
   const stocks=await mapLimit(group.symbols,3,loadSymbol);
   return {fetchedAt:new Date().toISOString(),group:{id:group.id,title:group.title,blurb:group.blurb,stocks}};

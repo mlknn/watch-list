@@ -1,21 +1,92 @@
 {
-  "indices": [
-    {"symbol": "^GSPC", "name": "S&P 500", "short": "S&P"},
-    {"symbol": "^IXIC", "name": "Nasdaq", "short": "Nasdaq"},
-    {"symbol": "GC=F", "name": "Gold", "short": "Gold"},
-    {"symbol": "^DJI", "name": "Dow Jones", "short": "Dow"},
-    {"symbol": "BTC-USD", "name": "Bitcoin", "short": "BTC"}
-  ],
-  "groups": [
-    {"id": "tech", "title": "Technology", "blurb": "Chips, software, cloud and the platforms behind the tape.", "symbols": ["AAPL", "MSFT", "NVDA", "GOOGL", "META", "AVGO", "AMD", "ORCL", "CRM", "ADBE", "AMAT", "INTC", "CSCO", "QCOM", "NOW"]},
-    {"id": "finance", "title": "Finance", "blurb": "Banks, payments and the plumbing of markets.", "symbols": ["JPM", "BAC", "V", "GS", "BRK-B", "MA", "WFC", "MS", "C", "SCHW", "BLK", "AXP", "PYPL", "COF"]},
-    {"id": "health", "title": "Health care", "blurb": "Insurers, medicines, devices and the businesses behind them.", "symbols": ["UNH", "LLY", "JNJ", "ABBV", "PFE", "MRK", "TMO", "ABT", "AMGN", "ISRG", "BMY", "GILD", "MDT", "CVS"]},
-    {"id": "consumer", "title": "Consumer", "blurb": "Retail, brands, restaurants and everyday demand.", "symbols": ["AMZN", "TSLA", "WMT", "COST", "HD", "KO", "PG", "NKE", "MCD", "SBUX", "PEP", "LOW", "TGT", "BKNG"]},
-    {"id": "comms", "title": "Communication", "blurb": "Networks, streaming and advertising platforms.", "symbols": ["NFLX", "DIS", "T", "VZ", "CMCSA", "TMUS", "CHTR", "EA"]},
-    {"id": "energy", "title": "Energy", "blurb": "Oil, gas and the companies that move it.", "symbols": ["XOM", "CVX", "COP", "SLB", "EOG", "OXY", "MPC", "PSX", "WMB"]},
-    {"id": "industrial", "title": "Industrials", "blurb": "Machines, aerospace, freight and defense.", "symbols": ["CAT", "GE", "HON", "UNP", "RTX", "BA", "DE", "UPS", "LMT", "MMM", "GEV"]},
-    {"id": "materials", "title": "Materials", "blurb": "Chemicals, metals and the inputs behind manufacturing.", "symbols": ["LIN", "APD", "FCX", "NEM", "SHW", "ECL", "NUE"]},
-    {"id": "utilities", "title": "Utilities", "blurb": "Power, grids and regulated cash flows.", "symbols": ["NEE", "DUK", "SO", "D", "AEP", "SRE"]},
-    {"id": "real-estate", "title": "Real estate", "blurb": "Towers, warehouses and listed property.", "symbols": ["AMT", "PLD", "EQIX", "SPG", "O", "CCI"]}
+  "markets": [
+    {
+      "id": "us",
+      "label": "United States",
+      "currency": "USD",
+      "session": {"tz": "America/New_York", "open": 570, "close": 960, "pre": 240, "after": 1200, "venue": "NYSE", "hours": "9:30 AM – 4:00 PM ET"},
+      "indices": [
+        {"symbol": "^GSPC", "name": "S&P 500", "short": "S&P"},
+        {"symbol": "^IXIC", "name": "Nasdaq", "short": "Nasdaq"},
+        {"symbol": "GC=F", "name": "Gold", "short": "Gold"},
+        {"symbol": "^DJI", "name": "Dow Jones", "short": "Dow"},
+        {"symbol": "BTC-USD", "name": "Bitcoin", "short": "BTC"}
+      ],
+      "etfs": [
+        {"symbol": "SPY", "name": "SPDR S&P 500"},
+        {"symbol": "QQQ", "name": "Invesco QQQ"},
+        {"symbol": "IWM", "name": "iShares Russell 2000"},
+        {"symbol": "DIA", "name": "SPDR Dow Jones"},
+        {"symbol": "VTI", "name": "Vanguard Total Stock"},
+        {"symbol": "GLD", "name": "SPDR Gold"}
+      ],
+      "groups": [
+        {"id": "tech", "title": "Technology", "blurb": "Chips, software, cloud and the platforms behind the tape.", "symbols": ["AAPL", "MSFT", "NVDA", "GOOGL", "META", "AVGO", "AMD", "ORCL"]},
+        {"id": "finance", "title": "Finance", "blurb": "Banks, payments and the plumbing of markets.", "symbols": ["JPM", "BAC", "V", "GS", "BRK-B", "MA", "WFC", "MS"]},
+        {"id": "health", "title": "Health care", "blurb": "Insurers, medicines, devices and the businesses behind them.", "symbols": ["UNH", "LLY", "JNJ", "ABBV", "PFE", "MRK", "TMO", "ABT"]},
+        {"id": "consumer", "title": "Consumer", "blurb": "Retail, brands, restaurants and everyday demand.", "symbols": ["AMZN", "TSLA", "WMT", "COST", "HD", "KO", "PG", "NKE"]},
+        {"id": "energy", "title": "Energy", "blurb": "Oil, gas and the companies that move it.", "symbols": ["XOM", "CVX", "COP", "SLB", "EOG", "OXY"]},
+        {"id": "industrial", "title": "Industrials", "blurb": "Machines, aerospace, freight and defense.", "symbols": ["CAT", "GE", "HON", "UNP", "RTX", "BA"]}
+      ]
+    },
+    {
+      "id": "eu",
+      "label": "Europe",
+      "currency": "EUR",
+      "session": {"tz": "Europe/Berlin", "open": 540, "close": 1050, "pre": 480, "after": 1140, "venue": "Xetra", "hours": "9:00 – 17:30 CET"},
+      "indices": [
+        {"symbol": "^STOXX50E", "name": "Euro Stoxx 50", "short": "SX5E"},
+        {"symbol": "^GDAXI", "name": "DAX", "short": "DAX"},
+        {"symbol": "^FCHI", "name": "CAC 40", "short": "CAC"},
+        {"symbol": "^FTSE", "name": "FTSE 100", "short": "FTSE"}
+      ],
+      "etfs": [
+        {"symbol": "VGK", "name": "Vanguard FTSE Europe"},
+        {"symbol": "EZU", "name": "iShares MSCI EMU"},
+        {"symbol": "EWG", "name": "iShares MSCI Germany"},
+        {"symbol": "EWU", "name": "iShares MSCI United Kingdom"},
+        {"symbol": "EWQ", "name": "iShares MSCI France"},
+        {"symbol": "FEZ", "name": "SPDR Euro Stoxx 50"}
+      ],
+      "groups": [
+        {"id": "eu-leaders", "title": "European leaders", "blurb": "Large listed names across the euro area, the UK and Switzerland.", "symbols": ["ASML.AS", "SAP.DE", "MC.PA", "OR.PA", "SIE.DE", "AIR.PA", "NESN.SW", "NOVN.SW", "AZN.L", "SHEL.L"]}
+      ]
+    },
+    {
+      "id": "ca",
+      "label": "Canada",
+      "currency": "CAD",
+      "session": {"tz": "America/Toronto", "open": 570, "close": 960, "pre": 480, "after": 1020, "venue": "TSX", "hours": "9:30 AM – 4:00 PM ET"},
+      "indices": [
+        {"symbol": "^GSPTSE", "name": "S&P/TSX Composite", "short": "TSX"},
+        {"symbol": "CAD=X", "name": "USD/CAD", "short": "USD/CAD"}
+      ],
+      "etfs": [
+        {"symbol": "XIU.TO", "name": "iShares S&P/TSX 60"},
+        {"symbol": "XIC.TO", "name": "iShares Core S&P/TSX"},
+        {"symbol": "VCN.TO", "name": "Vanguard FTSE Canada"},
+        {"symbol": "ZEB.TO", "name": "BMO Equal Weight Banks"},
+        {"symbol": "EWC", "name": "iShares MSCI Canada"}
+      ],
+      "groups": [
+        {"id": "ca-leaders", "title": "Canadian leaders", "blurb": "Banks, energy, rails and the large names on the TSX.", "symbols": ["RY.TO", "TD.TO", "SHOP.TO", "ENB.TO", "CNQ.TO", "CP.TO", "CNR.TO", "BNS.TO", "SU.TO", "BAM.TO"]}
+      ]
+    },
+    {
+      "id": "tr",
+      "label": "Turkey",
+      "currency": "TRY",
+      "session": {"tz": "Europe/Istanbul", "open": 600, "close": 1080, "pre": 570, "after": 1110, "venue": "BIST", "hours": "10:00 – 18:00 TRT"},
+      "indices": [
+        {"symbol": "XU100.IS", "name": "BIST 100", "short": "XU100"},
+        {"symbol": "XU030.IS", "name": "BIST 30", "short": "XU030"}
+      ],
+      "etfs": [
+        {"symbol": "TUR", "name": "iShares MSCI Turkey"}
+      ],
+      "groups": [
+        {"id": "tr-leaders", "title": "BIST leaders", "blurb": "Banks, industry, airlines and the large names on Borsa Istanbul.", "symbols": ["THYAO.IS", "GARAN.IS", "AKBNK.IS", "EREGL.IS", "BIMAS.IS", "SISE.IS", "TUPRS.IS", "ASELS.IS", "KCHOL.IS", "SAHOL.IS", "TCELL.IS", "PGSUS.IS"]}
+      ]
+    }
   ]
 }
