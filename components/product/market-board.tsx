@@ -350,31 +350,6 @@ export function MarketBoard(){
   }
   return <Favorites.Provider value={favoriteState}><main className="market-page">
     <LiveTicker market={market} groups={data.groups} ready={ready}/>
-    <section className="market-goals" aria-label={t('What you can do here')}>
-      <p className="eyebrow"><T text="THREE WAYS TO USE IT"/></p>
-      <h1><T text="Watchlists, markets, and earnings."/></h1>
-      <p className="intro"><T text="StockWatchlist is three tools. Pick the one you need, or use all of them."/></p>
-      <div className="market-goal-grid">
-        <article>
-          <p className="eyebrow"><T text="1 · WHAT-IF"/></p>
-          <h2><T text="Build a portfolio"/></h2>
-          <p><T text="Add stocks, freeze the price from the day you add them, and see what happens after that."/></p>
-          <a className="primary-button" href="/watchlists"><T text="Open watchlists"/></a>
-        </article>
-        <article>
-          <p className="eyebrow"><T text="2 · MARKETS"/></p>
-          <h2><T text="Follow the tape"/></h2>
-          <p><T text="Indexes, sectors, ETFs, and a market switcher for the US, Europe, Canada, and Turkey."/></p>
-          <a className="outline-button" href="#todays-tape"><T text="Stay on the dashboard"/></a>
-        </article>
-        <article>
-          <p className="eyebrow"><T text="3 · EARNINGS"/></p>
-          <h2><T text="US earnings calendar"/></h2>
-          <p><T text="See who reports next Monday, Wednesday, and the rest of the week — and who already reported in the last two quarters."/></p>
-          <a className="outline-button" href="/earnings"><T text="Open the calendar"/></a>
-        </article>
-      </div>
-    </section>
     <div className="page-heading market-heading" id="todays-tape">
       <div>
         <p className="eyebrow"><T text="MARKETS, IN ONE PLACE"/></p>
