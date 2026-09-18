@@ -30,7 +30,7 @@ export function mondayOnOrBefore(iso,tz=NY){
 
 export function weekDays(monday){
   const start=new Date(monday+'T12:00:00Z');
-  return Array.from({length:7},(_,i)=>{
+  return Array.from({length:5},(_,i)=>{
     const d=new Date(start);d.setUTCDate(start.getUTCDate()+i);
     return d.toISOString().slice(0,10);
   });
@@ -116,7 +116,7 @@ export async function earningsWeek(week,{loadDay=nasdaqDay,now=new Date()}={}){
   const {minWeek,maxWeek,todayMonday}=earningsWindow(now);
   const saved=cache.get(monday);
   if(saved&&Date.now()-saved.at<30*60*1000)return saved.data;
-  const days=await mapLimit(weekDays(monday),7,async date=>{
+  const days=await mapLimit(weekDays(monday),5,async date=>{
     try{return {date,companies:await loadDay(date)};}
     catch{return {date,companies:[]};}
   });

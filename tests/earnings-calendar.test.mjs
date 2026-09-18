@@ -9,9 +9,9 @@ test('class shares map to Yahoo tickers',()=>{
   assert.equal(toYahooSymbol('../x'),'');
 });
 
-test('week starts Monday and has seven day columns',()=>{
+test('week starts Monday and has five weekday columns',()=>{
   assert.equal(mondayOnOrBefore('2026-09-18'),'2026-09-14');
-  assert.deepEqual(weekDays('2026-09-14'),['2026-09-14','2026-09-15','2026-09-16','2026-09-17','2026-09-18','2026-09-19','2026-09-20']);
+  assert.deepEqual(weekDays('2026-09-14'),['2026-09-14','2026-09-15','2026-09-16','2026-09-17','2026-09-18']);
 });
 
 test('day rows sort by market cap and skip junk tickers',()=>{
@@ -28,9 +28,22 @@ test('day rows sort by market cap and skip junk tickers',()=>{
 
 test('calendar fetch uses injected days and keeps column order',async()=>{
   const now=new Date('2026-09-18T16:00:00Z');
-  const data=await earningsWeek('2026-09-16',{now,loadDay:async date=>date==='2026-09-16'?[{symbol:'INTC',name:'Intel',marketCap:1e11,when:''}]:[]});
+  const fetched=[];
+  const data=await earningsWeek('2026-09-16',{now,loadDay:async date=>{
+    fetched.push(date);
+    if(date==='2026-09-16')return [{symbol:'INTC',name:'Intel',marketCap:1e11,when:''}];
+    if(date==='2026-09-14')return [{symbol:'AAPL',name:'Apple',marketCap:1e12,when:'bmo'}];
+    if(date==='2026-09-18')return [{symbol:'MSFT',name:'Microsoft',marketCap:1e12,when:'amc'}];
+    return [];
+  }});
+  assert.deepEqual([...fetched].sort(),['2026-09-14','2026-09-15','2026-09-16','2026-09-17','2026-09-18']);
   assert.equal(data.weekStart,'2026-09-14');
   assert.equal(data.weeks.length,1);
+  assert.equal(data.weeks[0].days.length,5);
+  assert.equal(data.weeks[0].days[0].date,'2026-09-14');
+  assert.equal(data.weeks[0].days[0].companies[0].when,'bmo');
+  assert.equal(data.weeks[0].days[4].date,'2026-09-18');
+  assert.equal(data.weeks[0].days[4].companies[0].when,'amc');
   assert.equal(data.weeks[0].days[2].date,'2026-09-16');
   assert.equal(data.weeks[0].days[2].companies[0].symbol,'INTC');
 });
