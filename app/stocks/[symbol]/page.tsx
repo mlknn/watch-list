@@ -57,7 +57,7 @@ export default function StockDetails({params}:{params:Promise<{symbol:string}>})
       <section className="main-chart-panel story-card">
         <div className="chart-toolbar">{styleControls}{rangeControls}<Button variant="ghost" size="icon" aria-label="Refresh stock chart" disabled={busy} onClick={()=>setVersion(v=>v+1)}><RefreshCw className={busy?'spin':''}/></Button></div>
         <div className="chart-stage" aria-busy={busy}>{chart&&chart.range===range?<PriceChart data={chart} style={chartStyle} eventDates={eventDates}/>:<div className="chart-empty"><LoaderCircle className="spin"/>{t("Loading chart…")}</div>}</div>
-        <div className="chart-caption"><span>{range==='1d'?`Latest session: ${chart?.sessionDate||'—'}`:t('Historical price · Split-adjusted close')}{!!eventDates.length&&range!=='1d'&&` · ${t('Red lines are earnings dates.')}`}</span><span>{chart?.timezone}</span></div>
+        <div className="chart-caption"><span>{range==='1d'?`Latest session: ${chart?.sessionDate||'—'}`:t('Historical price · Split-adjusted close')}</span><span>{chart?.timezone}</span></div>
       </section>
     </div>
     <StockFactsRail open={rail} onToggle={()=>setRail(v=>!v)} facts={facts} note={fund?.available?t('Company fundamentals. Reporting periods vary.')+' “—” '+t('means unavailable.'):t('Some company statistics are unavailable from the provider.')}/>
