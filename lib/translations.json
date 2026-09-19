@@ -2215,6 +2215,22 @@
     "Sırada bilanço açıklayacaklar",
     "Próximos resultados"
   ],
+  "Reporting today": [
+    "Bugün açıklayacaklar",
+    "Publican hoy"
+  ],
+  "Reporting this week": [
+    "Bu hafta açıklayacaklar",
+    "Publican esta semana"
+  ],
+  "Reporting next week": [
+    "Gelecek hafta açıklayacaklar",
+    "Publican la próxima semana"
+  ],
+  "No upcoming reports this week or next.": [
+    "Bu hafta veya gelecek hafta yaklaşan bir açıklama yok.",
+    "No hay informes próximos esta semana ni la siguiente."
+  ],
   "Reported this week": [
     "Bu hafta açıklananlar",
     "Publicados esta semana"

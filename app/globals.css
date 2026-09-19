@@ -565,8 +565,11 @@ html.dark .nav-quiet:hover{color:#ffffff}
 .tool-preview-list li{display:flex;align-items:center;gap:8px;font-size:13px;min-width:0}
 .tool-preview-list .company-icon{flex:0 0 24px;width:24px;height:24px}
 .tool-preview-name{font-weight:650}
+.tool-preview-copy{min-width:0;flex:1}
+.tool-preview-copy .tool-preview-sub{display:block}
 .tool-preview-sub{color:#6b7a91;font-size:12px;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tool-preview-value{margin-left:auto;font-variant-numeric:tabular-nums;font-size:12px;color:#5b6a80}
+.tool-preview-value{margin-left:auto;font-variant-numeric:tabular-nums;font-size:12px;color:#5b6a80;text-align:right}
+.tool-preview-value small{display:block;font-weight:400;color:#6b7a91}
 .tool-preview-value.up{color:#14845b}
 .tool-preview-value.down{color:#b44450}
 .tool-preview-note{margin:0;font-size:13px;color:#6b7a91}
