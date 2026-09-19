@@ -3,7 +3,7 @@ import {useT} from "@/components/product/language";
 import {LanguageSelect} from '@/components/product/language';
 import {T} from '@/components/product/language';
 import {useCallback,useEffect,useRef,useState} from 'react';
-import {Plus,RefreshCw,Eye,Check,Pencil,Trash2,LoaderCircle,AlertCircle,Share2,Link2,Copy,Mail,LockKeyhole,ArrowLeft} from 'lucide-react';
+import {Plus,RefreshCw,Eye,Check,Pencil,Trash2,LoaderCircle,AlertCircle,Share2,Link2,Copy,Mail,LockKeyhole,ArrowLeft,CornerRightDown} from 'lucide-react';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Empty,EmptyHeader,EmptyTitle,EmptyDescription} from '@/components/ui/empty';
@@ -100,6 +100,7 @@ export function WatchlistWorkspace({compact=false}:{compact?:boolean}){const t=u
   <span role="status" className="sr-only">{notice}</span>
   {state&&active?<>
     {canEdit&&<form className="home-watchlist-search" onSubmit={addStock}><StockSearch value={ticker} onChange={setTicker} onPick={symbol=>{void openAddModal(symbol);}} inputRef={inputRef} currency={active.stocks[0]?.currency}/><Button type="submit" className="primary-button" disabled={!!busy||!ticker.trim()||addLimited}>{busy?<LoaderCircle className="spin"/>:<Plus/>}<T text="Add stock"/></Button></form>}
+    {state.guest&&!!active.stocks.length&&<StockPageHint placement="search"/>}
     {addLimited&&<p className="quote-warning">{t("Stock limit reached.")}</p>}
     {active.stocks.length?<CompactStocks stocks={active.stocks.slice(0,5)} hint={!!state.guest}/>:<p className="home-watchlist-empty"><T text="Search for your first stock above. Your watchlist will appear here."/></p>}
     <div className="home-watchlist-footer"><span>{state.guest?t("Saved on this device"):active.name} · {active.stocks.length} / {state.plan.maxStocks} {t("Stocks")}</span><span className="home-watchlist-footer-links">{active.stocks.length>5&&<a href="/watchlists"><T text="View all"/></a>}{state.guest?<button type="button" className="tool-link" onClick={()=>setSaveOpen(true)}><T text="Save with a free account"/></button>:<a href="/watchlists"><T text="Open full watchlist"/></a>}</span></div>
@@ -145,8 +146,10 @@ function WatchlistsOverview({lists,activeId,onSelect}:{lists:Watchlist[];activeI
 }
 
 /* Guests land here before they know a ticker opens a full company page. */
-export function StockPageHint({inline=false}:{inline?:boolean}){
-  return <span className={`stock-page-hint ${inline?'hint-inline':''}`}><ArrowLeft size={13} aria-hidden="true"/><span className="hint-text"><T text="Click a company to learn more about it"/></span></span>;
+export function StockPageHint({inline=false,placement}:{inline?:boolean;placement?:'inline'|'search'}){
+  const where=placement||(inline?'inline':'search');
+  const Icon=where==='search'?CornerRightDown:ArrowLeft;
+  return <span className={`stock-page-hint hint-${where}`}><Icon size={13} aria-hidden="true"/><span className="hint-text"><T text="Click a company to learn more about it"/></span></span>;
 }
 const shareCount=(quantity:number|null)=>quantity===null?'—':Number.isInteger(quantity)?String(quantity):String(Number(quantity.toFixed(4)));
 function CompactStocks({stocks,hint=false}:{stocks:Stock[];hint?:boolean}){
