@@ -556,7 +556,8 @@ html.dark .nav-quiet:hover{color:#ffffff}
 .home-hero>p{font-size:18px;line-height:1.6;color:#5b6a80;margin:16px 0 0;max-width:620px}
 .home-hero .hero-note{margin-top:14px}
 .home-tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:46px}
-.tool-card{display:flex;flex-direction:column;gap:12px;padding:20px;border:1px solid #e0e6ef;border-radius:16px;background:#fff}
+.tool-card{position:relative;display:flex;flex-direction:column;gap:12px;padding:20px;border:1px solid #e0e6ef;border-radius:16px;background:#fff;cursor:pointer;transition:border-color .15s ease,box-shadow .15s ease}
+.tool-card:hover,.tool-card:focus-within{border-color:#9adcbd;box-shadow:0 10px 24px rgba(20,40,32,.06)}
 .tool-card h2{font-size:21px;letter-spacing:-.4px}
 .tool-card>p{font-size:14px;line-height:1.55;color:#5b6a80;margin:0}
 .tool-preview{background:#f5f8fc;border-radius:12px;padding:11px 13px;min-height:118px}
@@ -574,7 +575,9 @@ html.dark .nav-quiet:hover{color:#ffffff}
 .tool-preview-value.down{color:#b44450}
 .tool-preview-note{margin:0;font-size:13px;color:#6b7a91}
 .tool-link{margin-top:auto;display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:650;color:#146c4c;text-decoration:none;min-height:40px}
-.tool-link:hover{text-decoration:underline}
+.tool-link:hover,.tool-link:focus-visible{text-decoration:underline}
+.tool-card .tool-link::after{content:"";position:absolute;inset:0;border-radius:16px;z-index:1}
+.tool-card:hover .tool-link{text-decoration:underline}
 .home-sample{margin-bottom:46px}
 .home-sample-head{max-width:720px;margin-bottom:16px}
 .home-sample-head h2{font-size:26px;letter-spacing:-.8px}
@@ -586,6 +589,7 @@ html.dark .nav-quiet:hover{color:#ffffff}
 .home-sample .sample-row{padding:10px 14px}
 .home-sample .showcase-total{font-size:38px}
 html.dark .tool-card{background:#141f1a;border-color:#2a4438}
+html.dark .tool-card:hover,html.dark .tool-card:focus-within{border-color:#3f8a64;box-shadow:0 10px 24px rgba(0,0,0,.28)}
 html.dark .tool-preview{background:#101a16}
 html.dark .tool-preview-label,html.dark .tool-preview-sub,html.dark .tool-preview-note{color:#b8ccc0}
 html.dark .tool-card>p,html.dark .home-hero>p,html.dark .home-sample-head p{color:#cfe2d6}
