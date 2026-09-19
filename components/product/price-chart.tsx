@@ -1,9 +1,10 @@
 'use client';
-import {useId} from 'react';
+import {useId,useMemo} from 'react';
 import {Area,AreaChart,CartesianGrid,ReferenceLine,Tooltip,XAxis,YAxis} from 'recharts';
 import {ChartContainer} from '@/components/ui/chart';
 import {type ChartPoint,type MarketChart} from '@/lib/market';
 import {chartPeriodStats,rangeLabel} from '@/lib/chart-period.mjs';
+import {chartEventTimes} from '@/lib/earnings-impact.mjs';
 import {price} from '@/lib/watchlist';
 import {useChartPalette} from '@/components/product/theme';
 
@@ -24,8 +25,9 @@ function downsample(points:ChartPoint[],max:number){
   return out;
 }
 
-function CandleChart({data,compact,className,upColor,downColor}:{data:MarketChart;compact:boolean;className?:string;upColor:string;downColor:string}){
+function CandleChart({data,compact,className,upColor,downColor,eventColor,eventDates}:{data:MarketChart;compact:boolean;className?:string;upColor:string;downColor:string;eventColor:string;eventDates?:string[]}){
   const bars=downsample(data.points.filter(p=>Number.isFinite(p.price)),compact?48:96);
+  const marks=compact?[]:chartEventTimes(bars,eventDates);
   const highs=bars.map(p=>p.high??p.price),lows=bars.map(p=>p.low??p.price);
   const min=Math.min(...lows),max=Math.max(...highs);
   const pad=(max-min)*0.06||1;
@@ -35,6 +37,12 @@ function CandleChart({data,compact,className,upColor,downColor}:{data:MarketChar
   const y=(v:number)=>((top-v)/span)*H;
   if(bars.length<1)return <div className={compact?'mini-chart-empty':'chart-empty'}>Not enough trading data to draw this chart.</div>;
   return <svg className={'candle-svg '+(className||'')} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-label={`${data.symbol} candlestick chart`}>
+    {marks.map(time=>{
+      const i=bars.findIndex(bar=>bar.time===time);
+      if(i<0)return null;
+      const cx=(i+0.5)*(W/bars.length);
+      return <line key={time} x1={cx} x2={cx} y1={0} y2={H} stroke={eventColor} strokeWidth={1.4}/>;
+    })}
     {bars.map((bar,i)=>{
       const open=bar.open??bar.price,close=bar.price,high=bar.high??Math.max(open,close),low=bar.low??Math.min(open,close);
       const cx=(i+0.5)*(W/bars.length),bodyUp=close>=open,color=bodyUp?upColor:downColor;
@@ -47,18 +55,19 @@ function CandleChart({data,compact,className,upColor,downColor}:{data:MarketChar
   </svg>;
 }
 
-export function PriceChart({data,compact=false,className,style='line'}:{data:MarketChart;compact?:boolean;className?:string;style?:ChartStyle}){
+export function PriceChart({data,compact=false,className,style='line',eventDates}:{data:MarketChart;compact?:boolean;className?:string;style?:ChartStyle;eventDates?:string[]}){
   const id=useId().replace(/[^a-zA-Z0-9]/g,'');
   const palette=useChartPalette();
   const period=chartPeriodStats(data);
   const up=period.up;
   const color=up?palette.up:palette.down;
+  const marks=useMemo(()=>compact?[]:chartEventTimes(data.points,eventDates),[compact,data.points,eventDates]);
   const label=(value:number)=>new Date(value).toLocaleString(undefined,{timeZone:data.timezone,...(data.range==='1d'?{hour:'numeric',minute:'2-digit'}:{month:'short',day:'numeric',...(data.range==='5y'||data.range==='max'?{year:'2-digit'}:{})})});
   if(data.points.length<2)return <div className={compact?'mini-chart-empty':'chart-empty'}>Not enough trading data to draw this chart.</div>;
   const last=period.last??data.points.at(-1)!.price;const percent=period.changePercent;const base=period.base;
   const chartClass=(compact?'mini-price-chart':'detail-price-chart')+(className?' '+className:'');
   const body=style==='candle'
-    ?<CandleChart data={data} compact={compact} className={chartClass} upColor={palette.up} downColor={palette.down}/>
-    :<ChartContainer config={{price:{label:'Price',color}}} className={chartClass} aria-label={`${data.symbol} price chart, ${data.sessionDate||data.range}, ${data.currency}`}><AreaChart accessibilityLayer data={data.points} margin={{top:8,right:compact?0:4,bottom:0,left:4}}><defs><linearGradient id={'price-fill-'+id} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={color} stopOpacity={.23}/><stop offset="100%" stopColor={color} stopOpacity={.015}/></linearGradient></defs>{!compact&&<CartesianGrid vertical={false} stroke={palette.grid}/>}<XAxis hide={compact} dataKey="time" tickFormatter={label} minTickGap={36} tickLine={false} axisLine={false} tickMargin={8}/><YAxis hide={compact} orientation="right" domain={['auto','auto']} tickFormatter={v=>Number(v).toFixed(data.quote.price<1?4:0)} width={44} tickLine={false} axisLine={false}/>{data.range==='1d'&&base!==null&&base!==undefined&&!compact&&<ReferenceLine y={base} stroke={palette.ref} strokeDasharray="3 4"/>}{!compact&&<Tooltip labelFormatter={value=>label(Number(value))} formatter={value=>[price(Number(value),data.currency),'Price']} contentStyle={{background:palette.tooltipBg,border:`1px solid ${palette.tooltipBorder}`,borderRadius:9,fontSize:13,color:palette.tooltipFg}}/>}<Area type="linear" dataKey="price" stroke={color} strokeWidth={compact?1.8:2} fill={`url(#price-fill-${id})`} isAnimationActive={false} dot={false} connectNulls={false}/></AreaChart></ChartContainer>;
+    ?<CandleChart data={data} compact={compact} className={chartClass} upColor={palette.up} downColor={palette.down} eventColor={palette.earn} eventDates={eventDates}/>
+    :<ChartContainer config={{price:{label:'Price',color}}} className={chartClass} aria-label={`${data.symbol} price chart, ${data.sessionDate||data.range}, ${data.currency}`}><AreaChart accessibilityLayer data={data.points} margin={{top:8,right:compact?0:4,bottom:0,left:4}}><defs><linearGradient id={'price-fill-'+id} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={color} stopOpacity={.23}/><stop offset="100%" stopColor={color} stopOpacity={.015}/></linearGradient></defs>{!compact&&<CartesianGrid vertical={false} stroke={palette.grid}/>}<XAxis hide={compact} dataKey="time" tickFormatter={label} minTickGap={36} tickLine={false} axisLine={false} tickMargin={8}/><YAxis hide={compact} orientation="right" domain={['auto','auto']} tickFormatter={v=>Number(v).toFixed(data.quote.price<1?4:0)} width={44} tickLine={false} axisLine={false}/>{data.range==='1d'&&base!==null&&base!==undefined&&!compact&&<ReferenceLine y={base} stroke={palette.ref} strokeDasharray="3 4"/>}{marks.map(time=><ReferenceLine key={time} x={time} stroke={palette.earn} strokeWidth={1.4} ifOverflow="hidden"/>)}{!compact&&<Tooltip labelFormatter={value=>label(Number(value))} formatter={value=>[price(Number(value),data.currency),'Price']} contentStyle={{background:palette.tooltipBg,border:`1px solid ${palette.tooltipBorder}`,borderRadius:9,fontSize:13,color:palette.tooltipFg}}/>}<Area type="linear" dataKey="price" stroke={color} strokeWidth={compact?1.8:2} fill={`url(#price-fill-${id})`} isAnimationActive={false} dot={false} connectNulls={false}/></AreaChart></ChartContainer>;
   return <>{!compact&&<div className={`chart-period-return ${up?'up':'down'}`} aria-live="polite"><strong>{percent===null?'—':`${percent>=0?'+':''}${percent.toFixed(2)}%`}</strong><span>{rangeLabel(data.range)} · {price(data.points[0].price,data.currency)} → {price(last,data.currency)}</span></div>}{body}</>;
 }

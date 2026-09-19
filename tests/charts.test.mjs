@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {normalizeChart,getChart} from '../server/charts.mjs';
+import {earningsEventDays,normalizeChart,getChart} from '../server/charts.mjs';
 import {chartPeriodStats,seriesPeriodStats} from '../lib/chart-period.mjs';
 const fixture=()=>({meta:{symbol:'TEST',longName:'Test Corporation',currency:'USD',exchangeTimezoneName:'America/New_York',regularMarketPrice:112,regularMarketTime:1788552000,regularMarketDayLow:105,regularMarketDayHigh:114},timestamp:[Date.parse('2026-09-03T19:55:00Z')/1000,Date.parse('2026-09-04T13:30:00Z')/1000,Date.parse('2026-09-04T13:35:00Z')/1000,Date.parse('2026-09-04T19:55:00Z')/1000],indicators:{quote:[{close:[100,106,null,112],open:[99,105,106,111],low:[98,105,null,111],high:[101,107,null,114],volume:[50,100,0,200]}]}});
 test('1D returns latest trading session only and derives its prior close',()=>{const chart=normalizeChart(fixture(),'1d');assert.equal(chart.points.length,2);assert.equal(chart.quote.previousClose,100);assert.equal(chart.quote.change,12);assert.equal(chart.quote.changePercent,12);assert.equal(chart.quote.open,105);assert.ok(chart.points.every(p=>new Date(p.time).toISOString().startsWith('2026-09-04')));assert.equal(chart.companyName,'Test Corporation');});
@@ -17,3 +17,12 @@ test('period percent follows the selected range instead of today only',()=>{
 });
 
 test('provider official previous close takes precedence over the last intraday bar',()=>{const input=fixture();input.meta.previousClose=99.5;assert.equal(normalizeChart(input,'1d').quote.previousClose,99.5);});
+test('past Yahoo earnings events become marker dates',()=>{
+  const input=fixture();
+  input.events={earnings:{
+    '1756684800':{date:1756684800},
+    'future':{date:Date.parse('2026-12-01T00:00:00Z')/1000},
+  }};
+  assert.deepEqual(earningsEventDays(input,Date.parse('2026-09-18T16:00:00Z')),['2025-09-01']);
+  assert.deepEqual(normalizeChart(input,'5d').earningsDates,['2025-09-01']);
+});

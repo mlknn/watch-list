@@ -30,8 +30,8 @@ export function useTheme(){return useContext(Ctx);}
 export function useChartPalette(){
   const {theme}=useTheme();
   return theme==='light'
-    ?{up:'#14845b',down:'#c34851',grid:'#e2e7ef',ref:'#c5d0de',tooltipBg:'#fff',tooltipFg:'#202b40',tooltipBorder:'#e2e7ef',cost:'#8b98ab',bar:'#9bb0e8',dot:'#fff'}
-    :{up:'#3dff8f',down:'#ff4458',grid:'#2a4438',ref:'#3a5248',tooltipBg:'#101a16',tooltipFg:'#ffffff',tooltipBorder:'#2a4438',cost:'#8aa094',bar:'#2a6b4a',dot:'#101a16'};
+    ?{up:'#14845b',down:'#c34851',grid:'#e2e7ef',ref:'#c5d0de',earn:'#d64545',tooltipBg:'#fff',tooltipFg:'#202b40',tooltipBorder:'#e2e7ef',cost:'#8b98ab',bar:'#9bb0e8',dot:'#fff'}
+    :{up:'#3dff8f',down:'#ff4458',grid:'#2a4438',ref:'#3a5248',earn:'#ff6b73',tooltipBg:'#101a16',tooltipFg:'#ffffff',tooltipBorder:'#2a4438',cost:'#8aa094',bar:'#2a6b4a',dot:'#101a16'};
 }
 
 export function ThemeToggle(){

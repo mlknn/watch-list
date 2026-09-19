@@ -2,6 +2,22 @@ import {AppError,normalizeTicker} from './quotes.mjs';
 export const CHART_RANGES={ '1d':{range:'5d',interval:'5m'},'5d':{range:'5d',interval:'1d'},'1mo':{range:'1mo',interval:'1d'},'3mo':{range:'3mo',interval:'1d'},'6mo':{range:'6mo',interval:'1d'},ytd:{range:'ytd',interval:'1d'},'1y':{range:'1y',interval:'1d'},'5y':{range:'5y',interval:'1d'},max:{range:'max',interval:'1d'} };
 const cache=new Map(),pending=new Map();
 const finite=v=>typeof v==='number'&&Number.isFinite(v)?v:null;
+export function earningsEventDays(result,now=Date.now()){
+  const today=new Date(now).toISOString().slice(0,10);
+  const raw=result?.events?.earnings;
+  if(!raw||typeof raw!=='object')return [];
+  const days=new Set();
+  for(const row of Object.values(raw)){
+    const value=row?.date??row?.earningsDate;
+    let day='';
+    if(typeof value==='number'&&Number.isFinite(value)){
+      const ms=value>1e12?value:value*1000;
+      day=new Date(ms).toISOString().slice(0,10);
+    }else if(typeof value==='string')day=value.slice(0,10);
+    if(/^\d{4}-\d{2}-\d{2}$/.test(day)&&day<=today)days.add(day);
+  }
+  return [...days].sort();
+}
 export function normalizeChart(result,range){
   const meta=result.meta;if(!meta||!finite(meta.regularMarketPrice)||!meta.currency)throw new AppError('The provider returned an incomplete quote.',502);
   let timezone=meta.exchangeTimezoneName||'America/New_York';
@@ -17,7 +33,7 @@ export function normalizeChart(result,range){
   const previousClose=finite(meta.previousClose)??all[sessionStart-1]?.price??null;
   const points=range==='1d'?lastSession:all;
   const current=meta.regularMarketPrice;
-  return {symbol:meta.symbol,companyName:meta.longName||meta.shortName||meta.symbol,currency:meta.currency,exchange:meta.fullExchangeName||meta.exchangeName||'',timezone,range,sessionDate:latestDay,interval:CHART_RANGES[range].interval,points,
+  return {symbol:meta.symbol,companyName:meta.longName||meta.shortName||meta.symbol,currency:meta.currency,exchange:meta.fullExchangeName||meta.exchangeName||'',timezone,range,sessionDate:latestDay,interval:CHART_RANGES[range].interval,points,earningsDates:earningsEventDays(result),
     quote:{price:current,previousClose,change:previousClose===null?null:current-previousClose,changePercent:previousClose?((current-previousClose)/previousClose)*100:null,quoteTime:meta.regularMarketTime?new Date(meta.regularMarketTime*1000).toISOString():null,
       open:lastSession[0]?.open??null,dayLow:finite(meta.regularMarketDayLow),dayHigh:finite(meta.regularMarketDayHigh),fiftyTwoWeekLow:finite(meta.fiftyTwoWeekLow),fiftyTwoWeekHigh:finite(meta.fiftyTwoWeekHigh),volume:finite(meta.regularMarketVolume)},source:'Yahoo Finance',fetchedAt:new Date().toISOString()};
 }
@@ -26,7 +42,7 @@ export async function getChart(value,range='1d'){
   const key=symbol+':'+range;const saved=cache.get(key);if(saved&&Date.now()-saved.at<60000)return saved.data;
   if(pending.has(key))return pending.get(key);
   const operation=(async()=>{let last;for(const host of ['query2.finance.yahoo.com','query1.finance.yahoo.com']){try{
-    const response=await fetch(`https://${host}/v8/finance/chart/${encodeURIComponent(symbol)}?range=${options.range}&interval=${options.interval}&includePrePost=false`,{headers:{'User-Agent':'Mozilla/5.0',Accept:'application/json'},signal:AbortSignal.timeout(8000)});
+    const response=await fetch(`https://${host}/v8/finance/chart/${encodeURIComponent(symbol)}?range=${options.range}&interval=${options.interval}&includePrePost=false&events=earn`,{headers:{'User-Agent':'Mozilla/5.0',Accept:'application/json'},signal:AbortSignal.timeout(8000)});
     if(response.status===404)throw new AppError(`Ticker “${symbol}” was not found.`,404);
     if(!response.ok)throw new AppError('Market data is temporarily unavailable. Please try again.',502);
     const payload=await response.json();const result=payload.chart?.result?.[0];if(!result)throw new AppError('No chart is available for this symbol.',404);
