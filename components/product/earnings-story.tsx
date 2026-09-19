@@ -27,8 +27,8 @@ function NextReportNotice({iso}:{iso?:string}){
   const tone=nextEarningsTone(day,todayInMarket());
   if(!tone)return null;
   const label=new Date(day+'T12:00:00Z').toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric',timeZone:'UTC'});
-  const prefix=tone==='today'?t('Reports today —'):tone==='this-week'?t('Coming this week —'):tone==='next-week'?t('Coming next week —'):t('Next earnings:');
-  return <p className={'story-next'+(nextEarningsSoon(tone)?' is-soon':'')} role={nextEarningsSoon(tone)?'status':undefined}>{prefix} {label}</p>;
+  const prefix=tone==='today'?t('The earnings report will be released today,'):tone==='this-week'?t('The earnings report will be released this week, on'):tone==='next-week'?t('The earnings report will be released next week, on'):t('The next earnings report will be released on');
+  return <p className={'story-next'+(nextEarningsSoon(tone)?' is-soon':'')} role={nextEarningsSoon(tone)?'status':undefined}>{prefix} {label}.</p>;
 }
 
 export function EarningsStory({symbol,nextDate}:{symbol:string;nextDate?:string}){
