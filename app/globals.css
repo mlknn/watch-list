@@ -750,14 +750,16 @@ html.dark .home-watchlist-table th,html.dark .home-watchlist-table td{border-col
   .home-watchlist-search .primary-button{width:100%}
   .home-watchlist-footer{align-items:flex-start;flex-direction:column}
   .home-watchlist-table th,.home-watchlist-table td{padding:12px 6px;font-size:11px}
-  .home-watchlist-table th:first-child{white-space:normal}
+  .home-watchlist-table th:first-child{white-space:normal;width:46%}
   .home-watchlist-table small{max-width:85px;font-size:10px}
   /* Phones show the company mark instead of the ticker; keep the symbol for assistive tech. */
   .home-watchlist-table .company-icon{display:inline-flex}
   .home-watchlist-table .home-ticker{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
   .home-watchlist-table .shares-column{display:none}
   .home-watchlist-table .row-shares{display:block}
-  .home-watchlist-table .stock-page-hint.hint-inline{display:inline-flex;white-space:normal;max-width:9.5rem;font-size:11px;line-height:1.35;align-items:flex-start;margin-left:8px}
+  .home-watchlist-table a{flex-wrap:wrap;align-items:center}
+  .home-watchlist-table .stock-page-hint.hint-inline{display:inline-flex;order:2;white-space:normal;max-width:7.5rem;font-size:11px;line-height:1.35;align-items:center;margin:0 0 0 6px}
+  .home-watchlist-table .home-company{order:3;flex:1 0 100%}
   .home-watchlist .stock-page-hint.hint-above{display:none}
   /* Zero the utility variables instead of `translate:none`, which the CSS minifier drops. */
   [data-slot=dialog-content],[data-slot=alert-dialog-content]{position:fixed!important;top:16px!important;left:16px!important;right:16px!important;bottom:auto!important;--tw-translate-x:0px!important;--tw-translate-y:0px!important;transform:none!important;width:auto!important;max-width:none!important;max-height:calc(100dvh - 32px)!important;margin:0!important;padding:22px 18px!important;animation:none!important}
