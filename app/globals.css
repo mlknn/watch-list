@@ -757,7 +757,7 @@ html.dark .home-watchlist-table th,html.dark .home-watchlist-table td{border-col
   .home-watchlist-table .home-ticker{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
   .home-watchlist-table .shares-column{display:none}
   .home-watchlist-table .row-shares{display:block}
-  .home-watchlist-table a{flex-wrap:wrap;align-items:center}
+  .home-watchlist-table a{display:flex;width:100%;flex-wrap:wrap;align-items:center}
   .home-watchlist-table .stock-page-hint.hint-inline{display:inline-flex;order:2;white-space:normal;max-width:7.5rem;font-size:11px;line-height:1.35;align-items:center;margin:0 0 0 6px}
   .home-watchlist-table .home-company{order:3;flex:1 0 100%}
   .home-watchlist .stock-page-hint.hint-above{display:none}
