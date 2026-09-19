@@ -177,13 +177,43 @@ function refreshWeek(monday,loadDay,now){
   return task;
 }
 
+/** Later Mondays to warm after the visible week is already answered. */
+export function weeksAhead(monday,count,maxWeek){
+  const out=[];
+  for(let i=1;i<=count;i++){
+    const next=addDays(monday,i*7);
+    if(next>maxWeek)break;
+    out.push(next);
+  }
+  return out;
+}
+
+function prefetchCount(monday,todayMonday){
+  if(monday===todayMonday)return 4;
+  if(monday>todayMonday)return 3;
+  return 2;
+}
+
+export async function prefetchAhead(monday,{loadDay=nasdaqDay,now=new Date(),count}={}){
+  const current=inFlight.get(monday);
+  if(current)await current.catch(()=>{});
+  const {maxWeek,todayMonday}=earningsWindow(now);
+  const ahead=count??prefetchCount(monday,todayMonday);
+  for(const week of weeksAhead(monday,ahead,maxWeek)){
+    const saved=weekCache.get(week);
+    if(saved&&Date.now()-saved.at<FRESH_MS)continue;
+    try{await refreshWeek(week,loadDay,now);}catch{/* Visible week already returned; skip a failed future day. */}
+  }
+}
+
 export async function earningsWeek(week,{loadDay=nasdaqDay,now=new Date()}={}){
   const monday=clampMonday(week,now);
   if(loadDay!==nasdaqDay)return loadWeek(monday,loadDay,now);
   const saved=weekCache.get(monday);
   const age=saved?Date.now()-saved.at:Infinity;
-  if(age<FRESH_MS)return saved.data;
-  // Answer from the last good copy and warm the next one in the background.
-  if(age<STALE_MS){void refreshWeek(monday,loadDay,now).catch(()=>{});return saved.data;}
-  return refreshWeek(monday,loadDay,now);
+  const data=age<FRESH_MS?saved.data:age<STALE_MS?(void refreshWeek(monday,loadDay,now).catch(()=>{}),saved.data):await refreshWeek(monday,loadDay,now);
+  // Future weeks warm after this response is ready, so this week never waits on them.
+  const delay=setTimeout(()=>{void prefetchAhead(monday,{now}).catch(()=>{});},400);
+  delay.unref?.();
+  return data;
 }

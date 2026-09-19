@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {averageImpact,eventWindows} from '../lib/earnings-impact.mjs';
-import {earningsWeek,mondayOnOrBefore,normalizeDayRows,reportTiming,toYahooSymbol,weekDays,clampMonday,earningsWindow,addDays} from '../server/earnings-calendar.mjs';
+import {earningsWeek,mondayOnOrBefore,normalizeDayRows,reportTiming,toYahooSymbol,weekDays,clampMonday,earningsWindow,addDays,weeksAhead,prefetchAhead} from '../server/earnings-calendar.mjs';
 
 test('class shares map to Yahoo tickers',()=>{
   assert.equal(toYahooSymbol('BRK.B'),'BRK-B');
@@ -105,6 +105,30 @@ test('past weeks stop two quarters back; future weeks stay in the window',()=>{
   assert.equal(clampMonday('2026-09-23',now),'2026-09-21');
   assert.throws(()=>clampMonday('2025-01-06',now),e=>e.status===400);
   assert.throws(()=>clampMonday(addDays(maxWeek,7),now),e=>e.status===400);
+});
+
+test('this week prefetches the next four Mondays, never itself',()=>{
+  const now=new Date('2026-09-18T16:00:00Z');
+  const {maxWeek,todayMonday}=earningsWindow(now);
+  assert.deepEqual(weeksAhead(todayMonday,4,maxWeek),['2026-09-21','2026-09-28','2026-10-05','2026-10-12']);
+});
+
+test('warming later weeks waits for this week and never fetches it again',async()=>{
+  const now=new Date('2026-09-18T16:00:00Z');
+  const fetched=[];
+  await earningsWeek('2026-09-14',{now,loadDay:async date=>{
+    fetched.push(date);
+    return [];
+  }});
+  const afterThis=fetched.length;
+  await prefetchAhead('2026-09-14',{now,count:2,loadDay:async date=>{
+    fetched.push(date);
+    return [];
+  }});
+  assert.equal(afterThis,5);
+  assert.ok(fetched.slice(afterThis).every(date=>date>='2026-09-21'));
+  assert.ok(fetched.includes('2026-09-21'));
+  assert.ok(!fetched.slice(afterThis).includes('2026-09-14'));
 });
 
 test('average path is relative to the earnings close',()=>{

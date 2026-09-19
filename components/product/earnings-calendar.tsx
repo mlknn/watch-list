@@ -18,38 +18,58 @@ function shiftWeek(monday:string,delta:number){
 }
 const dayFormat=(iso:string,options:Intl.DateTimeFormatOptions)=>new Date(iso+'T12:00:00Z').toLocaleDateString(undefined,{...options,timeZone:'UTC'});
 const UNAVAILABLE='The earnings calendar is temporarily unavailable.';
+const weekStore=new Map<string,Board>();
+
+async function pullWeek(monday:string){
+  const query=monday?'?week='+encodeURIComponent(monday):'';
+  const r=await fetch('/api/earnings-calendar'+query);
+  const result=await r.json() as Board&{error?:string};
+  if(!r.ok)throw Error(result.error||UNAVAILABLE);
+  weekStore.set(result.weekStart,result);
+  if(!monday)weekStore.set('',result);
+  return result;
+}
+
+function cachedWeek(monday:string){
+  return weekStore.get(monday)||(!monday?weekStore.get(''):undefined);
+}
 
 export function EarningsCalendar(){
   const t=useT();
   const router=useRouter();
   const params=useSearchParams();
   const week=params.get('week')||'';
-  const [data,setData]=useState<Board|null>(null);
+  const [data,setData]=useState<Board|null>(()=>cachedWeek(week)||null);
   const [error,setError]=useState('');
-  const [loading,setLoading]=useState(true);
+  const [loading,setLoading]=useState(!cachedWeek(week));
   const [attempt,setAttempt]=useState(0);
   const today=useMemo(()=>new Date().toISOString().slice(0,10),[]);
   useEffect(()=>{
     let alive=true;
-    setLoading(true);setError('');
-    const query=week?'?week='+encodeURIComponent(week):'';
-    void fetch('/api/earnings-calendar'+query).then(async r=>{
-      const result=await r.json() as Board&{error?:string};
-      if(!r.ok)throw Error(result.error||UNAVAILABLE);
-      if(!alive)return;
-      setData(result);
-      setLoading(false);
-    }).catch(e=>{if(alive){setError(e.message||UNAVAILABLE);setLoading(false);}});
+    const hit=cachedWeek(week);
+    if(hit){setData(hit);setLoading(false);setError('');}
+    else{setLoading(true);setError('');}
+    void pullWeek(week).then(result=>{if(!alive)return;setData(result);setLoading(false);}).catch(e=>{if(alive&&!hit){setError(e.message||UNAVAILABLE);setLoading(false);}});
     return()=>{alive=false;};
   },[week,attempt]);
-  // Warm the next week at the edge so stepping forward feels instant.
+  /* After this week is on screen, walk 2–4 future weeks one by one so Next week is already local. */
   useEffect(()=>{
     if(!data)return;
-    const upcoming=shiftWeek(data.weekStart,1);
-    if(upcoming>data.maxWeek)return;
-    const timer=window.setTimeout(()=>{void fetch('/api/earnings-calendar?week='+encodeURIComponent(upcoming)).catch(()=>{});},1200);
-    return()=>clearTimeout(timer);
-  },[data]);
+    const ahead=data.weekStart===data.todayMonday?4:data.weekStart>data.todayMonday?3:2;
+    let cancelled=false;
+    const run=async()=>{
+      for(let i=1;i<=ahead;i++){
+        await new Promise(resolve=>window.setTimeout(resolve,280));
+        if(cancelled)return;
+        const monday=shiftWeek(data.weekStart,i);
+        if(monday>data.maxWeek)return;
+        if(weekStore.has(monday))continue;
+        try{await pullWeek(monday);}catch{/* Keep the open week as-is if a later week misses. */}
+      }
+    };
+    void run();
+    return()=>{cancelled=true;};
+  },[data?.weekStart,data?.todayMonday,data?.maxWeek]);
   const go=useCallback((next:string)=>{
     if(!data||next<data.minWeek||next>data.maxWeek)return;
     router.push(next===data.todayMonday?'/earnings':'/earnings?week='+next);
