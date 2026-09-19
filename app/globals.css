@@ -495,6 +495,9 @@ html.dark .favorite-star{color:#d7e6dc;opacity:.95}
 .story-card{border:1px solid #e1e8f3;border-radius:16px;padding:22px;background:#fff}
 .story-card h2{font-size:22px;letter-spacing:-.5px;margin:0 0 8px}
 .story-card>p{font-size:13px;color:#74839a;line-height:1.6}
+.story-card .story-next,.earnings-story .story-next{margin:10px 0 12px;padding:10px 12px;border-radius:10px;background:#eef3f8;color:#2c3a4d;font-size:14px;font-weight:650;line-height:1.45}
+.story-card .story-next.is-soon,.earnings-story .story-next.is-soon{background:#fff4e0;color:#8a4a00;border:1px solid #f0c27a}
+.story-loading{display:inline-flex;align-items:center;gap:8px}
 .story-meta{font-size:11px!important;letter-spacing:.4px;text-transform:uppercase}
 .story-chart{height:280px;margin:12px 0 8px}
 .story-pills{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
@@ -516,6 +519,8 @@ html.dark .favorite-star{color:#d7e6dc;opacity:.95}
 .stock-facts-list dt{color:#7a889e}
 .stock-facts-list dd{font-weight:650;text-align:right}
 html.dark .earnings-day,html.dark .story-card,html.dark .stock-facts-rail{background:#141f1a;border-color:#2a4438}
+html.dark .story-card .story-next,html.dark .earnings-story .story-next{background:#101a16;color:#cfe2d6}
+html.dark .story-card .story-next.is-soon,html.dark .earnings-story .story-next.is-soon{background:#3a2a10;color:#ffd089;border-color:#8a6230}
 html.dark .earnings-day.is-future:not(.is-today){border-color:#2f6a4c}
 html.dark .earnings-chip:hover{background:#12301f}
 html.dark .story-pills article,html.dark .story-line-bar,html.dark .stock-facts-list>div{border-color:#2a4438}

@@ -8,6 +8,7 @@ import {useChartPalette} from './theme';
 import {apiFetch} from '@/lib/auth-client';
 import {marketChart} from '@/lib/market';
 import {averageImpact,eventWindows} from '@/lib/earnings-impact.mjs';
+import {addDays,isoDay,nextEarningsSoon,nextEarningsTone,todayInMarket} from '@/lib/next-earnings.mjs';
 import {Button} from '@/components/ui/button';
 
 type Quarter={periodEnd:string;revenue:number|null;netIncome:number|null;eps:number|null};
@@ -16,13 +17,41 @@ type Reports={quarters:Quarter[];currency:string|null;fetchedAt:string};
 const compact=(v:number|null)=>v===null?'—':new Intl.NumberFormat(undefined,{notation:'compact',maximumFractionDigits:2}).format(v);
 const pct=(v:number|null)=>v===null||!Number.isFinite(v)?'—':`${v>=0?'+':''}${v.toFixed(1)}%`;
 
-export function EarningsStory({symbol}:{symbol:string}){
+type EarningsCompany={symbol:string;reported:boolean};
+type EarningsDay={date:string;status:string;companies:EarningsCompany[]};
+type EarningsWeek={weekStart?:string;days?:EarningsDay[]};
+
+function NextReportNotice({iso}:{iso?:string}){
+  const t=useT();
+  const day=isoDay(iso);
+  const tone=nextEarningsTone(day,todayInMarket());
+  if(!tone)return null;
+  const label=new Date(day+'T12:00:00Z').toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric',timeZone:'UTC'});
+  const prefix=tone==='today'?t('Reports today —'):tone==='this-week'?t('Coming this week —'):tone==='next-week'?t('Coming next week —'):t('Next earnings:');
+  return <p className={'story-next'+(nextEarningsSoon(tone)?' is-soon':'')} role={nextEarningsSoon(tone)?'status':undefined}>{prefix} {label}</p>;
+}
+
+export function EarningsStory({symbol,nextDate}:{symbol:string;nextDate?:string}){
   const t=useT();
   const palette=useChartPalette();
   const [reports,setReports]=useState<Reports|null>(null);
   const [error,setError]=useState('');
   const [loading,setLoading]=useState(true);
   const [windows,setWindows]=useState<ReturnType<typeof eventWindows>>([]);
+  const [calendarDate,setCalendarDate]=useState('');
+  useEffect(()=>{
+    let alive=true;
+    const today=todayInMarket();
+    void fetch('/api/earnings-calendar').then(async r=>{
+      const current=await r.json() as EarningsWeek;
+      const nextMonday=current.weekStart?addDays(current.weekStart,7):'';
+      const upcoming=nextMonday?await fetch('/api/earnings-calendar?week='+encodeURIComponent(nextMonday)).then(res=>res.json() as Promise<EarningsWeek>).catch(()=>({days:[]})):{days:[]};
+      if(!alive)return;
+      const hit=[...(current.days||[]),...(upcoming.days||[])].filter(day=>day.status==='ok').flatMap(day=>(day.companies||[]).map(row=>({...row,date:day.date}))).find(row=>row.symbol===symbol&&!row.reported&&row.date>=today);
+      setCalendarDate(hit?.date||'');
+    }).catch(()=>{if(alive)setCalendarDate('');});
+    return()=>{alive=false;};
+  },[symbol]);
   useEffect(()=>{
     let alive=true;
     setLoading(true);setError('');
@@ -42,13 +71,16 @@ export function EarningsStory({symbol}:{symbol:string}){
     const income=q.netIncome||0;
     return {...q,label:new Date(q.periodEnd+'T12:00:00Z').toLocaleDateString(undefined,{month:'short',year:'2-digit',timeZone:'UTC'}),revAbs:Math.abs(rev),incomeAbs:Math.abs(income),incomeNeg:income<0};
   }),[reports]);
-  if(loading)return <section className="earnings-story" role="status"><LoaderCircle className="spin"/>{t('Loading quarterly results…')}</section>;
-  if(error)return <section className="earnings-story" role="alert">{error}</section>;
-  if(!reports?.quarters.length)return <section className="earnings-story"><p>{t('No quarterly reports are available for this symbol yet.')}</p></section>;
+  const reportDate=calendarDate||isoDay(nextDate);
+  const nextNotice=<NextReportNotice iso={reportDate}/>;
+  if(loading)return <section className="earnings-story" role="status">{nextNotice}<span className="story-loading"><LoaderCircle className="spin"/>{t('Loading quarterly results…')}</span></section>;
+  if(error)return <section className="earnings-story" role="alert">{nextNotice}<p>{error}</p></section>;
+  if(!reports?.quarters.length)return <section className="earnings-story">{nextNotice}<p>{t('No quarterly reports are available for this symbol yet.')}</p></section>;
   const maxRev=Math.max(...mix.map(q=>q.revAbs),1);
   return <div className="earnings-story">
     <section className="story-card">
       <p className="eyebrow"><T text="EARNINGS STORY"/></p>
+      {nextNotice}
       <h2><T text="Historical earnings impact"/></h2>
       <p><T text="Average path of the split-adjusted close around each reported quarter-end, using the last five years of daily prices."/></p>
       <p className="story-meta">{t('Based on')} {impact.samples} {t('quarter-ends')}</p>
