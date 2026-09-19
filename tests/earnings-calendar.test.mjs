@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {averageImpact,chartEventTimes,eventWindows} from '../lib/earnings-impact.mjs';
+import {averageImpact,chartEventMarks,chartEventTimes,eventWindows} from '../lib/earnings-impact.mjs';
 import {earningsWeek,mondayOnOrBefore,normalizeDayRows,reportTiming,toYahooSymbol,weekDays,clampMonday,earningsWindow,addDays,weeksAhead,prefetchAhead} from '../server/earnings-calendar.mjs';
 
 test('class shares map to Yahoo tickers',()=>{
@@ -134,6 +134,7 @@ test('warming later weeks waits for this week and never fetches it again',async(
 test('earnings markers sit on the first session on or after the report day',()=>{
   const points=Array.from({length:10},(_,i)=>({time:Date.parse('2026-01-05T20:00:00Z')+i*86400000,price:100+i}));
   assert.deepEqual(chartEventTimes(points,['2026-01-08','2026-01-20'],7,Date.parse('2026-01-20T12:00:00Z')),[Date.parse('2026-01-08T20:00:00Z')]);
+  assert.deepEqual(chartEventMarks(points,['2026-01-08'],7,Date.parse('2026-01-20T12:00:00Z')),[{time:Date.parse('2026-01-08T20:00:00Z'),date:'2026-01-08'}]);
   assert.deepEqual(chartEventTimes(points,['2025-06-01'],7,Date.parse('2026-01-20T12:00:00Z')),[]);
 });
 

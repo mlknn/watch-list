@@ -1939,9 +1939,13 @@
     "Bu sembol için henüz çeyreklik rapor yok.",
     "Aún no hay informes trimestrales para este símbolo."
   ],
-  "Red lines mark past earnings reports.": [
-    "Kırmızı çizgiler geçmiş kazanç raporlarını gösterir.",
-    "Las líneas rojas marcan informes de resultados pasados."
+  "Red lines are earnings dates.": [
+    "Kırmızı çizgiler kazanç tarihleridir.",
+    "Las líneas rojas son fechas de resultados."
+  ],
+  "Earnings date": [
+    "Kazanç tarihi",
+    "Fecha de resultados"
   ],
   "Historical price · Split-adjusted close": [
     "Tarihsel fiyat · Temettü ayarlı kapanış",

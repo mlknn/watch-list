@@ -190,6 +190,9 @@ h2 { font-size:19px; margin:0; letter-spacing:-.3px; font-weight:600; }
 .public-footer .language-select,.workspace-footer .language-select{display:block;max-width:140px;min-height:44px;padding:8px 12px;font-size:13px}
 .workspace-footer{flex-wrap:wrap;gap:16px;align-items:center}
 .chart-period-return{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 14px;margin:12px 0 4px;font-variant-numeric:tabular-nums}.chart-period-return strong{font-size:24px}.chart-period-return span{font-size:12px;color:#64748b}
+.chart-earn-legend{display:inline-flex;align-items:center;gap:6px;margin-left:auto;color:#d64545!important;font-weight:700}
+.chart-earn-legend i{width:2px;height:12px;border-radius:99px;background:currentColor}
+html.dark .chart-earn-legend{color:#ff6b73!important}
 .welcome-hero>.hero-preview,.welcome-hero>.showcase-performance{align-self:stretch}.welcome-hero>.hero-preview{display:flex;flex-direction:column}.welcome-hero>.hero-preview .sample-row{flex:1}.welcome-hero>.hero-preview .preview-bottom{margin-top:auto}
 @media(max-width:800px){.welcome-hero{grid-template-columns:minmax(0,1fr)}.welcome-hero>.hero-copy{display:block}.welcome-hero>.hero-preview,.welcome-hero>.showcase-performance{grid-column:1}.chart-toolbar{flex-wrap:wrap}.chart-ranges{flex-wrap:wrap;height:auto!important;max-width:100%}.chart-ranges [data-slot=tabs-trigger]{flex:0 0 auto}.stock-summary-card,.overview-panel,.portfolio-panel,.main-chart-panel{min-width:0}.public-nav{flex-wrap:nowrap;gap:12px}.public-nav nav{width:auto;margin-left:auto;justify-content:flex-end;flex-wrap:nowrap}.public-nav nav .nav-extra{display:none!important}.public-nav nav a,.nav-signout{min-height:44px;display:inline-flex;align-items:center}.public-footer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 12px}.public-footer .language-select{justify-self:end}.footer-tagline{display:none}.footer-links{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0}.footer-links a,.footer-links .nav-signout{min-height:44px;display:flex;align-items:center}.portfolio-chart-heading{flex-wrap:wrap;gap:12px}.range-buttons{flex-wrap:wrap}.portfolio-metrics strong{font-size:clamp(18px,5vw,26px);overflow-wrap:anywhere}.chart-period-return strong{font-size:22px}.chart-period-return span{overflow-wrap:anywhere}}
 
@@ -612,6 +615,12 @@ html.dark .tool-preview-value.down{color:#ff9aa4}
 .earnings-range-tag{font-size:11px;letter-spacing:.6px;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:#eef3ff;color:#3d5cae}
 .earnings-cal-nav{display:flex;gap:8px;flex-wrap:wrap}
 .earnings-cal-nav .outline-button{height:40px;font-size:13px;gap:4px}
+.earnings-cal-nav .is-next-week{position:relative;z-index:1;border-color:#2f9a68;color:#146c4c}
+.earnings-cal-nav .is-next-week::after{content:"";position:absolute;inset:-4px;border-radius:inherit;pointer-events:none;box-shadow:0 0 0 2px rgba(36,150,98,.45),0 0 14px rgba(36,150,98,.4);animation:earnings-next-glow 2.2s ease-in-out infinite}
+html.dark .earnings-cal-nav .is-next-week{border-color:#fff;color:#fff}
+html.dark .earnings-cal-nav .is-next-week::after{box-shadow:0 0 0 2px rgba(255,255,255,.7),0 0 16px rgba(255,255,255,.55)}
+@keyframes earnings-next-glow{0%,100%{opacity:.4}50%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.earnings-cal-nav .is-next-week::after{animation:none;opacity:.75}}
 .earnings-week{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;align-items:start;overflow:visible;padding:0}
 .earnings-week.is-loading{opacity:.6}
 .earnings-day{flex:none;width:auto;min-width:0;border-radius:14px}

@@ -101,7 +101,7 @@ export function EarningsCalendar(){
       <div className="earnings-cal-nav">
         <Button variant="outline" className="outline-button" disabled={!canPrev} onClick={()=>go(prev)}><ChevronLeft size={16}/><T text="Previous week"/></Button>
         <Button variant="outline" className="outline-button" disabled={!data||data.weekStart===data.todayMonday} onClick={()=>go(data?.todayMonday||'')}><T text="This week"/></Button>
-        <Button variant="outline" className="outline-button" disabled={!canNext} onClick={()=>go(next)}><T text="Next week"/><ChevronRight size={16}/></Button>
+        <Button variant="outline" className={'outline-button'+(canNext?' is-next-week':'')} disabled={!canNext} onClick={()=>go(next)}><T text="Next week"/><ChevronRight size={16}/></Button>
       </div>
     </div>
     {error&&<div className="error-banner" role="alert">{error===UNAVAILABLE?t(UNAVAILABLE):error}<Button variant="ghost" onClick={()=>setAttempt(n=>n+1)}><T text="Retry"/></Button></div>}
