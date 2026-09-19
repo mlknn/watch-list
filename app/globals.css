@@ -615,12 +615,12 @@ html.dark .tool-preview-value.down{color:#ff9aa4}
 .earnings-range-tag{font-size:11px;letter-spacing:.6px;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:#eef3ff;color:#3d5cae}
 .earnings-cal-nav{display:flex;gap:8px;flex-wrap:wrap}
 .earnings-cal-nav .outline-button{height:40px;font-size:13px;gap:4px}
-.earnings-cal-nav .is-next-week{position:relative;z-index:1;border-color:#2f9a68;color:#146c4c}
-.earnings-cal-nav .is-next-week::after{content:"";position:absolute;inset:-4px;border-radius:inherit;pointer-events:none;box-shadow:0 0 0 2px rgba(36,150,98,.45),0 0 14px rgba(36,150,98,.4);animation:earnings-next-glow 2.2s ease-in-out infinite}
-html.dark .earnings-cal-nav .is-next-week{border-color:#fff;color:#fff}
-html.dark .earnings-cal-nav .is-next-week::after{box-shadow:0 0 0 2px rgba(255,255,255,.7),0 0 16px rgba(255,255,255,.55)}
+.earnings-cal-nav .is-week-glow{position:relative;z-index:1;border-color:#2f9a68;color:#146c4c}
+.earnings-cal-nav .is-week-glow::after{content:"";position:absolute;inset:-4px;border-radius:inherit;pointer-events:none;box-shadow:0 0 0 2px rgba(36,150,98,.45),0 0 14px rgba(36,150,98,.4);animation:earnings-next-glow 2.2s ease-in-out infinite}
+html.dark .earnings-cal-nav .is-week-glow{border-color:#fff;color:#fff}
+html.dark .earnings-cal-nav .is-week-glow::after{box-shadow:0 0 0 2px rgba(255,255,255,.7),0 0 16px rgba(255,255,255,.55)}
 @keyframes earnings-next-glow{0%,100%{opacity:.4}50%{opacity:1}}
-@media(prefers-reduced-motion:reduce){.earnings-cal-nav .is-next-week::after{animation:none;opacity:.75}}
+@media(prefers-reduced-motion:reduce){.earnings-cal-nav .is-week-glow::after{animation:none;opacity:.75}}
 .earnings-week{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;align-items:start;overflow:visible;padding:0}
 .earnings-week.is-loading{opacity:.6}
 .earnings-day{flex:none;width:auto;min-width:0;border-radius:14px}

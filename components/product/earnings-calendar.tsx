@@ -83,6 +83,9 @@ export function EarningsCalendar(){
   const next=data?shiftWeek(data.weekStart,1):'';
   const canPrev=!!data&&prev>=data.minWeek;
   const canNext=!!data&&next<=data.maxWeek;
+  const onThisWeek=!!data&&data.weekStart===data.todayMonday;
+  const glowNext=onThisWeek&&canNext;
+  const glowThis=!onThisWeek&&!!data;
   const range=data?`${dayFormat(data.weekStart,{month:'short',day:'numeric'})} – ${dayFormat(data.weekEnd,{month:'short',day:'numeric',year:'numeric'})}`:'';
   const relative=!data?'':data.weekStart===data.todayMonday?t('This week')
     :data.weekStart===shiftWeek(data.todayMonday,-1)?t('Last week')
@@ -100,8 +103,8 @@ export function EarningsCalendar(){
       </div>
       <div className="earnings-cal-nav">
         <Button variant="outline" className="outline-button" disabled={!canPrev} onClick={()=>go(prev)}><ChevronLeft size={16}/><T text="Previous week"/></Button>
-        <Button variant="outline" className="outline-button" disabled={!data||data.weekStart===data.todayMonday} onClick={()=>go(data?.todayMonday||'')}><T text="This week"/></Button>
-        <Button variant="outline" className={'outline-button'+(canNext?' is-next-week':'')} disabled={!canNext} onClick={()=>go(next)}><T text="Next week"/><ChevronRight size={16}/></Button>
+        <Button variant="outline" className={'outline-button'+(glowThis?' is-week-glow':'')} disabled={!data||onThisWeek} onClick={()=>go(data?.todayMonday||'')}><T text="This week"/></Button>
+        <Button variant="outline" className={'outline-button'+(glowNext?' is-week-glow':'')} disabled={!canNext} onClick={()=>go(next)}><T text="Next week"/><ChevronRight size={16}/></Button>
       </div>
     </div>
     {error&&<div className="error-banner" role="alert">{error===UNAVAILABLE?t(UNAVAILABLE):error}<Button variant="ghost" onClick={()=>setAttempt(n=>n+1)}><T text="Retry"/></Button></div>}
