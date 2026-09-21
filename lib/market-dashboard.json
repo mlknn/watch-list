@@ -73,19 +73,39 @@
       ]
     },
     {
-      "id": "tr",
-      "label": "Turkey",
-      "currency": "TRY",
-      "session": {"tz": "Europe/Istanbul", "open": 600, "close": 1080, "pre": 570, "after": 1110, "venue": "BIST", "hours": "10:00 – 18:00 TRT"},
+      "id": "global",
+      "label": "Global",
+      "currency": "",
+      "etfTitle": "Country ETFs",
+      "etfBlurb": "One fund per major cash market outside the US, Canada, and Europe.",
+      "session": {"tz": "Asia/Tokyo", "open": 540, "close": 900, "pre": 480, "after": 930, "venue": "Global", "hours": "Asia first, then the Americas", "rolling": true},
       "indices": [
-        {"symbol": "XU100.IS", "name": "BIST 100", "short": "XU100"},
-        {"symbol": "XU030.IS", "name": "BIST 30", "short": "XU030"}
+        {"symbol": "^N225", "name": "Nikkei 225", "short": "Nikkei"},
+        {"symbol": "^HSI", "name": "Hang Seng", "short": "HSI"},
+        {"symbol": "^NSEI", "name": "Nifty 50", "short": "Nifty"},
+        {"symbol": "^KS11", "name": "KOSPI", "short": "KOSPI"},
+        {"symbol": "^AXJO", "name": "S&P/ASX 200", "short": "ASX"}
       ],
       "etfs": [
-        {"symbol": "TUR", "name": "iShares MSCI Turkey"}
+        {"symbol": "EWJ", "name": "iShares MSCI Japan"},
+        {"symbol": "MCHI", "name": "iShares MSCI China"},
+        {"symbol": "EWH", "name": "iShares MSCI Hong Kong"},
+        {"symbol": "INDA", "name": "iShares MSCI India"},
+        {"symbol": "EWY", "name": "iShares MSCI South Korea"},
+        {"symbol": "EWT", "name": "iShares MSCI Taiwan"},
+        {"symbol": "EWA", "name": "iShares MSCI Australia"},
+        {"symbol": "EWZ", "name": "iShares MSCI Brazil"},
+        {"symbol": "KSA", "name": "iShares MSCI Saudi Arabia"},
+        {"symbol": "EZA", "name": "iShares MSCI South Africa"}
       ],
       "groups": [
-        {"id": "tr-leaders", "title": "BIST leaders", "blurb": "Banks, industry, airlines and the large names on Borsa Istanbul.", "symbols": ["THYAO.IS", "GARAN.IS", "AKBNK.IS", "EREGL.IS", "BIMAS.IS", "SISE.IS", "TUPRS.IS", "ASELS.IS", "KCHOL.IS", "SAHOL.IS", "TCELL.IS", "PGSUS.IS"]}
+        {"id": "global-japan", "title": "Japan", "blurb": "Autos, electronics, banks and the large names on the Tokyo exchange.", "symbols": ["7203.T", "6758.T", "6861.T", "9984.T", "8306.T", "9983.T"]},
+        {"id": "global-china", "title": "China & Hong Kong", "blurb": "Internet platforms, consumption and the large names in Hong Kong and Shanghai.", "symbols": ["0700.HK", "9988.HK", "3690.HK", "9618.HK", "0941.HK", "1211.HK"]},
+        {"id": "global-india", "title": "India", "blurb": "Energy, IT, banks and the large names on the NSE.", "symbols": ["RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS", "ICICIBANK.NS", "BHARTIARTL.NS"]},
+        {"id": "global-korea-taiwan", "title": "Korea & Taiwan", "blurb": "Chips, electronics and the large names in Seoul and Taipei.", "symbols": ["005930.KS", "000660.KS", "035420.KS", "2330.TW", "2317.TW"]},
+        {"id": "global-australia", "title": "Australia", "blurb": "Miners, banks and the large names on the ASX.", "symbols": ["BHP.AX", "CBA.AX", "CSL.AX", "WBC.AX"]},
+        {"id": "global-latam", "title": "Brazil", "blurb": "Oil, iron ore, banks and the large names in São Paulo.", "symbols": ["PETR4.SA", "VALE3.SA", "ITUB4.SA", "ABEV3.SA"]},
+        {"id": "global-emea", "title": "Saudi Arabia & South Africa", "blurb": "Energy, banks and the large names in Riyadh and Johannesburg.", "symbols": ["2222.SR", "1120.SR", "NPN.JO", "FSR.JO"]}
       ]
     },
     {

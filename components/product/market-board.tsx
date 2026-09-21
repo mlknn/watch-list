@@ -408,7 +408,7 @@ export function MarketBoard(){
     e.preventDefault();
     if(!query.trim()){inputRef.current?.focus();return;}
     setSearching(true);setSearchError('');
-    try{await openStock(await resolveStockInput(query,market.currency));}
+    try{await openStock(await resolveStockInput(query,market.currency||undefined));}
     catch(err){setSearchError((err as Error).message);}
     finally{setSearching(false);}
   }
@@ -426,6 +426,7 @@ export function MarketBoard(){
   const favoriteState:FavoriteState={signedIn,ids:new Set(favoriteRows.map(row=>row.symbol)),rows:favoriteRows,toggle};
   const quotedRows=data.groups.flatMap(group=>group.stocks);
   const isCrypto=market.kind==='crypto';
+  const isGlobal=market.id==='global';
   const etfGroup=data.groups.find(group=>group.kind==='etfs');
   const coinGroup=data.groups.find(group=>group.kind==='coins');
   const stockGroups=data.groups.filter(group=>group.kind!=='etfs'&&group.kind!=='coins');
@@ -446,7 +447,7 @@ export function MarketBoard(){
       <div>
         <p className="eyebrow">{isCrypto?t('CRYPTO, AROUND THE CLOCK'):t('MARKETS, IN ONE PLACE')}</p>
         <h2>{isCrypto?t('The tape never sleeps.'):t('Today’s tape.')}</h2>
-        <p className="intro">{isCrypto?t('Live USD quotes for bitcoin, ether, and the coins that move with them.'):t('Pick a market, then look up stocks, ETFs, charts, and company details.')}</p>
+        <p className="intro">{isCrypto?t('Live USD quotes for bitcoin, ether, and the coins that move with them.'):isGlobal?t('Indexes and leaders from Japan, China, India, Korea, and the other large cash markets.'):t('Pick a market, then look up stocks, ETFs, charts, and company details.')}</p>
         {isCrypto&&!!ready[coinGroup?.id||'']&&breadth.quoted>0&&<p className="crypto-breadth" aria-live="polite"><span className="up">{breadth.up} {t('advancing')}</span><span className="down">{breadth.down} {t('declining')}</span></p>}
         <div className="market-picks" role="group" aria-label={t('Change the market')}>
           {listMarkets().map(item=>{
@@ -458,7 +459,7 @@ export function MarketBoard(){
       <SessionBadge market={market}/>
     </div>
     <form className="market-search" onSubmit={e=>void search(e)} role="search">
-      <StockSearch value={query} onChange={v=>{setQuery(v);setSearchError('');}} inputRef={inputRef} onPick={symbol=>void openStock(symbol)} currency={market.currency} placeholder={isCrypto?t('Search crypto, e.g. BTC'):undefined}/>
+      <StockSearch value={query} onChange={v=>{setQuery(v);setSearchError('');}} inputRef={inputRef} onPick={symbol=>void openStock(symbol)} currency={market.currency||undefined} placeholder={isCrypto?t('Search crypto, e.g. BTC'):isGlobal?t('Search global, e.g. Toyota'):undefined}/>
       <Button type="submit" className="primary-button" disabled={searching}>{searching?<LoaderCircle className="spin"/>:<Search/>}<span className="market-search-label">{t('Search')}</span></Button>
     </form>
     {searchError&&<p className="form-error" role="alert">{searchError}</p>}

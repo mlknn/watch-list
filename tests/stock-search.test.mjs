@@ -35,6 +35,7 @@ test('european, canadian and turkish tickers appear in local suggestions',()=>{
   assert.ok(getTickerSuggestions('aapl',8,'USD').every(item=>!item.symbol.endsWith('.IS')&&!item.symbol.endsWith('.TO')));
   assert.ok(getTickerSuggestions('thy',8,'TRY').every(item=>item.symbol.endsWith('.IS')));
   assert.ok(getTickerSuggestions('ry',8,'CAD').every(item=>item.symbol.endsWith('.TO')||item.symbol.endsWith('.V')||item.symbol.endsWith('.CN')||item.symbol.endsWith('.NE')));
+  assert.ok(getTickerSuggestions('toyota').some(item=>item.symbol==='7203.T'));
 });
 test('one letter suggests company and ticker prefixes including Tesla and T-Mobile',()=>{const items=getTickerSuggestions('t',8);assert.ok(items.some(s=>s.symbol==='TSLA'));assert.ok(items.some(s=>s.symbol==='TMUS'));assert.equal(items[0].symbol,'T');});
 test('full company name resolves to its ticker before stock creation',async()=>{const {resolveStockInput}=await import('../lib/stock-search.mjs');assert.equal(await resolveStockInput('Tesla'),'TSLA');assert.equal(await resolveStockInput('Apple Inc.'),'AAPL');assert.equal(await resolveStockInput('tsla'),'TSLA');await assert.rejects(resolveStockInput('not an actual company'),/Choose a company/);});

@@ -947,6 +947,10 @@
     "Bir piyasa seç, sonra hisse, ETF, grafik ve şirket detayına bak.",
     "Elige un mercado y busca acciones, ETF, gráficos y datos de la empresa."
   ],
+  "Indexes and leaders from Japan, China, India, Korea, and the other large cash markets.": [
+    "Japonya, Çin, Hindistan, Kore ve diğer büyük nakit piyasalarının endeksleri ve liderleri.",
+    "Índices y líderes de Japón, China, India, Corea y los otros grandes mercados de efectivo."
+  ],
   "Change the market": [
     "Piyasayı değiştir",
     "Cambiar el mercado"
@@ -966,6 +970,10 @@
   "Canada": [
     "Kanada",
     "Canadá"
+  ],
+  "Global": [
+    "Küresel",
+    "Global"
   ],
   "Turkey": [
     "Türkiye",
@@ -1003,6 +1011,14 @@
     "ABD borsalarındaki bitcoin ve ether fonları.",
     "Fondos de bitcoin y ether en bolsas de EE. UU."
   ],
+  "Country ETFs": [
+    "Ülke ETF’leri",
+    "ETFs de país"
+  ],
+  "One fund per major cash market outside the US, Canada, and Europe.": [
+    "ABD, Kanada ve Avrupa dışındaki her büyük nakit piyasası için bir fon.",
+    "Un fondo por cada gran mercado de efectivo fuera de EE. UU., Canadá y Europa."
+  ],
   "Coin board": [
     "Coin panosu",
     "Tablero de monedas"
@@ -1014,6 +1030,10 @@
   "Search crypto, e.g. BTC": [
     "Kripto ara, ör. BTC",
     "Buscar cripto, ej. BTC"
+  ],
+  "Search global, e.g. Toyota": [
+    "Küresel ara, ör. Toyota",
+    "Buscar global, ej. Toyota"
   ],
   "LIVE BOARD": [
     "CANLI TABLO",
@@ -1054,6 +1074,62 @@
   "Banks, energy, rails and the large names on the TSX.": [
     "Bankalar, enerji, demiryolu ve TSX’teki büyük isimler.",
     "Bancos, energía, ferrocarriles y los grandes nombres del TSX."
+  ],
+  "Japan": [
+    "Japonya",
+    "Japón"
+  ],
+  "Autos, electronics, banks and the large names on the Tokyo exchange.": [
+    "Otomotiv, elektronik, bankalar ve Tokyo borsasındaki büyük isimler.",
+    "Autos, electrónica, bancos y los grandes nombres de Tokio."
+  ],
+  "China & Hong Kong": [
+    "Çin ve Hong Kong",
+    "China y Hong Kong"
+  ],
+  "Internet platforms, consumption and the large names in Hong Kong and Shanghai.": [
+    "İnternet platformları, tüketim ve Hong Kong ile Şanghay’daki büyük isimler.",
+    "Plataformas de internet, consumo y los grandes nombres de Hong Kong y Shanghái."
+  ],
+  "India": [
+    "Hindistan",
+    "India"
+  ],
+  "Energy, IT, banks and the large names on the NSE.": [
+    "Enerji, bilişim, bankalar ve NSE’deki büyük isimler.",
+    "Energía, tecnología, bancos y los grandes nombres del NSE."
+  ],
+  "Korea & Taiwan": [
+    "Kore ve Tayvan",
+    "Corea y Taiwán"
+  ],
+  "Chips, electronics and the large names in Seoul and Taipei.": [
+    "Çip, elektronik ve Seul ile Taipei’deki büyük isimler.",
+    "Chips, electrónica y los grandes nombres de Seúl y Taipéi."
+  ],
+  "Australia": [
+    "Avustralya",
+    "Australia"
+  ],
+  "Miners, banks and the large names on the ASX.": [
+    "Madenciler, bankalar ve ASX’teki büyük isimler.",
+    "Mineras, bancos y los grandes nombres del ASX."
+  ],
+  "Brazil": [
+    "Brezilya",
+    "Brasil"
+  ],
+  "Oil, iron ore, banks and the large names in São Paulo.": [
+    "Petrol, demir cevheri, bankalar ve São Paulo’daki büyük isimler.",
+    "Petróleo, mineral de hierro, bancos y los grandes nombres de São Paulo."
+  ],
+  "Saudi Arabia & South Africa": [
+    "Suudi Arabistan ve Güney Afrika",
+    "Arabia Saudí y Sudáfrica"
+  ],
+  "Energy, banks and the large names in Riyadh and Johannesburg.": [
+    "Enerji, bankalar ve Riyad ile Johannesburg’daki büyük isimler.",
+    "Energía, bancos y los grandes nombres de Riad y Johannesburgo."
   ],
   "BIST leaders": [
     "BIST liderleri",
@@ -2114,6 +2190,10 @@
   "Indexes, sectors, crypto and ETFs across the US, Europe, Canada and Turkey.": [
     "ABD, Avrupa, Kanada ve Türkiye’de endeksler, sektörler, kripto ve ETF’ler.",
     "Índices, sectores, cripto y ETFs de EE.UU., Europa, Canadá y Turquía."
+  ],
+  "Indexes, sectors, crypto and ETFs across the US, Europe, Canada and global markets.": [
+    "ABD, Avrupa, Kanada ve küresel piyasalarda endeksler, sektörler, kripto ve ETF’ler.",
+    "Índices, sectores, cripto y ETFs de EE.UU., Europa, Canadá y mercados globales."
   ],
   "See which US-listed companies report next, day by day.": [
     "ABD’de işlem gören şirketlerin bilanço günlerini gün gün gör.",

@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import {findGroup,getMarket,groupsFor,isCryptoCoin,listMarkets} from '../lib/markets.mjs';
 import {exchangeSession} from '../lib/market-tape.mjs';
 
-test('market catalog has US, Europe, Canada, Turkey and crypto',()=>{
-  assert.deepEqual(listMarkets().map(item=>item.id),['us','eu','ca','tr','crypto']);
-  assert.equal(getMarket('tr').label,'Turkey');
-  assert.equal(getMarket('TR').id,'tr');
+test('market catalog has US, Europe, Canada, global and crypto',()=>{
+  assert.deepEqual(listMarkets().map(item=>item.id),['us','eu','ca','global','crypto']);
+  assert.equal(getMarket('global').label,'Global');
+  assert.equal(getMarket('tr').id,'global');
   assert.equal(getMarket('crypto').kind,'crypto');
   assert.equal(getMarket('nope').id,'us');
 });
@@ -41,8 +41,15 @@ test('Yahoo coin tickers are treated as crypto, not company pages',()=>{
   assert.equal(isCryptoCoin('BRK-B'),false);
 });
 
-test('BIST session is open at noon Istanbul on a weekday',()=>{
-  const session=exchangeSession(new Date('2026-09-10T09:00:00Z'),getMarket('tr').session);
-  assert.equal(session.code,'open');
-  assert.match(session.detail,/BIST/);
+test('global covers ten cash markets outside the US, Canada and Europe',()=>{
+  const market=getMarket('global');
+  assert.equal(market.etfs.length,10);
+  assert.ok(groupsFor(market).some(group=>group.title==='Japan'&&group.symbols.includes('7203.T')));
+  assert.ok(groupsFor(market).some(group=>group.title==='India'&&group.symbols.includes('RELIANCE.NS')));
+  assert.ok(groupsFor(market).some(group=>group.title==='Korea & Taiwan'&&group.symbols.includes('005930.KS')));
+  const wednesday=exchangeSession(new Date('2026-09-10T09:00:00Z'),market.session);
+  assert.equal(wednesday.code,'open');
+  assert.match(wednesday.detail,/rolling/i);
+  const sunday=exchangeSession(new Date('2026-09-13T09:00:00Z'),market.session);
+  assert.equal(sunday.code,'closed');
 });
