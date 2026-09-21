@@ -49,8 +49,8 @@ export function HomeTools({showcase}:{showcase:ShowcaseData|null}){
   const t=useT();
   const etfs=useEtfs();
   const earnings=useEarnings();
-  const picks=showcase?.stocks.slice(0,3)||[];
-  const funds=(etfs||[]).filter(row=>row.chart).slice(0,3);
+  const picks=showcase?.stocks.slice(0,5)||[];
+  const funds=(etfs||[]).filter(row=>row.chart).slice(0,5);
   const dayLabel=(iso:string)=>new Date(iso+'T12:00:00Z').toLocaleDateString(undefined,{weekday:'short',day:'numeric',timeZone:'UTC'});
   return <section className="home-tools" aria-label={t('What you can do here')}>
     <article className="tool-card">

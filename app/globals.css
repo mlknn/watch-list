@@ -573,7 +573,7 @@ html.dark .nav-quiet:hover{color:#ffffff}
 .tool-card:hover,.tool-card:focus-within{border-color:#9adcbd;box-shadow:0 10px 24px rgba(20,40,32,.06)}
 .tool-card h2{font-size:21px;letter-spacing:-.4px}
 .tool-card>p{font-size:14px;line-height:1.55;color:#5b6a80;margin:0}
-.tool-preview{background:#f5f8fc;border-radius:12px;padding:11px 13px;min-height:118px}
+.tool-preview{background:#f5f8fc;border-radius:12px;padding:11px 13px;min-height:118px;flex:1}
 .tool-preview-label{display:block;font-size:11px;letter-spacing:.7px;text-transform:uppercase;color:#6b7a91;margin-bottom:7px}
 .tool-preview-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .tool-preview-list li{display:flex;align-items:center;gap:8px;font-size:13px;min-width:0}
