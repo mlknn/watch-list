@@ -12,6 +12,7 @@ import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/u
 import {Select,SelectTrigger,SelectValue,SelectContent,SelectItem} from '@/components/ui/select';
 
 import {EarningsStory,StockFactsRail} from '@/components/product/earnings-story';
+import {MarketLockBanner} from '@/components/product/market-lock-banner';
 import {marketChart,stockDataFetch,type MarketChart} from '@/lib/market';
 import {chartPeriodStats,rangeLabel} from '@/lib/chart-period.mjs';
 import {price,quoteTime,type AccountState} from '@/lib/watchlist';
