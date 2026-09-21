@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {averageImpact,chartEventMarks,chartEventTimes,eventWindows} from '../lib/earnings-impact.mjs';
-import {earningsWeek,mondayOnOrBefore,normalizeDayRows,reportTiming,toYahooSymbol,weekDays,clampMonday,earningsWindow,addDays,weeksAhead,prefetchAhead} from '../server/earnings-calendar.mjs';
+import {earningsWeek,mondayOnOrBefore,normalizeDayRows,reportTiming,toYahooSymbol,weekDays,clampMonday,earningsWindow,addDays,weeksAhead,prefetchAhead,nasdaqCacheTtl,homePreviewRows,earningsHomePreview} from '../server/earnings-calendar.mjs';
 
 test('class shares map to Yahoo tickers',()=>{
   assert.equal(toYahooSymbol('BRK.B'),'BRK-B');
@@ -145,4 +145,35 @@ test('average path is relative to the earnings close',()=>{
   assert.equal(windows.length,1);
   assert.equal(avg.path.find(p=>p.offset===0)?.percent,0);
   assert.ok(avg.day!==null);
+});
+
+test('future report dates stay cached a day; today refreshes sooner',()=>{
+  assert.equal(nasdaqCacheTtl('2026-09-22','2026-09-21'),86400);
+  assert.equal(nasdaqCacheTtl('2026-09-21','2026-09-21'),900);
+});
+
+test('homepage preview pins $1T names this week and still shows later days',()=>{
+  const days=[
+    {date:'2026-09-21',status:'ok',companies:[{symbol:'NKE',reported:false,marketCap:1.2e11},{symbol:'COST',reported:false,marketCap:4e11}]},
+    {date:'2026-09-22',status:'ok',companies:[{symbol:'INTC',reported:false,marketCap:1.5e11}]},
+    {date:'2026-09-25',status:'ok',companies:[{symbol:'AAPL',reported:false,marketCap:3e12},{symbol:'MSFT',reported:false,marketCap:3.1e12}]},
+  ];
+  const rows=homePreviewRows(days,'2026-09-21','2026-09-21',{limit:5});
+  assert.deepEqual(rows.map(row=>row.symbol).slice(0,2),['MSFT','AAPL']);
+  assert.ok(rows.some(row=>row.symbol==='NKE'&&row.date==='2026-09-21'));
+  assert.ok(rows.some(row=>row.symbol==='INTC'&&row.date==='2026-09-22'));
+  assert.equal(rows.length,5);
+});
+
+test('homepage preview skips already-reported names and uses next week when this week is empty',async()=>{
+  const now=new Date('2026-09-18T16:00:00Z');
+  const data=await earningsHomePreview({now,loadDay:async date=>{
+    if(date==='2026-09-14')return [{symbol:'OLD',reported:true,marketCap:2e12}];
+    if(date==='2026-09-21')return [{symbol:'NVDA',reported:false,marketCap:4e12}];
+    if(date==='2026-09-22')return [{symbol:'AMD',reported:false,marketCap:3e11}];
+    return [];
+  }});
+  assert.equal(data.label,'Reporting next week');
+  assert.equal(data.rows[0].symbol,'NVDA');
+  assert.ok(data.rows.some(row=>row.symbol==='AMD'&&row.date==='2026-09-22'));
 });

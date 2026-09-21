@@ -5,7 +5,9 @@ const dayCache=new Map();
 const inFlight=new Map();
 const NY='America/New_York';
 const FRESH_MS=15*60*1000;
-const STALE_MS=12*60*60*1000;
+/** Keep yesterday’s snapshot long enough that today’s homepage does not wait on Nasdaq. */
+const STALE_MS=36*60*60*1000;
+const TRILLION=1_000_000_000_000;
 
 export function toYahooSymbol(value){
   const raw=String(value||'').trim().toUpperCase();
@@ -19,6 +21,11 @@ export function parseMarketCap(value){
 }
 
 const MIN_MARKET_CAP=2_000_000_000;
+
+/** Future report dates are fetched the day before and held at the edge; today stays shorter so reported flags can move. */
+export function nasdaqCacheTtl(date,today){
+  return String(date)>String(today)?86400:900;
+}
 
 export function ymdInZone(date,tz=NY){
   return new Intl.DateTimeFormat('en-CA',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'}).format(date);
@@ -115,8 +122,8 @@ async function nasdaqDay(date,{fetchImpl=fetch}={}){
           Referer:'https://www.nasdaq.com/market-activity/earnings',
           'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
         },
-        // Cloudflare keeps the upstream day at the edge so a cold worker still answers fast.
-        cf:{cacheTtl:900,cacheEverything:true},
+        // Tomorrow’s list is cached 24h so a call made today still answers tomorrow.
+        cf:{cacheTtl:nasdaqCacheTtl(date,ymdInZone(new Date())),cacheEverything:true},
         signal:AbortSignal.timeout(7000),
       });
       if(!response.ok)throw new AppError('US earnings calendar is temporarily unavailable.',502);
@@ -216,4 +223,79 @@ export async function earningsWeek(week,{loadDay=nasdaqDay,now=new Date()}={}){
   const delay=setTimeout(()=>{void prefetchAhead(monday,{now}).catch(()=>{});},400);
   delay.unref?.();
   return data;
+}
+
+function peekCachedWeek(monday){
+  const saved=weekCache.get(monday);
+  if(saved&&Date.now()-saved.at<STALE_MS)return saved.data;
+  return null;
+}
+
+async function readWeek(monday,loadDay,now){
+  if(loadDay!==nasdaqDay)return loadWeek(monday,loadDay,now);
+  const saved=weekCache.get(monday);
+  const age=saved?Date.now()-saved.at:Infinity;
+  if(age<FRESH_MS)return saved.data;
+  if(age<STALE_MS){
+    void refreshWeek(monday,loadDay,now).catch(()=>{});
+    return saved.data;
+  }
+  return refreshWeek(monday,loadDay,now);
+}
+
+/**
+ * Homepage teaser: $1T names reporting this week first, then the largest name on later days.
+ * Never takes three names from only the next session.
+ */
+export function homePreviewRows(days,today,weekStart,{limit=5}={}){
+  const upcoming=(days||[]).filter(day=>day.status==='ok'&&day.date>=today)
+    .flatMap(day=>(day.companies||[]).filter(row=>!row.reported).map(row=>({
+      symbol:row.symbol,
+      date:day.date,
+      marketCap:Number(row.marketCap)||0,
+    })));
+  const friday=weekStart?addDays(weekStart,4):'';
+  const mega=upcoming
+    .filter(row=>row.marketCap>=TRILLION&&(!friday||row.date<=friday))
+    .sort((a,b)=>b.marketCap-a.marketCap||a.date.localeCompare(b.date));
+  const picked=[];
+  const seen=new Set();
+  function add(row){
+    if(!row||seen.has(row.symbol)||picked.length>=limit)return;
+    seen.add(row.symbol);
+    picked.push({symbol:row.symbol,date:row.date});
+  }
+  for(const row of mega)add(row);
+  const byDay=new Map();
+  for(const row of upcoming){
+    if(seen.has(row.symbol))continue;
+    const cur=byDay.get(row.date);
+    if(!cur||row.marketCap>cur.marketCap)byDay.set(row.date,row);
+  }
+  for(const date of [...byDay.keys()].sort())add(byDay.get(date));
+  const rest=upcoming.filter(row=>!seen.has(row.symbol)).sort((a,b)=>b.marketCap-a.marketCap||a.date.localeCompare(b.date));
+  for(const row of rest)add(row);
+  return picked;
+}
+
+export async function earningsHomePreview({loadDay=nasdaqDay,now=new Date(),limit=5}={}){
+  const today=ymdInZone(now);
+  const monday=mondayOnOrBefore(today);
+  const nextMonday=addDays(monday,7);
+  const thisWeek=await readWeek(monday,loadDay,now);
+  let nextWeek=loadDay===nasdaqDay?peekCachedWeek(nextMonday):null;
+  const friday=thisWeek.weekEnd||addDays(monday,4);
+  const laterThisWeek=(thisWeek.days||[]).some(day=>day.status==='ok'&&day.date>today&&(day.companies||[]).some(row=>!row.reported));
+  const firstPass=homePreviewRows(thisWeek.days||[],today,monday,{limit});
+  if(!nextWeek&&(firstPass.length<limit||!laterThisWeek)){
+    try{nextWeek=await readWeek(nextMonday,loadDay,now);}catch{nextWeek=null;}
+  }else if(loadDay===nasdaqDay){
+    void refreshWeek(nextMonday,loadDay,now).catch(()=>{});
+  }
+  const rows=homePreviewRows([...(thisWeek.days||[]),...(nextWeek?.days||[])],today,monday,{limit});
+  const first=rows[0]?.date||'';
+  const label=first===today?'Reporting today':first&&first<=friday?'Reporting this week':'Reporting next week';
+  const delay=setTimeout(()=>{void prefetchAhead(monday,{now}).catch(()=>{});},400);
+  delay.unref?.();
+  return {label,rows,weekStart:monday};
 }
