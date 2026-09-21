@@ -1,6 +1,6 @@
 # StockWatchlist
 
-A what-if stock portfolio at [stockwatchlist.app](https://stockwatchlist.app). Yahoo and brokers show today’s price. This freezes the price (and optional cost) from the day you add a pick.
+A what-if stock portfolio at [stockwatchlist.app](https://stockwatchlist.app). Yahoo and brokers show today’s price. This freezes the price (and optional cost) from the day you add a pick. US, Europe, Canada, and Turkey — one currency per list.
 
 **Not a broker. Not investment advice.** Quotes are delayed public data.
 

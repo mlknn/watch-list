@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://stockwatchlist.app'),
   openGraph: {
     title: 'StockWatchlist — Watchlists, markets, and earnings',
-    description: 'Track your stock ideas, explore global markets, and see who reports earnings next. No account needed to start.',
+    description: 'Build a what-if stock portfolio and see how your picks perform over time. No signup to start. US, Europe, Canada, and Turkey.',
     url: 'https://stockwatchlist.app',
     siteName: 'StockWatchlist',
     type: 'website',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'StockWatchlist — Watchlists, markets, and earnings',
-    description: 'Track your stock ideas, explore global markets, and see who reports earnings next. No account needed to start.',
+    description: 'Build a what-if stock portfolio and see how your picks perform over time. No signup to start. US, Europe, Canada, and Turkey.',
     images: ['/og.jpg'],
   },
   icons: {
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico?v=6',
     apple: '/apple-touch-icon.png?v=6',
   },
-  description: 'Track your stock ideas, explore global markets, and see who reports earnings next. No account needed to start.',
+  description: 'Build a what-if stock portfolio and see how your picks perform over time. No signup to start. US, Europe, Canada, and Turkey.',
 };
 export const viewport: Viewport = {width:'device-width',initialScale:1,viewportFit:'cover'};
 const softwareJsonLd = {
@@ -51,7 +51,7 @@ const softwareJsonLd = {
       codeRepository: 'https://github.com/mlknn/watch-list',
       sameAs: ['https://github.com/mlknn/watch-list'],
       isAccessibleForFree: true,
-      description: 'A what-if stock portfolio that freezes the price and cost from the day you add a pick, then tracks US, Europe, Canada, and Turkey lists. Not a broker. Not investment advice.',
+      description: 'StockWatchlist is a what-if portfolio, not a broker. Add tickers, optional shares and cost, and we freeze that starting point. Yahoo shows today’s price. This shows what happened after you put a number on an idea. Start with no account. Separate lists for USD, EUR, CAD, and TRY. Delayed public quotes. Not advice.',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     },
   ],
