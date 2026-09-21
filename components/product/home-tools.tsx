@@ -90,7 +90,7 @@ export function HomeTools({showcase}:{showcase:ShowcaseData|null}){
     </article>
     <article className="tool-card">
       <h2><T text="Markets"/></h2>
-      <p><T text="Indexes, sectors and ETFs across the US, Europe, Canada and Turkey."/></p>
+      <p><T text="Indexes, sectors, crypto and ETFs across the US, Europe, Canada and Turkey."/></p>
       <PreviewFrame label={t('US ETFs today')} ready={funds.length>0} empty={t('Loading quotes…')}>
         {funds.map(row=><li key={row.symbol}>
           <CompanyIcon symbol={row.symbol}/>

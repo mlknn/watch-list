@@ -792,3 +792,75 @@ html.dark .home-watchlist-table th,html.dark .home-watchlist-table td{border-col
   .add-stock-dialog .add-quote-price strong{font-size:26px}
   [data-slot=dialog-content] input{font-size:16px}
 }
+
+.market-page.is-crypto .market-heading h2{font-size:clamp(28px,4.2vw,40px);letter-spacing:-1.4px}
+.market-page.is-crypto .intro{max-width:560px}
+.crypto-breadth{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0}
+.crypto-breadth span{display:inline-flex;align-items:center;min-height:28px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.2px}
+.crypto-breadth .up{background:#e8f8ef;color:#147a52}
+.crypto-breadth .down{background:#fdecee;color:#b44450}
+.market-page.is-crypto .market-session{background:linear-gradient(180deg,#141c31,#0c1220);border-color:#2a3c63;color:#eef3ff;box-shadow:0 0 0 1px rgba(61,255,143,.08),0 16px 40px rgba(12,18,32,.18)}
+.market-page.is-crypto .market-session span,.market-page.is-crypto .market-session small{color:#9eb0d0}
+.market-page.is-crypto .market-session.is-always .market-session-dot{background:#3dff8f;box-shadow:0 0 0 4px rgba(61,255,143,.16),0 0 14px #3dff8f;animation:crypto-pulse 2.4s ease-in-out infinite}
+.market-page.is-crypto .market-ticker{background:#0c1220;border-color:#1d2a48}
+.market-page.is-crypto .market-ticker a{background:#151e33;border-color:#2a3c63;color:#d5def3}
+.market-page.is-crypto .market-ticker a span{color:#9eb0d0}
+.market-page.is-crypto .market-ticker a.is-up{background:#10261c;border-color:#1e5a3d}
+.market-page.is-crypto .market-ticker a.is-down{background:#2a141a;border-color:#6a2a35}
+.market-index-hero.is-crypto,.crypto-heat-wrap,.market-page.is-crypto .market-top-grid .market-group,.market-page.is-crypto .market-tape,.market-page.is-crypto .market-favorites{background:radial-gradient(900px 320px at 8% -20%,rgba(86,120,255,.22),transparent 52%),linear-gradient(180deg,#141c31,#0c1220);border:1px solid #24355c;color:#eef3ff;border-radius:22px}
+.market-index-hero.is-crypto{padding:18px 18px 10px}
+.market-index-hero.is-crypto .market-index-card{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08)}
+.market-index-hero.is-crypto .market-index-card h3,.market-index-hero.is-crypto .market-index-quote strong,.crypto-heat-wrap h2,.market-page.is-crypto .market-group h2,.market-page.is-crypto .market-movers h3{color:#f4f7ff}
+.market-index-hero.is-crypto .eyebrow,.crypto-heat-wrap .eyebrow,.crypto-heat-wrap p:not(.eyebrow),.market-page.is-crypto .market-group-copy p:not(.eyebrow){color:#9eb0d0}
+.market-index-hero.is-crypto .index-expand{color:#9eb0d0}
+.market-index-hero.is-crypto [data-slot=tabs-list]{background:rgba(255,255,255,.08)}
+.market-index-hero.is-crypto [data-slot=tabs-trigger]{color:#d5def3!important}
+.market-index-hero.is-crypto [data-slot=tabs-trigger][data-active],.market-index-hero.is-crypto [data-slot=tabs-trigger][aria-selected=true]{background:#eef3ff!important;color:#152038!important}
+.market-index-hero.is-crypto .market-index-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.market-page.is-crypto .market-index-hero.is-crypto .index-hero-chart,.market-page.is-crypto .market-index-hero.is-crypto .market-index-card .candle-svg{height:168px!important}
+.crypto-heat-wrap{margin:0 0 16px;padding:18px}
+.crypto-heat-copy{margin-bottom:14px}
+.crypto-heat{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-rows:minmax(108px,auto);gap:8px}
+.crypto-tile{position:relative;isolation:isolate;display:grid;align-content:end;gap:2px;min-height:118px;padding:42px 14px 12px;border-radius:16px;overflow:hidden;text-decoration:none;color:#f3f6ff;background:#10182a;border:1px solid rgba(255,255,255,.06)}
+.crypto-tile:before{content:"";position:absolute;inset:0;background:var(--heat-color,#6b7c99);opacity:var(--heat,.14);z-index:-1}
+.crypto-tile.is-lead{grid-column:span 2;grid-row:span 2;min-height:228px;padding:52px 18px 16px}
+.crypto-tile-mark{position:absolute;top:10px;left:12px;right:10px;display:flex;justify-content:space-between;align-items:flex-start;z-index:1}
+.crypto-tile strong{font-size:18px;letter-spacing:-.4px;line-height:1.1}
+.crypto-tile.is-lead strong{font-size:34px;letter-spacing:-1.4px}
+.crypto-tile>span:not(.crypto-tile-mark){color:#c5d0e8;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crypto-tile em{font-style:normal;font-variant-numeric:tabular-nums;font-weight:700;font-size:15px;letter-spacing:-.3px}
+.crypto-tile.is-lead em{font-size:26px;letter-spacing:-.8px}
+.crypto-tile small{font-variant-numeric:tabular-nums;font-weight:700;font-size:13px}
+.crypto-tile.is-up small{color:#b8ffd4}
+.crypto-tile.is-down small{color:#ffc4cd}
+.crypto-tile .favorite-star{color:#c9d4ea;opacity:.75}
+.crypto-tile .favorite-star.is-on,.crypto-tile .favorite-star.is-on:hover{color:#f5c16c;opacity:1}
+.crypto-tile:hover{border-color:rgba(245,193,108,.45)}
+.market-page.is-crypto .market-table{background:#10182a;border-color:#24355c}
+.market-page.is-crypto .market-table-head{background:#151e33;color:#8ea0c2}
+.market-page.is-crypto .market-table-row{border-color:#1d2a48;color:#eef3ff}
+.market-page.is-crypto .market-table-row:hover{background:#182236}
+.market-page.is-crypto .market-table-name small{color:#8ea0c2}
+.market-page.is-crypto .market-movers a{border-color:#1d2a48;color:#eef3ff}
+.market-page.is-crypto .market-sort.is-on{color:#f5c16c}
+.market-page.is-crypto .favorite-star{color:#9eb0d0}
+html.dark .crypto-breadth .up{background:#10261c;color:#8dffc0}
+html.dark .crypto-breadth .down{background:#2a141a;color:#ff9aa6}
+html.dark .market-page.is-crypto .market-index-hero,html.dark .market-page.is-crypto .crypto-heat-wrap,html.dark .market-page.is-crypto .market-top-grid .market-group,html.dark .market-page.is-crypto .market-tape,html.dark .market-page.is-crypto .market-favorites,html.dark .market-page.is-crypto .market-session,html.dark .market-page.is-crypto .market-index-card{background:radial-gradient(900px 320px at 8% -20%,rgba(86,120,255,.18),transparent 52%),linear-gradient(180deg,#141c31,#0c1220);border-color:#24355c;color:#eef3ff}
+html.dark .market-page.is-crypto .market-table{background:#10182a;border-color:#24355c}
+@keyframes crypto-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@media(prefers-reduced-motion:reduce){.market-page.is-crypto .market-session.is-always .market-session-dot{animation:none}}
+@media(max-width:900px){
+  .crypto-heat{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .market-index-hero.is-crypto .market-index-grid{grid-template-columns:1fr}
+  .market-page.is-crypto .market-index-hero.is-crypto .index-hero-chart,.market-page.is-crypto .market-index-hero.is-crypto .market-index-card .candle-svg{height:128px!important}
+}
+@media(max-width:640px){
+  .crypto-heat{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(96px,auto)}
+  .crypto-tile{min-height:104px;padding:38px 12px 10px}
+  .crypto-tile.is-lead{grid-column:span 2;grid-row:span 1;min-height:148px;padding:42px 14px 12px}
+  .crypto-tile.is-lead strong{font-size:26px}
+  .crypto-tile.is-lead em{font-size:20px}
+  .crypto-heat-wrap,.market-index-hero.is-crypto{padding:14px}
+  .market-index-hero.is-crypto .market-index-grid{grid-template-columns:1fr!important}
+}

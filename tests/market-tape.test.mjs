@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {nyseSession,tapeBreadth,tapeMovers,sectorAverage} from '../lib/market-tape.mjs';
+import {exchangeSession,nyseSession,tapeBreadth,tapeMovers,sectorAverage} from '../lib/market-tape.mjs';
 
 const row=(symbol,pct)=>({symbol,chart:{quote:{changePercent:pct,price:10,currency:'USD'},companyName:symbol}});
 
@@ -12,6 +12,12 @@ test('NYSE session is open at noon Eastern on a weekday',()=>{
 
 test('NYSE session is closed on Saturday',()=>{
   assert.equal(nyseSession(new Date('2026-09-12T16:00:00Z')).code,'closed');
+});
+
+test('always-open venues stay open on Saturday',()=>{
+  const session=exchangeSession(new Date('2026-09-12T16:00:00Z'),{tz:'Etc/UTC',alwaysOpen:true,venue:'Crypto'});
+  assert.equal(session.code,'open');
+  assert.match(session.detail,/around the clock/);
 });
 
 test('tape breadth and movers come from unique quoted names',()=>{

@@ -963,6 +963,66 @@
     "Türkiye",
     "Turquía"
   ],
+  "Crypto": [
+    "Kripto",
+    "Cripto"
+  ],
+  "CRYPTO, AROUND THE CLOCK": [
+    "KRİPTO, 24 SAAT",
+    "CRIPTO, LAS 24 HORAS"
+  ],
+  "The tape never sleeps.": [
+    "Bant hiç uyumaz.",
+    "La cinta no duerme."
+  ],
+  "Live USD quotes for bitcoin, ether, and the coins that move with them.": [
+    "Bitcoin, ether ve onlarla hareket eden coin’ler için canlı USD fiyatları.",
+    "Cotizaciones en USD de bitcoin, ether y las monedas que se mueven con ellas."
+  ],
+  "24 hours": [
+    "24 saat",
+    "24 horas"
+  ],
+  "Trades around the clock.": [
+    "Gece gündüz işlem görür.",
+    "Cotiza las 24 horas."
+  ],
+  "Spot ETFs": [
+    "Spot ETF’ler",
+    "ETF al contado"
+  ],
+  "Bitcoin and ether funds on US exchanges.": [
+    "ABD borsalarındaki bitcoin ve ether fonları.",
+    "Fondos de bitcoin y ether en bolsas de EE. UU."
+  ],
+  "Coin board": [
+    "Coin panosu",
+    "Tablero de monedas"
+  ],
+  "24-hour USD quotes. Color is today’s move.": [
+    "24 saatlik USD fiyatlar. Renk bugünün hareketi.",
+    "Cotizaciones USD 24 h. El color es el movimiento de hoy."
+  ],
+  "Search crypto, e.g. BTC": [
+    "Kripto ara, ör. BTC",
+    "Buscar cripto, ej. BTC"
+  ],
+  "LIVE BOARD": [
+    "CANLI TABLO",
+    "TABLERO EN VIVO"
+  ],
+  "advancing": [
+    "yükselen",
+    "al alza"
+  ],
+  "declining": [
+    "düşen",
+    "a la baja"
+  ],
+  "Crypto never closes. Click a coin for the chart. Not advice.": [
+    "Kripto kapanmaz. Grafik için coine tıkla. Tavsiye değildir.",
+    "El cripto no cierra. Pulsa una moneda para el gráfico. No es consejo."
+  ],
   "Key ETFs": [
     "Önemli ETF’ler",
     "ETF clave"
@@ -2042,6 +2102,10 @@
   "Indexes, sectors and ETFs across the US, Europe, Canada and Turkey.": [
     "ABD, Avrupa, Kanada ve Türkiye’de endeksler, sektörler ve ETF’ler.",
     "Índices, sectores y ETFs de EE.UU., Europa, Canadá y Turquía."
+  ],
+  "Indexes, sectors, crypto and ETFs across the US, Europe, Canada and Turkey.": [
+    "ABD, Avrupa, Kanada ve Türkiye’de endeksler, sektörler, kripto ve ETF’ler.",
+    "Índices, sectores, cripto y ETFs de EE.UU., Europa, Canadá y Turquía."
   ],
   "See which US-listed companies report next, day by day.": [
     "ABD’de işlem gören şirketlerin bilanço günlerini gün gün gör.",

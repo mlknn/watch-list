@@ -87,6 +87,29 @@
       "groups": [
         {"id": "tr-leaders", "title": "BIST leaders", "blurb": "Banks, industry, airlines and the large names on Borsa Istanbul.", "symbols": ["THYAO.IS", "GARAN.IS", "AKBNK.IS", "EREGL.IS", "BIMAS.IS", "SISE.IS", "TUPRS.IS", "ASELS.IS", "KCHOL.IS", "SAHOL.IS", "TCELL.IS", "PGSUS.IS"]}
       ]
+    },
+    {
+      "id": "crypto",
+      "label": "Crypto",
+      "kind": "crypto",
+      "currency": "USD",
+      "etfTitle": "Spot ETFs",
+      "etfBlurb": "Bitcoin and ether funds on US exchanges.",
+      "session": {"tz": "Etc/UTC", "open": 0, "close": 1440, "pre": 0, "after": 1440, "venue": "Crypto", "hours": "24 hours", "alwaysOpen": true},
+      "indices": [
+        {"symbol": "BTC-USD", "name": "Bitcoin", "short": "BTC"},
+        {"symbol": "ETH-USD", "name": "Ethereum", "short": "ETH"},
+        {"symbol": "SOL-USD", "name": "Solana", "short": "SOL"}
+      ],
+      "etfs": [
+        {"symbol": "IBIT", "name": "iShares Bitcoin"},
+        {"symbol": "FBTC", "name": "Fidelity Bitcoin"},
+        {"symbol": "ETHA", "name": "iShares Ethereum"},
+        {"symbol": "ARKB", "name": "ARK 21Shares Bitcoin"}
+      ],
+      "groups": [
+        {"id": "crypto-coins", "kind": "coins", "title": "Coin board", "blurb": "24-hour USD quotes. Color is today’s move.", "symbols": ["BTC-USD", "ETH-USD", "SOL-USD", "XRP-USD", "BNB-USD", "ADA-USD", "DOGE-USD", "AVAX-USD", "LINK-USD", "DOT-USD", "LTC-USD", "ATOM-USD", "NEAR-USD", "XLM-USD", "HBAR-USD", "SHIB-USD", "BCH-USD", "TRX-USD", "ETC-USD", "FIL-USD", "ICP-USD", "RENDER-USD"]}
+      ]
     }
   ]
 }

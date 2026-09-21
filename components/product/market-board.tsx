@@ -1,5 +1,5 @@
 'use client';
-import {createContext,useContext,useEffect,useMemo,useRef,useState} from 'react';
+import {createContext,useContext,useEffect,useMemo,useRef,useState,type CSSProperties} from 'react';
 import {T,useT} from '@/components/product/language';
 import {useRouter,useSearchParams} from 'next/navigation';
 import {LoaderCircle,Maximize2,Search,Star} from 'lucide-react';
@@ -12,7 +12,7 @@ import {Tabs,TabsList,TabsTrigger} from '@/components/ui/tabs';
 import {price} from '@/lib/watchlist';
 import {marketChart,type MarketChart} from '@/lib/market';
 import {chartPeriodStats} from '@/lib/chart-period.mjs';
-import {exchangeSession,sectorAverage,tapeMovers} from '@/lib/market-tape.mjs';
+import {exchangeSession,sectorAverage,tapeBreadth,tapeMovers} from '@/lib/market-tape.mjs';
 import {getMarket,groupsFor,listMarkets} from '@/lib/markets.mjs';
 import {resolveStockInput} from '@/lib/stock-search.mjs';
 import {apiJson} from '@/lib/auth-client';
@@ -67,10 +67,12 @@ function SessionBadge({market}:{market:Market}){
   useEffect(()=>{const id=window.setInterval(()=>setNow(new Date()),30000);return()=>clearInterval(id);},[]);
   const session=exchangeSession(now,market.session);
   const clock=new Intl.DateTimeFormat(undefined,{timeZone:market.session.tz,hour:'numeric',minute:'2-digit'}).format(now);
-  const label=session.code==='open'?t('Session open'):t(session.label);
-  return <aside className={'market-session is-'+session.code} aria-live="polite">
+  const always=!!market.session.alwaysOpen;
+  const label=always?t('24 hours'):session.code==='open'?t('Session open'):t(session.label);
+  const detail=always?t('Trades around the clock.'):session.detail;
+  return <aside className={'market-session is-'+session.code+(always?' is-always':'')} aria-live="polite">
     <strong><span className="market-session-dot" aria-hidden="true"/>{label}</strong>
-    <span>{session.detail}</span>
+    <span>{detail}</span>
     <small>{clock} · {market.session.venue}</small>
   </aside>;
 }
@@ -138,7 +140,7 @@ function FavoriteStar({symbol}:{symbol:string}){
   </button>;
 }
 
-function IndexHero({indices}:{indices:(Row&{name:string})[]}){
+function IndexHero({indices,variant}:{indices:(Row&{name:string})[];variant?:'crypto'}){
   const t=useT();
   const [range,setRange]=useState('1d');
   const [style,setStyle]=useState<ChartStyle>('line');
@@ -156,7 +158,7 @@ function IndexHero({indices}:{indices:(Row&{name:string})[]}){
     });
     return()=>{alive=false;};
   },[indices,range]);
-  return <section id="indexes" className="market-index-hero" aria-label="Major markets">
+  return <section id="indexes" className={'market-index-hero'+(variant==='crypto'?' is-crypto':'')} aria-label={variant==='crypto'?'Major coins':'Major markets'}>
     <div className="market-index-toolbar">
       <Tabs value={style} onValueChange={v=>setStyle(v as ChartStyle)}>
         <TabsList className="chart-ranges market-index-style" aria-label="Chart type">
@@ -210,6 +212,40 @@ function IndexHero({indices}:{indices:(Row&{name:string})[]}){
         </DialogContent>
       </Dialog>;
     })()}
+  </section>;
+}
+
+function coinCode(symbol:string){return symbol.replace(/-USD$/,'');}
+function coinName(row:Row){return (row.chart?.companyName||row.name||coinCode(row.symbol)).replace(/\s+USD$/i,'');}
+function heatVars(pct:number|null):CSSProperties{
+  if(pct==null)return {'--heat':'0.14','--heat-color':'#6b7c99'} as CSSProperties;
+  const mag=Math.min(1,Math.abs(pct)/7);
+  return {'--heat':String(0.18+mag*0.52),'--heat-color':pct>=0?'#3dff8f':'#ff5d7a'} as CSSProperties;
+}
+
+function CryptoHeat({group,ready}:{group:Group;ready:boolean}){
+  const t=useT();
+  const avg=ready?sectorAverage(group.stocks):null;
+  const leads=new Set(['BTC-USD','ETH-USD','SOL-USD']);
+  return <section id={group.id} className="crypto-heat-wrap">
+    <div className="market-group-copy crypto-heat-copy">
+      <p className="eyebrow"><T text="LIVE BOARD"/></p>
+      <h2>{t(group.title)}{avg!==null&&<span className={avg>=0?'up':'down'}>{fmtPct(avg)}</span>}</h2>
+      <p>{t(group.blurb)}</p>
+    </div>
+    <div className="crypto-heat" aria-busy={!ready}>
+      {group.stocks.map(row=>{
+        const pct=dayPct(row);
+        const lead=leads.has(row.symbol);
+        return <a key={row.symbol} href={'/stocks/'+encodeURIComponent(row.symbol)} className={'crypto-tile'+(lead?' is-lead':'')+(pct==null?'':pct>=0?' is-up':' is-down')} style={heatVars(pct)}>
+          <span className="crypto-tile-mark"><CompanyIcon symbol={row.symbol}/><FavoriteStar symbol={row.symbol}/></span>
+          <strong>{coinCode(row.symbol)}</strong>
+          <span>{coinName(row)}</span>
+          <em>{row.chart?price(row.chart.quote.price,row.chart.currency):ready?'—':t('Loading…')}</em>
+          <small>{fmtPct(pct)}</small>
+        </a>;
+      })}
+    </div>
   </section>;
 }
 
@@ -336,8 +372,11 @@ export function MarketBoard(){
   }
   const favoriteState:FavoriteState={signedIn,ids:new Set(favoriteRows.map(row=>row.symbol)),rows:favoriteRows,toggle};
   const quotedRows=data.groups.flatMap(group=>group.stocks);
+  const isCrypto=market.kind==='crypto';
   const etfGroup=data.groups.find(group=>group.kind==='etfs');
-  const stockGroups=data.groups.filter(group=>group.kind!=='etfs');
+  const coinGroup=data.groups.find(group=>group.kind==='coins');
+  const stockGroups=data.groups.filter(group=>group.kind!=='etfs'&&group.kind!=='coins');
+  const breadth=tapeBreadth(quotedRows);
   function cycleSort(id:string,key:Sort['key']){
     setSorts(prev=>{
       const cur=prev[id];
@@ -348,13 +387,14 @@ export function MarketBoard(){
   function changeMarket(id:string){
     router.push(id==='us'?'/dashboard':'/dashboard?market='+id);
   }
-  return <Favorites.Provider value={favoriteState}><main className="market-page">
+  return <Favorites.Provider value={favoriteState}><main className={'market-page'+(isCrypto?' is-crypto':'')}>
     <LiveTicker market={market} groups={data.groups} ready={ready}/>
     <div className="page-heading market-heading" id="todays-tape">
       <div>
-        <p className="eyebrow"><T text="MARKETS, IN ONE PLACE"/></p>
-        <h2><T text="Today’s tape."/></h2>
-        <p className="intro"><T text="Pick a market, then look up stocks, ETFs, charts, and company details."/></p>
+        <p className="eyebrow">{isCrypto?t('CRYPTO, AROUND THE CLOCK'):t('MARKETS, IN ONE PLACE')}</p>
+        <h2>{isCrypto?t('The tape never sleeps.'):t('Today’s tape.')}</h2>
+        <p className="intro">{isCrypto?t('Live USD quotes for bitcoin, ether, and the coins that move with them.'):t('Pick a market, then look up stocks, ETFs, charts, and company details.')}</p>
+        {isCrypto&&!!ready[coinGroup?.id||'']&&breadth.quoted>0&&<p className="crypto-breadth" aria-live="polite"><span className="up">{breadth.up} {t('advancing')}</span><span className="down">{breadth.down} {t('declining')}</span></p>}
         <label className="market-switch">
           <span><T text="Change the market"/></span>
           <select aria-label={t('Change the market')} value={market.id} onChange={e=>changeMarket(e.target.value)}>
@@ -365,20 +405,21 @@ export function MarketBoard(){
       <SessionBadge market={market}/>
     </div>
     <form className="market-search" onSubmit={e=>void search(e)} role="search">
-      <StockSearch value={query} onChange={v=>{setQuery(v);setSearchError('');}} inputRef={inputRef} onPick={symbol=>void openStock(symbol)} currency={market.currency}/>
+      <StockSearch value={query} onChange={v=>{setQuery(v);setSearchError('');}} inputRef={inputRef} onPick={symbol=>void openStock(symbol)} currency={market.currency} placeholder={isCrypto?t('Search crypto, e.g. BTC'):undefined}/>
       <Button type="submit" className="primary-button" disabled={searching}>{searching?<LoaderCircle className="spin"/>:<Search/>}<span className="market-search-label">{t('Search')}</span></Button>
     </form>
     {searchError&&<p className="form-error" role="alert">{searchError}</p>}
     {error&&<p className="error-banner" role="alert">{error}</p>}
-    <IndexHero indices={data.indices}/>
+    <IndexHero indices={data.indices} variant={isCrypto?'crypto':undefined}/>
+    {isCrypto&&coinGroup&&<CryptoHeat group={coinGroup} ready={!!ready[coinGroup.id]}/>}
     <div className="market-top-grid">
       {etfGroup&&<GroupTable group={etfGroup} ready={!!ready[etfGroup.id]} sort={sorts[etfGroup.id]||null} onSort={key=>cycleSort(etfGroup.id,key)}/>}
       <TapeStrip rows={quotedRows}/>
     </div>
     <FavoritesBoard rows={favoriteRows}/>
-    <div className="market-sector-grid">
+    {!isCrypto&&<div className="market-sector-grid">
       {stockGroups.map(group=><GroupTable key={group.id} group={group} ready={!!ready[group.id]} sort={sorts[group.id]||null} onSort={key=>cycleSort(group.id,key)}/>)}
-    </div>
-    <p className="market-footnote">{t('Yahoo Finance · Quotes may be delayed')}{data.fetchedAt?` · ${new Date(data.fetchedAt).toLocaleString()}`:''}. {t('Charts are for looking, not advice. Click any row for details and quarterly earnings.')}</p>
+    </div>}
+    <p className="market-footnote">{t('Yahoo Finance · Quotes may be delayed')}{data.fetchedAt?` · ${new Date(data.fetchedAt).toLocaleString()}`:''}. {isCrypto?t('Crypto never closes. Click a coin for the chart. Not advice.'):t('Charts are for looking, not advice. Click any row for details and quarterly earnings.')}</p>
   </main></Favorites.Provider>;
 }
