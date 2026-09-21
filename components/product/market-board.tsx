@@ -13,7 +13,7 @@ import {price} from '@/lib/watchlist';
 import {marketChart,type MarketChart} from '@/lib/market';
 import {chartPeriodStats} from '@/lib/chart-period.mjs';
 import {exchangeSession,sectorAverage,tapeBreadth,tapeMovers} from '@/lib/market-tape.mjs';
-import {getMarket,groupsFor,listMarkets} from '@/lib/markets.mjs';
+import {getMarket,groupsFor,isCryptoCoin,listMarkets} from '@/lib/markets.mjs';
 import {resolveStockInput} from '@/lib/stock-search.mjs';
 import {apiJson} from '@/lib/auth-client';
 
@@ -77,21 +77,27 @@ function SessionBadge({market}:{market:Market}){
   </aside>;
 }
 
-function TapeStrip({rows}:{rows:Row[]}){
+function tapeLabel(row:Row){return isCryptoCoin(row.symbol)?coinCode(row.symbol):row.symbol;}
+function TapeStrip({rows,onCoin}:{rows:Row[];onCoin:(symbol:string,name?:string)=>void}){
   const t=useT();
   const {gainers,losers}=tapeMovers(rows,4);
   if(!gainers.length&&!losers.length)return null;
+  function open(e:React.MouseEvent<HTMLAnchorElement>,row:Row){
+    if(!isCryptoCoin(row.symbol))return;
+    e.preventDefault();
+    onCoin(row.symbol,coinName(row));
+  }
   return <section className="market-tape" aria-label={t('Today')}>
     <div className="market-movers">
       <div>
         <p className="eyebrow"><T text="LEADERS"/></p>
         <h3><T text="Gainers"/></h3>
-        {gainers.map(row=><a key={'g-'+row.symbol} href={'/stocks/'+encodeURIComponent(row.symbol)}><CompanyIcon symbol={row.symbol}/><span>{row.symbol}</span><em className="up">{fmtPct(dayPct(row))}</em></a>)}
+        {gainers.map(row=><a key={'g-'+row.symbol} href={isCryptoCoin(row.symbol)?'#':('/stocks/'+encodeURIComponent(row.symbol))} onClick={e=>open(e,row)}>{!isCryptoCoin(row.symbol)?<CompanyIcon symbol={row.symbol}/>:null}<span>{tapeLabel(row)}</span><em className="up">{fmtPct(dayPct(row))}</em></a>)}
       </div>
       <div>
         <p className="eyebrow"><T text="LAGGARDS"/></p>
         <h3><T text="Losers"/></h3>
-        {losers.map(row=><a key={'l-'+row.symbol} href={'/stocks/'+encodeURIComponent(row.symbol)}><CompanyIcon symbol={row.symbol}/><span>{row.symbol}</span><em className="down">{fmtPct(dayPct(row))}</em></a>)}
+        {losers.map(row=><a key={'l-'+row.symbol} href={isCryptoCoin(row.symbol)?'#':('/stocks/'+encodeURIComponent(row.symbol))} onClick={e=>open(e,row)}>{!isCryptoCoin(row.symbol)?<CompanyIcon symbol={row.symbol}/>:null}<span>{tapeLabel(row)}</span><em className="down">{fmtPct(dayPct(row))}</em></a>)}
       </div>
     </div>
   </section>;
@@ -223,7 +229,43 @@ function heatVars(pct:number|null):CSSProperties{
   return {'--heat':String(0.18+mag*0.52),'--heat-color':pct>=0?'#3dff8f':'#ff5d7a'} as CSSProperties;
 }
 
-function CryptoHeat({group,ready}:{group:Group;ready:boolean}){
+function CoinChartDialog({symbol,name,onClose}:{symbol:string|null;name?:string;onClose:()=>void}){
+  const t=useT();
+  const [range,setRange]=useState('1d');
+  const [style,setStyle]=useState<ChartStyle>('line');
+  const [chart,setChart]=useState<MarketChart|null>(null);
+  const [error,setError]=useState('');
+  const [busy,setBusy]=useState(false);
+  useEffect(()=>{
+    if(!symbol){setChart(null);setError('');return;}
+    let alive=true;setBusy(true);setChart(null);setError('');
+    void marketChart(symbol,range).then(data=>{if(!alive)return;setChart(data);setBusy(false);},e=>{if(!alive)return;setError((e as Error).message);setBusy(false);});
+    return()=>{alive=false;};
+  },[symbol,range]);
+  const title=name||(symbol?coinCode(symbol):'');
+  return <Dialog open={!!symbol} onOpenChange={v=>{if(!v)onClose();}}>
+    <DialogContent className="full-chart-dialog index-chart-dialog">
+      <DialogTitle>{title}</DialogTitle>
+      <DialogDescription>{chart?`${price(chart.quote.price,chart.currency)} · ${chart.sessionDate||chart.range}`:t('Loading chart…')}</DialogDescription>
+      <div className="market-index-toolbar">
+        <Tabs value={style} onValueChange={v=>setStyle(v as ChartStyle)}>
+          <TabsList className="chart-ranges market-index-style" aria-label="Chart type">
+            <TabsTrigger value="line"><T text="Line"/></TabsTrigger>
+            <TabsTrigger value="candle"><T text="Candle"/></TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <Tabs value={range} onValueChange={v=>setRange(String(v))}>
+          <TabsList className="chart-ranges market-index-ranges" aria-label="Chart time range">
+            {INDEX_RANGES.map(([value,label])=><TabsTrigger key={value} value={value}>{label}</TabsTrigger>)}
+          </TabsList>
+        </Tabs>
+      </div>
+      {chart&&chart.range===range?<PriceChart data={chart} style={style} className="index-expanded-chart"/>:busy?<div className="market-loading"><LoaderCircle className="spin"/></div>:<p className="market-card-error">{error||t('Chart unavailable.')}</p>}
+    </DialogContent>
+  </Dialog>;
+}
+
+function CryptoHeat({group,ready,onOpen}:{group:Group;ready:boolean;onOpen:(row:Row)=>void}){
   const t=useT();
   const avg=ready?sectorAverage(group.stocks):null;
   const leads=new Set(['BTC-USD','ETH-USD','SOL-USD']);
@@ -237,31 +279,37 @@ function CryptoHeat({group,ready}:{group:Group;ready:boolean}){
       {group.stocks.map(row=>{
         const pct=dayPct(row);
         const lead=leads.has(row.symbol);
-        return <a key={row.symbol} href={'/stocks/'+encodeURIComponent(row.symbol)} className={'crypto-tile'+(lead?' is-lead':'')+(pct==null?'':pct>=0?' is-up':' is-down')} style={heatVars(pct)}>
-          <span className="crypto-tile-mark"><CompanyIcon symbol={row.symbol}/><FavoriteStar symbol={row.symbol}/></span>
+        return <div role="button" tabIndex={0} key={row.symbol} onClick={()=>onOpen(row)} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onOpen(row);}}} className={'crypto-tile'+(lead?' is-lead':'')+(pct==null?'':pct>=0?' is-up':' is-down')} style={heatVars(pct)}>
+          <span className="crypto-tile-mark"><FavoriteStar symbol={row.symbol}/></span>
           <strong>{coinCode(row.symbol)}</strong>
           <span>{coinName(row)}</span>
           <em>{row.chart?price(row.chart.quote.price,row.chart.currency):ready?'—':t('Loading…')}</em>
           <small>{fmtPct(pct)}</small>
-        </a>;
+        </div>;
       })}
     </div>
   </section>;
 }
 
-function StockRow({row,pending}:{row:Row;pending:boolean}){
+function StockRow({row,pending,onCoin}:{row:Row;pending:boolean;onCoin?:(symbol:string,name?:string)=>void}){
   const t=useT();
   const chart=row.chart;
-  const href='/stocks/'+encodeURIComponent(row.symbol);
+  const crypto=isCryptoCoin(row.symbol);
+  const href=crypto?'#':('/stocks/'+encodeURIComponent(row.symbol));
+  function open(e:React.MouseEvent){
+    if(!crypto||!onCoin)return;
+    e.preventDefault();
+    onCoin(row.symbol,coinName(row));
+  }
   return <div className="market-table-row">
-    <span className="market-table-name"><FavoriteStar symbol={row.symbol}/><a href={href}><CompanyIcon symbol={row.symbol}/><span className="market-table-copy"><strong>{chart?.companyName||row.name||row.symbol}</strong><small>{row.symbol}</small></span></a></span>
-    <a className="market-table-price" href={href}>{chart?price(chart.quote.price,chart.currency):'—'}</a>
-    <a className="market-table-change" href={href}>{chart?<Change chart={chart}/>:pending?<span className="market-card-pending">{t('Loading…')}</span>:<span className="market-card-error">{row.error||'—'}</span>}</a>
-    <a className="market-table-open" href={href}>{t('Details')}</a>
+    <span className="market-table-name"><FavoriteStar symbol={row.symbol}/><a href={href} onClick={open}>{!crypto?<CompanyIcon symbol={row.symbol}/>:null}<span className="market-table-copy"><strong>{crypto?coinName(row):(chart?.companyName||row.name||row.symbol)}</strong><small>{crypto?coinCode(row.symbol):row.symbol}</small></span></a></span>
+    <a className="market-table-price" href={href} onClick={open}>{chart?price(chart.quote.price,chart.currency):'—'}</a>
+    <a className="market-table-change" href={href} onClick={open}>{chart?<Change chart={chart}/>:pending?<span className="market-card-pending">{t('Loading…')}</span>:<span className="market-card-error">{row.error||'—'}</span>}</a>
+    <a className="market-table-open" href={href} onClick={open}>{crypto?t('Chart'):t('Details')}</a>
   </div>;
 }
 
-function FavoritesBoard({rows}:{rows:Row[]}){
+function FavoritesBoard({rows,onCoin}:{rows:Row[];onCoin?:(symbol:string,name?:string)=>void}){
   const t=useT();
   if(!rows.length)return null;
   return <section className="market-group market-favorites" aria-label={t('Favorites')}>
@@ -273,12 +321,12 @@ function FavoritesBoard({rows}:{rows:Row[]}){
       <div className="market-table-head" role="row">
         <span><T text="Company"/></span><span><T text="Price"/></span><span><T text="Today"/></span><span></span>
       </div>
-      {rows.map(row=><StockRow key={row.symbol} row={row} pending={!row.chart&&!row.error}/>)}
+      {rows.map(row=><StockRow key={row.symbol} row={row} pending={!row.chart&&!row.error} onCoin={onCoin}/>)}
     </div>
   </section>;
 }
 
-function GroupTable({group,ready,sort,onSort}:{group:Group;ready:boolean;sort:Sort|null;onSort:(key:Sort['key'])=>void}){
+function GroupTable({group,ready,sort,onSort,onCoin}:{group:Group;ready:boolean;sort:Sort|null;onSort:(key:Sort['key'])=>void;onCoin?:(symbol:string,name?:string)=>void}){
   const t=useT();
   const avg=ready?sectorAverage(group.stocks):null;
   return <section id={group.id} className={'market-group'+(group.kind==='etfs'?' is-etfs':'')}>
@@ -293,7 +341,7 @@ function GroupTable({group,ready,sort,onSort}:{group:Group;ready:boolean;sort:So
         <SortHead label={t('Today')} k="change" sort={sort} onSort={onSort}/>
         <span></span>
       </div>
-      {sortRows(group.stocks,sort).map(row=><StockRow key={row.symbol} row={row} pending={!ready}/>)}
+      {sortRows(group.stocks,sort).map(row=><StockRow key={row.symbol} row={row} pending={!ready} onCoin={onCoin}/>)}
     </div>
   </section>;
 }
@@ -311,6 +359,7 @@ export function MarketBoard(){
   const [signedIn,setSignedIn]=useState(false);
   const [favoriteRows,setFavoriteRows]=useState<Row[]>([]);
   const [sorts,setSorts]=useState<Record<string,Sort|null>>({});
+  const [coinChart,setCoinChart]=useState<{symbol:string;name?:string}|null>(null);
   useEffect(()=>{setData(skeleton(market));setReady({});setError('');},[market]);
   useEffect(()=>{let alive=true;
     const loaded=new Set<string>();
@@ -348,7 +397,11 @@ export function MarketBoard(){
     return()=>{alive=false;observer.disconnect();clearTimeout(timer);};
   },[market]);
   useEffect(()=>{let alive=true;void apiJson<{signedIn:boolean;favorites:Row[]}>('/api/favorites',undefined,false).then(result=>{if(!alive)return;setSignedIn(!!result.signedIn);setFavoriteRows(result.favorites||[]);}).catch(()=>{if(alive){setSignedIn(false);setFavoriteRows([]);}});return()=>{alive=false;};},[]);
+  function openCoin(symbol:string,name?:string){
+    setCoinChart({symbol,name});
+  }
   async function openStock(symbol:string){
+    if(isCryptoCoin(symbol)){openCoin(symbol);return;}
     router.push('/stocks/'+encodeURIComponent(symbol));
   }
   async function search(e:React.FormEvent){
@@ -411,15 +464,16 @@ export function MarketBoard(){
     {searchError&&<p className="form-error" role="alert">{searchError}</p>}
     {error&&<p className="error-banner" role="alert">{error}</p>}
     <IndexHero indices={data.indices} variant={isCrypto?'crypto':undefined}/>
-    {isCrypto&&coinGroup&&<CryptoHeat group={coinGroup} ready={!!ready[coinGroup.id]}/>}
+    {isCrypto&&coinGroup&&<CryptoHeat group={coinGroup} ready={!!ready[coinGroup.id]} onOpen={row=>openCoin(row.symbol,coinName(row))}/>}
     <div className="market-top-grid">
-      {etfGroup&&<GroupTable group={etfGroup} ready={!!ready[etfGroup.id]} sort={sorts[etfGroup.id]||null} onSort={key=>cycleSort(etfGroup.id,key)}/>}
-      <TapeStrip rows={quotedRows}/>
+      {etfGroup&&<GroupTable group={etfGroup} ready={!!ready[etfGroup.id]} sort={sorts[etfGroup.id]||null} onSort={key=>cycleSort(etfGroup.id,key)} onCoin={openCoin}/>}
+      <TapeStrip rows={quotedRows} onCoin={openCoin}/>
     </div>
-    <FavoritesBoard rows={favoriteRows}/>
+    <FavoritesBoard rows={favoriteRows} onCoin={openCoin}/>
     {!isCrypto&&<div className="market-sector-grid">
-      {stockGroups.map(group=><GroupTable key={group.id} group={group} ready={!!ready[group.id]} sort={sorts[group.id]||null} onSort={key=>cycleSort(group.id,key)}/>)}
+      {stockGroups.map(group=><GroupTable key={group.id} group={group} ready={!!ready[group.id]} sort={sorts[group.id]||null} onSort={key=>cycleSort(group.id,key)} onCoin={openCoin}/>)}
     </div>}
     <p className="market-footnote">{t('Yahoo Finance · Quotes may be delayed')}{data.fetchedAt?` · ${new Date(data.fetchedAt).toLocaleString()}`:''}. {isCrypto?t('Crypto never closes. Click a coin for the chart. Not advice.'):t('Charts are for looking, not advice. Click any row for details and quarterly earnings.')}</p>
+    <CoinChartDialog symbol={coinChart?.symbol||null} name={coinChart?.name} onClose={()=>setCoinChart(null)}/>
   </main></Favorites.Provider>;
 }

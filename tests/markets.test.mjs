@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {findGroup,getMarket,groupsFor,listMarkets} from '../lib/markets.mjs';
+import {findGroup,getMarket,groupsFor,isCryptoCoin,listMarkets} from '../lib/markets.mjs';
 import {exchangeSession} from '../lib/market-tape.mjs';
 
 test('market catalog has US, Europe, Canada, Turkey and crypto',()=>{
@@ -32,6 +32,13 @@ test('crypto keeps a 24-hour session on Saturday and uses a coin board',()=>{
   assert.equal(groups[0].title,'Spot ETFs');
   assert.equal(groups[1].kind,'coins');
   assert.ok(groups[1].symbols.includes('BTC-USD'));
+});
+
+test('Yahoo coin tickers are treated as crypto, not company pages',()=>{
+  assert.equal(isCryptoCoin('LTC-USD'),true);
+  assert.equal(isCryptoCoin('btc-usd'),true);
+  assert.equal(isCryptoCoin('IBIT'),false);
+  assert.equal(isCryptoCoin('BRK-B'),false);
 });
 
 test('BIST session is open at noon Istanbul on a weekday',()=>{
