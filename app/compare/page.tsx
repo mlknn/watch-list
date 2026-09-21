@@ -3,7 +3,7 @@ import {PublicNav,PublicFooter} from '@/components/product/nav';
 
 export const metadata: Metadata = {
   title: 'StockWatchlist vs Yahoo Finance, Google Finance, and TradingView',
-  description: 'Yahoo, Google, and TradingView show today’s price. StockWatchlist freezes the add-day price, then adds Markets and Earnings. US, Europe, Canada, and Turkey. Not a broker.',
+  description: 'Yahoo, Google, and TradingView show today’s price. StockWatchlist freezes the add-day price and optional cost for a what-if paper portfolio. Not a broker.',
   alternates: {canonical: 'https://stockwatchlist.app/compare'},
   openGraph: {url: 'https://stockwatchlist.app/compare'},
 };
@@ -46,7 +46,7 @@ export default function Compare() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(faqJsonLd).replace(/</g,'\\u003c')}}/>
       <p className="eyebrow">COMPARE</p>
       <h1>A paper book, not another live quote screen</h1>
-      <p>Yahoo Finance, Google Finance, and TradingView are excellent at showing what a ticker does <em>today</em>. StockWatchlist answers a narrower question: what happened after you put a number on an idea. The add-day price (and optional cost, shares, and purchase date) stay frozen. Markets covers US, Europe, Canada, and Turkey. Earnings is a weekly calendar of who reports next. It is not a broker and not investment advice. Quotes are delayed public data.</p>
+      <p>Yahoo Finance, Google Finance, and TradingView are excellent at showing what a ticker does <em>today</em>. StockWatchlist answers a narrower question: what happened after you put a number on an idea. The add-day price (and optional cost, shares, and purchase date) stay frozen. It is not a broker and not investment advice. Quotes are delayed public data.</p>
 
       <section>
         <h2>Side by side</h2>

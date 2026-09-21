@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://stockwatchlist.app'),
   openGraph: {
     title: 'StockWatchlist — Watchlists, markets, and earnings',
-    description: 'Watchlists, Markets, and an earnings calendar. What-if portfolios for US, Europe, Canada, and Turkey. No signup to start.',
+    description: 'Track your stock ideas, explore global markets, and see who reports earnings next. No account needed to start.',
     url: 'https://stockwatchlist.app',
     siteName: 'StockWatchlist',
     type: 'website',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'StockWatchlist — Watchlists, markets, and earnings',
-    description: 'Watchlists, Markets, and an earnings calendar. What-if portfolios for US, Europe, Canada, and Turkey. No signup to start.',
+    description: 'Track your stock ideas, explore global markets, and see who reports earnings next. No account needed to start.',
     images: ['/og.jpg'],
   },
   icons: {
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico?v=6',
     apple: '/apple-touch-icon.png?v=6',
   },
-  description: 'Watchlists, Markets, and an earnings calendar. What-if portfolios for US, Europe, Canada, and Turkey. No signup to start.',
+  description: 'Track your stock ideas, explore global markets, and see who reports earnings next. No account needed to start.',
 };
 export const viewport: Viewport = {width:'device-width',initialScale:1,viewportFit:'cover'};
 const softwareJsonLd = {
@@ -51,7 +51,7 @@ const softwareJsonLd = {
       codeRepository: 'https://github.com/mlknn/watch-list',
       sameAs: ['https://github.com/mlknn/watch-list'],
       isAccessibleForFree: true,
-      description: 'StockWatchlist is a what-if portfolio, not a broker. Add tickers, optional shares and cost, and we freeze that starting point. Markets covers US, Europe, Canada, and Turkey. Earnings is a weekly calendar of who reports next. Start with no account. Separate lists for USD, EUR, CAD, and TRY. Delayed public quotes. Not advice.',
+      description: 'A what-if stock portfolio that freezes the price and cost from the day you add a pick, then tracks US, Europe, Canada, and Turkey lists. Not a broker. Not investment advice.',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     },
   ],
