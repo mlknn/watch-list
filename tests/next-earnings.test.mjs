@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {addDays,isoDay,mondayOnOrBefore,nextEarningsSoon,nextEarningsTone,todayInMarket} from '../lib/next-earnings.mjs';
+import {addDays,earningsShareCard,isoDay,mondayOnOrBefore,nextEarningsSoon,nextEarningsTone,todayInMarket} from '../lib/next-earnings.mjs';
 
 test('isoDay keeps a calendar day and drops clock noise',()=>{
   assert.equal(isoDay('2026-09-21T16:00:00.000Z'),'2026-09-21');
@@ -33,4 +33,15 @@ test('past dates and far-ahead dates stay quiet',()=>{
   assert.equal(nextEarningsTone('2026-09-17','2026-09-18'),null);
   assert.equal(nextEarningsTone('2026-10-27','2026-09-18'),'later');
   assert.equal(nextEarningsTone('',todayInMarket(new Date('2026-09-18T16:00:00-04:00'))),null);
+});
+
+test('a shared earnings week link names earnings in the title and description',()=>{
+  const week=earningsShareCard('2026-10-14');
+  assert.equal(week.url,'https://stockwatchlist.app/earnings?week=2026-10-12');
+  assert.equal(week.title,'Earnings week of Oct 12, 2026');
+  assert.equal(week.description,'US stocks reporting earnings October 12–16, 2026. One column per weekday on the earnings calendar.');
+  const home=earningsShareCard('');
+  assert.equal(home.url,'https://stockwatchlist.app/earnings');
+  assert.equal(home.title,'Earnings calendar');
+  assert.match(home.description,/earnings/i);
 });
