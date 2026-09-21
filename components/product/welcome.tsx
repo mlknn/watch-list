@@ -18,7 +18,7 @@ export function Welcome() {
     <section id="about" className="home-about">
       <h2><T text="Three tools, one place."/></h2>
       <p><T text="Start with one watchlist on this device. Create a free account for up to five lists and access across devices."/></p>
-      <p><T text="US, Europe, Canada, and Turkey."/> <T text="Each list stays in the currency of the first stock you add — USD, EUR, CAD, or TRY."/></p>
+      <p><T text="Track your stock ideas, explore global markets, and see who reports earnings next."/> <T text="US, Europe, Canada, and Turkey."/> <T text="Each list stays in the currency of the first stock you add — USD, EUR, CAD, or TRY."/></p>
       <p><T text="Yahoo Finance · Quotes may be delayed"/> · <a href="/privacy"><T text="Privacy"/></a> · <a href="/open-source"><T text="Open source"/></a></p>
     </section>
   </main><PublicFooter/></>;

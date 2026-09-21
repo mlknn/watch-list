@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://stockwatchlist.app'),
   openGraph: {
     title: 'StockWatchlist — Watchlists, markets, and earnings',
-    description: 'Build a what-if stock portfolio and see how your picks perform over time. No signup to start. US, Europe, Canada, and Turkey.',
+    description: 'Watchlists, Markets, and an earnings calendar. What-if portfolios for US, Europe, Canada, and Turkey. No signup to start.',
     url: 'https://stockwatchlist.app',
     siteName: 'StockWatchlist',
     type: 'website',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'StockWatchlist — Watchlists, markets, and earnings',
-    description: 'Build a what-if stock portfolio and see how your picks perform over time. No signup to start. US, Europe, Canada, and Turkey.',
+    description: 'Watchlists, Markets, and an earnings calendar. What-if portfolios for US, Europe, Canada, and Turkey. No signup to start.',
     images: ['/og.jpg'],
   },
   icons: {
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico?v=6',
     apple: '/apple-touch-icon.png?v=6',
   },
-  description: 'Build a what-if stock portfolio and see how your picks perform over time. No signup to start. US, Europe, Canada, and Turkey.',
+  description: 'Watchlists, Markets, and an earnings calendar. What-if portfolios for US, Europe, Canada, and Turkey. No signup to start.',
 };
 export const viewport: Viewport = {width:'device-width',initialScale:1,viewportFit:'cover'};
 const softwareJsonLd = {
@@ -51,7 +51,7 @@ const softwareJsonLd = {
       codeRepository: 'https://github.com/mlknn/watch-list',
       sameAs: ['https://github.com/mlknn/watch-list'],
       isAccessibleForFree: true,
-      description: 'StockWatchlist is a what-if portfolio, not a broker. Add tickers, optional shares and cost, and we freeze that starting point. Yahoo shows today’s price. This shows what happened after you put a number on an idea. Start with no account. Separate lists for USD, EUR, CAD, and TRY. Delayed public quotes. Not advice.',
+      description: 'StockWatchlist is a what-if portfolio, not a broker. Add tickers, optional shares and cost, and we freeze that starting point. Markets covers US, Europe, Canada, and Turkey. Earnings is a weekly calendar of who reports next. Start with no account. Separate lists for USD, EUR, CAD, and TRY. Delayed public quotes. Not advice.',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     },
   ],
