@@ -5,7 +5,7 @@ import {MarketBoard} from '@/components/product/market-board';
 
 export const metadata: Metadata = {
   title: 'Markets | StockWatchlist',
-  description: 'US, Europe, Canada, global cash markets, and crypto. Search stocks, coins, and ETFs, read indexes, and open charts and company details.',
+  description: 'Markets tape for the US, Europe, Canada, global cash markets (Japan, China, India, Korea, and more), and crypto. Indexes, ETFs, gainers and losers. No account needed.',
   alternates: {canonical: 'https://stockwatchlist.app/dashboard'},
 };
 

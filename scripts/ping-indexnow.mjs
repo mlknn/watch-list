@@ -1,6 +1,7 @@
 const key = 'be798144d0d664b57c9868c47643a58c';
 const urls = [
   'https://stockwatchlist.app/',
+  'https://stockwatchlist.app/watchlists',
   'https://stockwatchlist.app/dashboard',
   'https://stockwatchlist.app/earnings',
   'https://stockwatchlist.app/compare',

@@ -1,21 +1,25 @@
 # StockWatchlist
 
-A what-if stock portfolio at [stockwatchlist.app](https://stockwatchlist.app). Yahoo and brokers show today’s price. This freezes the price (and optional cost) from the day you add a pick.
+Three tools at [stockwatchlist.app](https://stockwatchlist.app): **watchlists**, **markets**, and a **US earnings calendar**. No account required to start.
 
 **Not a broker. Not investment advice.** Quotes are delayed public data.
 
-- [Live app](https://stockwatchlist.app) — no account required to start
+- [Watchlists](https://stockwatchlist.app/watchlists) — freeze the add-day price (and optional cost). Lists lock to USD, EUR, CAD, or TRY.
+- [Markets](https://stockwatchlist.app/dashboard) — US, Europe, Canada, global cash markets, and crypto. Indexes, ETFs, gainers and losers.
+- [Earnings](https://stockwatchlist.app/earnings) — US-listed names above $2B, one column per weekday. Source: Nasdaq.
 - [Compare](https://stockwatchlist.app/compare) — vs Yahoo Finance, Google Finance, TradingView
 - [Open source notes](https://stockwatchlist.app/open-source)
 - Saved lists can issue a read-only `/share/…` link (capability token; do not commit live tokens)
-- Markets: US (USD), Europe (EUR), Canada (CAD), Turkey (TRY). Each list locks to the first stock’s currency.
+
+Yahoo and brokers show today’s price. Watchlists here freeze the starting point, then show what happened after you put a number on an idea.
 
 ## Features
 
 - Guest lists on this device; save later with email or Google Sign-In
 - Frozen add-price, optional shares, purchase date, cost basis, unrealized gain
 - Read-only share links
-- Dashboard for indexes and sectors
+- Markets switcher: US, Europe, Canada, Global, Crypto
+- US earnings calendar (this week, next week, two quarters back)
 - Free for everyone: up to 5 lists and 20 stocks in each
 
 ## Self-host
@@ -34,4 +38,4 @@ Hosted production uses Cloudflare. Keep `LOCAL_AUTH_ENABLED=false` on any public
 
 [MIT](LICENSE)
 
-Quotes come from Yahoo Finance’s unofficial public chart API and may be delayed or rate-limited. Review that before a paid public deployment.
+Quotes come from Yahoo Finance’s unofficial public chart API and may be delayed or rate-limited. The earnings calendar uses Nasdaq. Review both before a paid public deployment.

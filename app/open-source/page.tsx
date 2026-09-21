@@ -13,8 +13,8 @@ export default function OpenSource() {
     <PublicNav/>
     <main className="privacy-page">
       <p className="eyebrow">OPEN SOURCE</p>
-      <h1>MIT-licensed what-if portfolios</h1>
-      <p>The StockWatchlist web app is public under the MIT license. The hosted product is <a href="https://stockwatchlist.app">stockwatchlist.app</a>. The source is <a href="https://github.com/mlknn/watch-list" rel="noopener noreferrer">github.com/mlknn/watch-list</a>.</p>
+      <h1>MIT-licensed watchlists, markets, and earnings</h1>
+      <p>The StockWatchlist web app is public under the MIT license. The hosted product is <a href="https://stockwatchlist.app">stockwatchlist.app</a> — watchlists, a markets tape, and a US earnings calendar. The source is <a href="https://github.com/mlknn/watch-list" rel="noopener noreferrer">github.com/mlknn/watch-list</a>.</p>
       <section>
         <h2>What you can do</h2>
         <ul>

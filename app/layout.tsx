@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://stockwatchlist.app'),
   openGraph: {
     title: 'StockWatchlist — Watchlists, markets, and earnings',
-    description: 'Track your stock ideas, explore global markets, and see who reports earnings next. No account needed to start.',
+    description: 'Watchlists that freeze the add-day price, a markets tape (US, Europe, Canada, global, crypto), and a US earnings calendar. No account needed to start.',
     url: 'https://stockwatchlist.app',
     siteName: 'StockWatchlist',
     type: 'website',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'StockWatchlist — Watchlists, markets, and earnings',
-    description: 'Track your stock ideas, explore global markets, and see who reports earnings next. No account needed to start.',
+    description: 'Watchlists that freeze the add-day price, a markets tape (US, Europe, Canada, global, crypto), and a US earnings calendar. No account needed to start.',
     images: ['/opengraph-image?v=home'],
   },
   icons: {
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico?v=6',
     apple: '/apple-touch-icon.png?v=6',
   },
-  description: 'Track your stock ideas, explore global markets, and see who reports earnings next. No account needed to start.',
+  description: 'Watchlists that freeze the add-day price, a markets tape (US, Europe, Canada, global, crypto), and a US earnings calendar. No account needed to start.',
 };
 export const viewport: Viewport = {width:'device-width',initialScale:1,viewportFit:'cover'};
 const softwareJsonLd = {
@@ -51,8 +51,20 @@ const softwareJsonLd = {
       codeRepository: 'https://github.com/mlknn/watch-list',
       sameAs: ['https://github.com/mlknn/watch-list'],
       isAccessibleForFree: true,
-      description: 'A what-if stock portfolio that freezes the price and cost from the day you add a pick, then tracks US, Europe, Canada, and Turkey lists. Not a broker. Not investment advice.',
+      description: 'Three tools: watchlists that freeze the add-day price and optional cost, a markets tape for the US, Europe, Canada, global cash markets, and crypto, and a US earnings calendar. No account needed to start. Not a broker. Not investment advice.',
+      featureList: [
+        'Watchlists that freeze the starting price, with optional shares and cost',
+        'Currency-locked lists: USD, EUR, CAD, TRY',
+        'Markets board: US, Europe, Canada, Global, Crypto',
+        'US earnings calendar for companies above $2B, one column per weekday',
+        'No account required to start',
+      ],
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      hasPart: [
+        { '@type': 'WebPage', name: 'Watchlists', url: 'https://stockwatchlist.app/watchlists', description: 'Paper watchlists that freeze the add-day price. Optional shares, cost, and a read-only share link. Lists lock to USD, EUR, CAD, or TRY.' },
+        { '@type': 'WebPage', name: 'Markets', url: 'https://stockwatchlist.app/dashboard', description: 'Indexes, ETFs, sector lists, gainers and losers across the US, Europe, Canada, global cash markets, and crypto.' },
+        { '@type': 'WebPage', name: 'Earnings', url: 'https://stockwatchlist.app/earnings', description: 'US-listed earnings calendar above $2B. One column per weekday. Before open or after close. Source: Nasdaq.' },
+      ],
     },
   ],
 };

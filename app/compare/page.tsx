@@ -3,7 +3,7 @@ import {PublicNav,PublicFooter} from '@/components/product/nav';
 
 export const metadata: Metadata = {
   title: 'StockWatchlist vs Yahoo Finance, Google Finance, and TradingView',
-  description: 'Yahoo, Google, and TradingView show today’s price. StockWatchlist freezes the add-day price and optional cost for a what-if paper portfolio. Not a broker.',
+  description: 'Watchlists that freeze the add-day price, plus a markets tape and a US earnings calendar. Compared with Yahoo Finance, Google Finance, and TradingView. Not a broker.',
   alternates: {canonical: 'https://stockwatchlist.app/compare'},
   openGraph: {url: 'https://stockwatchlist.app/compare'},
 };
@@ -17,7 +17,7 @@ const faqJsonLd = {
       name: 'Is StockWatchlist a Yahoo Finance alternative?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'For a personal paper portfolio that remembers the price from the day you added a stock, yes. Yahoo Finance is stronger for news, live quotes, and a conventional watchlist of today’s prices. StockWatchlist is not a broker and is not investment advice.',
+        text: 'For a personal paper watchlist that remembers the add-day price, a public markets tape, or a US earnings calendar without an account, yes. Yahoo Finance is stronger for news, live quotes, and research. StockWatchlist is not a broker and is not investment advice.',
       },
     },
     {
@@ -25,7 +25,15 @@ const faqJsonLd = {
       name: 'Can I use StockWatchlist without an account?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes. You can build a list on this device first. Create a free account only if you want the list on another device.',
+        text: 'Yes. Watchlists start on this device. Markets and the earnings calendar are public. Create a free account only if you want saved lists on another device.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Does StockWatchlist have an earnings calendar?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. https://stockwatchlist.app/earnings is a public US earnings calendar for listed companies above $2B. One column per weekday, before the open or after the close. No account required. Source: Nasdaq.',
       },
     },
     {
@@ -33,7 +41,7 @@ const faqJsonLd = {
       name: 'Which markets does StockWatchlist cover?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'US (USD), Europe (EUR), Canada (CAD), and Turkey (TRY). Each list locks to the currency of the first stock you add.',
+        text: 'Watchlists lock to USD, EUR, CAD, or TRY. The Markets page covers the US, Europe, Canada, global cash markets (Japan, China, India, Korea, and more), and crypto. The earnings calendar is US-listed companies above $2B.',
       },
     },
   ],
@@ -45,8 +53,8 @@ export default function Compare() {
     <main className="privacy-page compare-page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(faqJsonLd).replace(/</g,'\\u003c')}}/>
       <p className="eyebrow">COMPARE</p>
-      <h1>A paper book, not another live quote screen</h1>
-      <p>Yahoo Finance, Google Finance, and TradingView are excellent at showing what a ticker does <em>today</em>. StockWatchlist answers a narrower question: what happened after you put a number on an idea. The add-day price (and optional cost, shares, and purchase date) stay frozen. It is not a broker and not investment advice. Quotes are delayed public data.</p>
+      <h1>Watchlists, markets, and who reports this week</h1>
+      <p>Yahoo Finance, Google Finance, and TradingView are excellent at showing what a ticker does <em>today</em>. StockWatchlist is three public pages: watchlists that freeze the add-day price, a markets tape, and a US earnings calendar. No account is required to start. It is not a broker and not investment advice. Quotes are delayed public data.</p>
 
       <section>
         <h2>Side by side</h2>
@@ -64,7 +72,7 @@ export default function Compare() {
             <tbody>
               <tr>
                 <th scope="row">Primary job</th>
-                <td>What-if / paper portfolio</td>
+                <td>Watchlists, markets tape, earnings calendar</td>
                 <td>News, quotes, research</td>
                 <td>Google-account portfolio</td>
                 <td>Charts and social trading</td>
@@ -84,11 +92,25 @@ export default function Compare() {
                 <td>Browse yes; save needs account</td>
               </tr>
               <tr>
-                <th scope="row">US / Europe / Canada / Turkey lists</th>
-                <td>Separate currency lock per list</td>
+                <th scope="row">Watchlist currencies</th>
+                <td>USD / EUR / CAD / TRY, one per list</td>
                 <td>Global quotes</td>
                 <td>Global quotes</td>
                 <td>Global quotes</td>
+              </tr>
+              <tr>
+                <th scope="row">Markets page</th>
+                <td><a href="/dashboard">US, Europe, Canada, Global, Crypto</a></td>
+                <td>Full research terminal</td>
+                <td>Quotes and news</td>
+                <td>Full chart terminal</td>
+              </tr>
+              <tr>
+                <th scope="row">Earnings calendar</th>
+                <td><a href="/earnings">US-listed, above $2B, weekday columns</a></td>
+                <td>Yes, with news</td>
+                <td>Limited</td>
+                <td>Economic calendar</td>
               </tr>
               <tr>
                 <th scope="row">Read-only share link</th>
@@ -118,8 +140,8 @@ export default function Compare() {
 
       <section>
         <h2>When to stay on Yahoo, Google, or TradingView</h2>
-        <p>Use those tools for headlines, professional-looking charts, options chains, and anything that needs a live tape. Use StockWatchlist when you want a quiet paper book: name a thesis, add tickers, lock the starting point, and look back later.</p>
-        <p><a className="solid-link" href="/watchlists">Build a portfolio — no signup</a></p>
+        <p>Use those tools for headlines, professional-looking charts, options chains, and a live tape. Use StockWatchlist when you want a paper watchlist that keeps the add-day price, a simpler markets board, or who reports this week — without making an account first.</p>
+        <p><a className="solid-link" href="/watchlists">Watchlists</a> · <a className="solid-link" href="/dashboard">Markets</a> · <a className="solid-link" href="/earnings">Earnings</a></p>
       </section>
     </main>
     <PublicFooter/>
