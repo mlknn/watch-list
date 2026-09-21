@@ -412,10 +412,10 @@ html.dark .watchlist-invite-row p{color:#d5e6db}
 .watchlist-index tbody tr:focus-visible{outline:2px solid #365bd8;outline-offset:-2px}
 html.dark .watchlist-index tbody tr:focus-visible{outline-color:#3dff8f}
 
-.market-switch{display:grid;gap:6px;margin-top:16px;max-width:280px;font-size:12px;font-weight:650;color:#627391}
-.market-switch select{min-height:44px;border:1px solid #d6deed;border-radius:10px;background:#fff;color:#203256;padding:0 12px;font-size:15px}
-html.dark .market-switch{color:#d5e6db}
-html.dark .market-switch select{background:#101a16;border-color:#2a4438;color:#ffffff}
+.market-picks{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.market-picks .outline-button{height:40px;font-size:13px}
+.market-picks .outline-button.is-on{background:#146c4c;border-color:#146c4c;color:#fff}
+html.dark .market-picks .outline-button.is-on{background:#3dff8f;border-color:#3dff8f;color:#0b1612}
 .market-page{padding-bottom:40px}
 .market-goals{margin:0 0 22px;padding:24px 26px;border:1px solid #e1e8f3;border-radius:20px;background:#fff}
 .welcome-goals{margin:0 0 56px}
@@ -468,8 +468,8 @@ html.dark .market-tape .market-movers{background:transparent;border:0}
 @media(max-width:640px){
   .market-index-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
   .index-hero-chart,.market-index-card .candle-svg{height:72px!important}
-  .market-switch{max-width:none}
-  .market-switch select{width:100%}
+  .market-picks{width:100%}
+  .market-picks .outline-button{flex:1 1 auto}
   .market-heading{gap:12px}
 }
 .watchlist-index{overflow-x:auto}

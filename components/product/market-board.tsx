@@ -448,12 +448,12 @@ export function MarketBoard(){
         <h2>{isCrypto?t('The tape never sleeps.'):t('Today’s tape.')}</h2>
         <p className="intro">{isCrypto?t('Live USD quotes for bitcoin, ether, and the coins that move with them.'):t('Pick a market, then look up stocks, ETFs, charts, and company details.')}</p>
         {isCrypto&&!!ready[coinGroup?.id||'']&&breadth.quoted>0&&<p className="crypto-breadth" aria-live="polite"><span className="up">{breadth.up} {t('advancing')}</span><span className="down">{breadth.down} {t('declining')}</span></p>}
-        <label className="market-switch">
-          <span><T text="Change the market"/></span>
-          <select aria-label={t('Change the market')} value={market.id} onChange={e=>changeMarket(e.target.value)}>
-            {listMarkets().map(item=><option key={item.id} value={item.id}>{t(item.label)}</option>)}
-          </select>
-        </label>
+        <div className="market-picks" role="group" aria-label={t('Change the market')}>
+          {listMarkets().map(item=>{
+            const on=market.id===item.id;
+            return <Button key={item.id} type="button" variant="outline" className={'outline-button'+(on?' is-on':'')} aria-pressed={on} onClick={()=>changeMarket(item.id)}>{t(item.id==='us'?'US':item.label)}</Button>;
+          })}
+        </div>
       </div>
       <SessionBadge market={market}/>
     </div>
