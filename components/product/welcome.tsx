@@ -14,7 +14,7 @@ export function Welcome() {
     </section>
     <HomeTools showcase={showcase.data}/>
     <WatchlistWorkspace compact/>
-    <details className="home-example"><summary><T text="See an example watchlist"/></summary><SamplePortfolio data={showcase.data} error={showcase.error}/></details>
+    <details className="home-example" open><summary><T text="See an example watchlist"/></summary><SamplePortfolio data={showcase.data} error={showcase.error}/></details>
     <section id="about" className="home-about">
       <h2><T text="Three tools, one place."/></h2>
       <p><T text="Start with one watchlist on this device. Create a free account for up to five lists and access across devices."/></p>
