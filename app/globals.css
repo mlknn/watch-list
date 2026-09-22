@@ -752,6 +752,7 @@ html.dark .stock-page-hint{color:#5fe0a4}
 .home-watchlist-table thead th{font-size:11px;color:#617189;font-weight:500}
 .home-watchlist-table a{display:inline-flex;gap:9px;align-items:center;vertical-align:middle;color:inherit;text-decoration:none}
 .home-watchlist-table small{display:block;font-weight:400;color:#617189;max-width:190px;text-overflow:ellipsis;overflow:hidden}
+.home-watchlist-table .latest-pct{display:block;font-size:11px;font-weight:600;margin-top:2px}
 .home-example{padding:12px 0;border-bottom:1px solid #dce4f0}
 .home-example summary{cursor:pointer;font-size:14px;font-weight:600;padding:12px 0}
 .home-about{padding:28px 0 34px;max-width:680px}
