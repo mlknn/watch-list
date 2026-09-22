@@ -2422,5 +2422,85 @@
   "Click a company to learn more about it": [
     "Şirket hakkında daha fazlası için üzerine tıkla",
     "Toca una empresa para ver más sobre ella"
+  ],
+  "TODAY'S MOVE": [
+    "BUGÜNKÜ HAREKET",
+    "EL MOVIMIENTO DE HOY"
+  ],
+  "{name} is up {pct}% today versus the previous close.": [
+    "{name} bugün önceki kapanışa göre %{pct} yükseldi.",
+    "{name} sube un {pct}% hoy frente al cierre anterior."
+  ],
+  "{name} is down {pct}% today versus the previous close.": [
+    "{name} bugün önceki kapanışa göre %{pct} düştü.",
+    "{name} baja un {pct}% hoy frente al cierre anterior."
+  ],
+  "{name} is little changed today versus the previous close.": [
+    "{name} bugün önceki kapanışa göre neredeyse değişmedi.",
+    "{name} apenas cambia hoy frente al cierre anterior."
+  ],
+  "It opened higher and is still above the open.": [
+    "Yüksek açtı ve hâlâ açılışın üzerinde.",
+    "Abrió al alza y sigue por encima de la apertura."
+  ],
+  "It opened higher, then faded below the open.": [
+    "Yüksek açtı, sonra açılışın altına geriledi.",
+    "Abrió al alza y luego cedió por debajo de la apertura."
+  ],
+  "It opened lower and is still below the open.": [
+    "Düşük açtı ve hâlâ açılışın altında.",
+    "Abrió a la baja y sigue por debajo de la apertura."
+  ],
+  "It opened lower, then recovered above the open.": [
+    "Düşük açtı, sonra açılışın üzerine toparlandı.",
+    "Abrió a la baja y luego recuperó por encima de la apertura."
+  ],
+  "It is trading above the open.": [
+    "Açılışın üzerinde işlem görüyor.",
+    "Cotiza por encima de la apertura."
+  ],
+  "It is trading below the open.": [
+    "Açılışın altında işlem görüyor.",
+    "Cotiza por debajo de la apertura."
+  ],
+  "It is near the session high.": [
+    "Seansın zirvesine yakın.",
+    "Está cerca del máximo de la sesión."
+  ],
+  "It is near the session low.": [
+    "Seansın dipine yakın.",
+    "Está cerca del mínimo de la sesión."
+  ],
+  "Price is near the 52-week high.": [
+    "Fiyat 52 haftalık zirveye yakın.",
+    "El precio está cerca del máximo de 52 semanas."
+  ],
+  "Price is near the 52-week low.": [
+    "Fiyat 52 haftalık dibe yakın.",
+    "El precio está cerca del mínimo de 52 semanas."
+  ],
+  "Earnings are scheduled today.": [
+    "Bilanço bugün açıklanacak.",
+    "Los resultados se publican hoy."
+  ],
+  "Today's Yahoo Finance headline may help explain the move:": [
+    "Bugünkü Yahoo Finance haberi hareketi açıklamaya yardımcı olabilir:",
+    "El titular de hoy en Yahoo Finance puede ayudar a explicar el movimiento:"
+  ],
+  "Recent Yahoo Finance news:": [
+    "Yahoo Finance’taki güncel haber:",
+    "Noticia reciente en Yahoo Finance:"
+  ],
+  "Headlines are not a confirmed reason for the move. Not advice.": [
+    "Manşetler hareketin kesin nedeni değildir. Tavsiye değildir.",
+    "Los titulares no son una causa confirmada. No es consejo."
+  ],
+  "Read from the regular-session quote. Not advice.": [
+    "Normal seans kotasyonundan okunur. Tavsiye değildir.",
+    "Leído del precio de la sesión regular. No es consejo."
+  ],
+  "More headlines on Yahoo Finance ↗": [
+    "Yahoo Finance’ta daha fazla haber ↗",
+    "Más titulares en Yahoo Finance ↗"
   ]
 }
