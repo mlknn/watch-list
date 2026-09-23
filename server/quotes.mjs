@@ -9,6 +9,28 @@ export function normalizeTicker(value) {
 }
 const cache = new Map();
 const pending = new Map();
+export function quoteFromChart(payload, requestedSymbol) {
+  const meta = payload?.chart?.result?.[0]?.meta;
+  if (!meta || payload.chart?.error) throw new AppError(`No quote is available for ${requestedSymbol}.`, 404);
+  if (!Number.isFinite(meta.regularMarketPrice) || meta.regularMarketPrice <= 0 || !Number.isFinite(meta.regularMarketTime) || !meta.currency || !(meta.longName || meta.shortName)) {
+    throw new AppError(`The provider returned an incomplete quote for ${requestedSymbol}. Please try again later.`, 502);
+  }
+  const previousClose = Number.isFinite(meta.previousClose) ? meta.previousClose : Number.isFinite(meta.chartPreviousClose) ? meta.chartPreviousClose : null;
+  const changePercent = Number.isFinite(meta.regularMarketChangePercent) ? meta.regularMarketChangePercent : previousClose ? ((meta.regularMarketPrice - previousClose) / previousClose) * 100 : null;
+  return {
+    symbol: normalizeTicker(meta.symbol || requestedSymbol),
+    companyName: meta.longName || meta.shortName,
+    currency: meta.currency,
+    price: meta.regularMarketPrice,
+    previousClose,
+    changePercent,
+    quoteType: meta.instrumentType || meta.quoteType || '',
+    quoteTime: new Date(meta.regularMarketTime * 1000).toISOString(),
+    checkedAt: new Date().toISOString(),
+    exchange: meta.fullExchangeName || meta.exchangeName || '',
+    source: 'Yahoo Finance',
+  };
+}
 export async function getQuote(value) {
   const symbol = normalizeTicker(value);
   const cached = cache.get(symbol);
@@ -18,26 +40,12 @@ export async function getQuote(value) {
     let lastError;
     for (const host of ['query2.finance.yahoo.com', 'query1.finance.yahoo.com']) {
       try {
-        const response = await fetch(`https://${host}/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1d`, {
+        const response = await fetch(`https://${host}/v8/finance/chart/${encodeURIComponent(symbol)}?range=5d&interval=5m&includePrePost=false`, {
           headers: { 'User-Agent': 'Mozilla/5.0', Accept: 'application/json' }, signal: AbortSignal.timeout(8000),
         });
         if (response.status === 404) throw new AppError(`Ticker “${symbol}” was not found. Check the symbol and exchange suffix.`, 404);
         if (!response.ok) throw new AppError('The quote provider is temporarily unavailable. Please try again shortly.', 502);
-        const payload = await response.json();
-        const meta = payload.chart?.result?.[0]?.meta;
-        if (!meta || payload.chart?.error) throw new AppError(`No quote is available for ${symbol}.`, 404);
-        if (!Number.isFinite(meta.regularMarketPrice) || meta.regularMarketPrice <= 0 || !Number.isFinite(meta.regularMarketTime) || !meta.currency || !(meta.longName || meta.shortName)) {
-          throw new AppError(`The provider returned an incomplete quote for ${symbol}. Please try again later.`, 502);
-        }
-        const previousClose=Number.isFinite(meta.previousClose)?meta.previousClose:Number.isFinite(meta.chartPreviousClose)?meta.chartPreviousClose:null;
-        const changePercent=Number.isFinite(meta.regularMarketChangePercent)?meta.regularMarketChangePercent:previousClose?((meta.regularMarketPrice-previousClose)/previousClose)*100:null;
-        const quote = {
-          symbol: normalizeTicker(meta.symbol || symbol), companyName: meta.longName || meta.shortName,
-          currency: meta.currency, price: meta.regularMarketPrice, previousClose, changePercent,
-          quoteType: meta.instrumentType || meta.quoteType || '',
-          quoteTime: new Date(meta.regularMarketTime * 1000).toISOString(),
-          checkedAt: new Date().toISOString(), exchange: meta.fullExchangeName || meta.exchangeName || '', source: 'Yahoo Finance',
-        };
+        const quote = quoteFromChart(await response.json(), symbol);
         cache.set(symbol, { quote, fetchedAt: Date.now() });
         if (cache.size > 1000) cache.delete(cache.keys().next().value);
         return quote;

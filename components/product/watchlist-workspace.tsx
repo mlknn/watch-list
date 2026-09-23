@@ -30,7 +30,7 @@ import {type AccountState,type Stock,type Watchlist,watchlistPerformance,price} 
 import {CompanyIcon} from '@/components/product/company-icon';
 import {track} from '@/lib/analytics';
 type Action={mode?:'basic'|'advanced';quantity?:number;costPerShare?:number;acquiredAt?:string;notes?:string;action:string;listId?:string;stockId?:string;name?:string;ticker?:string};
-async function chartQuote(symbol:string){const chart=await marketChart(symbol);return {symbol:chart.symbol,companyName:chart.companyName,currency:chart.currency,exchange:chart.exchange,price:chart.quote.price,quoteTime:chart.quote.quoteTime||chart.fetchedAt,checkedAt:chart.fetchedAt};}
+async function chartQuote(symbol:string){const chart=await marketChart(symbol);return {symbol:chart.symbol,companyName:chart.companyName,currency:chart.currency,exchange:chart.exchange,price:chart.quote.price,previousClose:chart.quote.previousClose,changePercent:chart.quote.changePercent,quoteTime:chart.quote.quoteTime||chart.fetchedAt,checkedAt:chart.fetchedAt};}
 export function WatchlistWorkspace({compact=false}:{compact?:boolean}){const t=useT();
   const [position,setPosition]=useState<PositionDraft>(emptyPosition),[editing,setEditing]=useState<Stock|null>(null),[editDraft,setEditDraft]=useState<PositionDraft>(emptyPosition);
   const [state,setState]=useState<AccountState|null>(null),[activeId,setActiveId]=useState(''),[ticker,setTicker]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(''),[notice,setNotice]=useState(''),[dialog,setDialog]=useState<'create'|'rename'|'share'|null>(null),[name,setName]=useState(''),[deletion,setDeletion]=useState<{listId:string;stockId?:string;label:string}|null>(null),[configured,setConfigured]=useState<boolean|null>(null),[saveOpen,setSaveOpen]=useState(false);
@@ -72,7 +72,7 @@ export function WatchlistWorkspace({compact=false}:{compact?:boolean}){const t=u
     }catch(e){if(!automatic){setError((e as Error).message);throw e;}return null;}
     finally{if(automatic)refreshing.current=false;else{lock.current=false;setBusy('');}}
   },[apply]);
-  useEffect(()=>{void load();const refresh=()=>{if(!document.hidden&&stateRef.current)void act({action:'refresh'},true);};const timer=setInterval(refresh,60000);document.addEventListener('visibilitychange',refresh);return()=>{clearInterval(timer);document.removeEventListener('visibilitychange',refresh);};},[load,act]);
+  useEffect(()=>{void load().finally(()=>{if(!document.hidden&&stateRef.current)void act({action:'refresh'},true);});const refresh=()=>{if(!document.hidden&&stateRef.current)void act({action:'refresh'},true);};const timer=setInterval(refresh,60000);document.addEventListener('visibilitychange',refresh);return()=>{clearInterval(timer);document.removeEventListener('visibilitychange',refresh);};},[load,act]);
   useEffect(()=>{setCanShare(typeof navigator!=='undefined'&&typeof navigator.share==='function');},[]);
   const canRegisterTools=!!state&&!state.guest;
   useEffect(()=>{

@@ -97,6 +97,17 @@ test('guest workspaces allow one list and twenty stocks',()=>{
   assert.throws(()=>applyGuestAction(state,{action:'addStock',listId,ticker:'T20',quantity:1,costPerShare:10,acquiredAt:'2026-01-02T00:00:00.000Z'},{...quote,symbol:'T20'}),/Stock limit reached/);
 });
 
+test('guest refresh updates the last price and today’s change',()=>{
+  const added={symbol:'IONQ',companyName:'IonQ',currency:'USD',exchange:'NYSE',price:38.14,quoteTime:'2026-09-05T16:00:00.000Z',checkedAt:'2026-09-05T16:00:00.000Z'};
+  let state=applyGuestAction(emptyGuestState(),{action:'createList'});
+  state=applyGuestAction(state,{action:'addStock',listId:state.watchlists[0].id,ticker:'IONQ'},added);
+  state=applyGuestAction(state,{action:'refresh'},{IONQ:{symbol:'IONQ',companyName:'IonQ',currency:'USD',exchange:'NYSE',price:42.88,previousClose:40.74,changePercent:5.253,quoteTime:'2026-09-23T17:54:00.000Z',checkedAt:'2026-09-23T17:54:00.000Z'}});
+  const stock=state.watchlists[0].stocks[0];
+  assert.equal(stock.addedPrice,38.14);
+  assert.equal(stock.currentPrice,42.88);
+  assert.equal(stock.dayChangePercent,5.253);
+  assert.equal(stock.previousClose,40.74);
+});
 test('guest can track a stock without inventing a share quantity',()=>{
   const quote={symbol:'AAPL',companyName:'Apple',currency:'USD',exchange:'Nasdaq',price:190,quoteTime:'2026-09-10T20:00:00.000Z',checkedAt:'2026-09-10T20:00:00.000Z'};
   let state=applyGuestAction(emptyGuestState(),{action:'createList'});
