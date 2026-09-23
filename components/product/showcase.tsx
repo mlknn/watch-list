@@ -5,8 +5,38 @@ import {useEffect,useRef,useState,useId} from 'react';
 import {TrendingUp,ArrowUpRight} from 'lucide-react';
 import {Area,AreaChart,CartesianGrid,ReferenceLine,Tooltip,XAxis,YAxis} from 'recharts';
 import {ChartContainer} from '@/components/ui/chart';
-import {price} from '@/lib/watchlist';
+import {price,type Watchlist} from '@/lib/watchlist';
+import {WatchlistBoard} from '@/components/product/watchlist-summary';
 import {useChartPalette} from '@/components/product/theme';
+
+function showcaseList(data:ShowcaseData):Watchlist{
+ const invest=data.performance?.investmentPerStock||1000;
+ return {
+  mode:'advanced',
+  id:'example',
+  name:'Example',
+  createdAt:'2021-09-03T00:00:00.000Z',
+  role:'viewer',
+  stocks:data.stocks.map(stock=>({
+   id:stock.symbol,
+   symbol:stock.symbol,
+   companyName:stock.companyName||stock.name,
+   currency:stock.currency,
+   exchange:'',
+   addedAt:'2021-09-03T00:00:00.000Z',
+   addedPrice:stock.addedPrice,
+   initialQuoteTime:stock.quoteTime,
+   currentPrice:stock.currentPrice,
+   quoteTime:stock.quoteTime,
+   checkedAt:stock.quoteTime,
+   quoteError:null,
+   quantity:stock.addedPrice>0?invest/stock.addedPrice:null,
+   costPerShare:stock.addedPrice,
+   acquiredAt:'2021-09-03T00:00:00.000Z',
+   notes:'',
+  })),
+ };
+}
 export type Row={symbol:string;name:string;companyName:string;date:string;addedPrice:number;currentPrice:number;currency:string;changePercent:number;quoteTime:string};
 export type ShowcaseData={stocks:Row[];method:string;performance:{startDate:string;initialValue:number;currentValue:number;changePercent:number;investmentPerStock:number;quoteTime:string;points:{time:number;value:number;changePercent:number}[]}};
 
@@ -91,6 +121,7 @@ export function SamplePortfolio({data,error}:{data:ShowcaseData|null;error:strin
    <p><T text="Ten companies, an equal starting amount each, priced with real quotes. A watchlist keeps the price from the day you add a stock — earlier dates are not backtested."/></p>
   </div>
   <div className="home-sample-body">
+   {data?<WatchlistBoard list={showcaseList(data)}/>:null}
    <div className="hero-preview real-preview expanded-preview">
     <div className="example-column-labels"><span><T text="Company / starting price"/></span><span><T text="Change / latest price"/></span></div>
     {data?data.stocks.map(s=><SampleRow key={s.symbol} stock={s}/>):<div className="showcase-loading" role="status">{error||t("Loading companies and their story since 2021…")}</div>}

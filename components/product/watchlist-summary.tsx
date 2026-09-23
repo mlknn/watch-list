@@ -1,5 +1,6 @@
 'use client';
 import {T,useT} from '@/components/product/language';
+import {WatchlistAllocation} from '@/components/product/watchlist-allocation';
 import {type Watchlist,price,watchlistPerformance} from '@/lib/watchlist';
 
 function totals(list:Watchlist){
@@ -28,16 +29,19 @@ export function WatchlistBoard({list}:{list:Watchlist}){
  const {stocks,first,currency,supported,complete,cost,value,gain,percent}=totals(list);
  const tone=percent===null?'':percent>=0?'up':'down';
  return <section className="watchlist-board" aria-label={t('Watchlist summary')}>
-  <div className="watchlist-board-hero">
-   <span><T text="Current value"/></span>
-   <strong>{complete&&stocks.length?price(value,currency):stocks.length?t('Add shares to see value'):t('No stocks yet')}</strong>
-   <em className={tone}>{percent===null?'—':complete?<>{gain>0?'+':''}{price(gain,currency)} <small>({`${percent>0?'+':''}${percent.toFixed(2)}%`})</small></>:`${percent>=0?'+':''}${percent.toFixed(2)}%`} <small>{t('Since created')}</small></em>
+  <div className="watchlist-board-main">
+   <div className="watchlist-board-hero">
+    <span><T text="Current value"/></span>
+    <strong>{complete&&stocks.length?price(value,currency):stocks.length?t('Add shares to see value'):t('No stocks yet')}</strong>
+    <em className={tone}>{percent===null?'—':complete?<>{gain>0?'+':''}{price(gain,currency)} <small>({`${percent>0?'+':''}${percent.toFixed(2)}%`})</small></>:`${percent>=0?'+':''}${percent.toFixed(2)}%`} <small>{t('Since created')}</small></em>
+   </div>
+   <dl>
+    <div><dt><T text="First stock added"/></dt><dd>{first?first.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):'—'}</dd></div>
+    <div><dt><T text="Total cost"/></dt><dd>{complete?price(cost,currency):'—'}</dd></div>
+    <div><dt><T text="Stocks"/></dt><dd>{stocks.length}</dd></div>
+   </dl>
+   {!complete&&<p>{supported?t("Add missing purchase quantities to see complete totals."):t("This list mixed currencies. Keep one currency per list.")}</p>}
   </div>
-  <dl>
-   <div><dt><T text="First stock added"/></dt><dd>{first?first.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):'—'}</dd></div>
-   <div><dt><T text="Total cost"/></dt><dd>{complete?price(cost,currency):'—'}</dd></div>
-   <div><dt><T text="Stocks"/></dt><dd>{stocks.length}</dd></div>
-  </dl>
-  {!complete&&<p>{supported?t("Add missing purchase quantities to see complete totals."):t("This list mixed currencies. Keep one currency per list.")}</p>}
+  <WatchlistAllocation list={list} compact/>
  </section>;
 }
