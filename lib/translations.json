@@ -2554,5 +2554,225 @@
   "Add shares to see value": [
     "Değeri görmek için adet ekle",
     "Añade acciones para ver el valor"
+  ],
+  "Track upcoming announcements and compare reported results with market expectations.": [
+    "Yaklaşan açıklamaları izle, açıklanan sonuçları piyasa beklentisiyle karşılaştır.",
+    "Sigue los anuncios próximos y compara los resultados con las expectativas."
+  ],
+  "Source: Nasdaq": [
+    "Kaynak: Nasdaq",
+    "Fuente: Nasdaq"
+  ],
+  "US-listed companies above $1B": [
+    "1 milyar doların üzerindeki ABD şirketleri",
+    "Empresas de EE.UU. de más de 1000 M$"
+  ],
+  "New York time": [
+    "New York saati",
+    "Hora de Nueva York"
+  ],
+  "Last successful update": [
+    "Son başarılı güncelleme",
+    "Última actualización correcta"
+  ],
+  "Some days in this week could not be refreshed.": [
+    "Bu haftanın bazı günleri yenilenemedi.",
+    "Algunos días de esta semana no se pudieron actualizar."
+  ],
+  "In my watchlists": [
+    "Listelerimde",
+    "En mis listas"
+  ],
+  "Search company or ticker": [
+    "Şirket veya sembol ara",
+    "Busca empresa o símbolo"
+  ],
+  "Clear search": [
+    "Aramayı temizle",
+    "Borrar búsqueda"
+  ],
+  "Announcement time": [
+    "Açıklama saati",
+    "Hora del anuncio"
+  ],
+  "All times": [
+    "Tüm saatler",
+    "Todas las horas"
+  ],
+  "Before open": [
+    "Açılıştan önce",
+    "Antes de la apertura"
+  ],
+  "After close": [
+    "Kapanıştan sonra",
+    "Tras el cierre"
+  ],
+  "Time not supplied": [
+    "Saat belirtilmemiş",
+    "Hora no indicada"
+  ],
+  "All statuses": [
+    "Tüm durumlar",
+    "Todos los estados"
+  ],
+  "Upcoming": [
+    "Beklenen",
+    "Pendiente"
+  ],
+  "All market caps": [
+    "Tüm piyasa değerleri",
+    "Todas las capitalizaciones"
+  ],
+  "$1–10B": ["1–10 milyar $", "1000–10 000 M$"],
+  "$10–50B": ["10–50 milyar $", "10 000–50 000 M$"],
+  "$50–200B": ["50–200 milyar $", "50 000–200 000 M$"],
+  "$200B+": ["200 milyar $+", "Más de 200 000 M$"],
+  "My watchlists": [
+    "Listelerim",
+    "Mis listas"
+  ],
+  "Filters": [
+    "Filtreler",
+    "Filtros"
+  ],
+  "View": [
+    "Görünüm",
+    "Vista"
+  ],
+  "Calendar": [
+    "Takvim",
+    "Calendario"
+  ],
+  "Table": [
+    "Tablo",
+    "Tabla"
+  ],
+  "companies": [
+    "şirket",
+    "empresas"
+  ],
+  "Clear filters": [
+    "Filtreleri temizle",
+    "Quitar filtros"
+  ],
+  "Pick a week": [
+    "Hafta seç",
+    "Elige una semana"
+  ],
+  "Export CSV": [
+    "CSV indir",
+    "Exportar CSV"
+  ],
+  "No earnings announcements in the available coverage for this period.": [
+    "Bu dönem için kapsamdaki bir açıklama yok.",
+    "No hay anuncios en la cobertura de este período."
+  ],
+  "No companies match your filters.": [
+    "Filtrelere uyan şirket yok.",
+    "Ninguna empresa coincide con los filtros."
+  ],
+  "Earnings comparison": [
+    "Bilanço karşılaştırması",
+    "Comparación de resultados"
+  ],
+  "Company / ticker": [
+    "Şirket / sembol",
+    "Empresa / símbolo"
+  ],
+  "Announcement date": [
+    "Açıklama tarihi",
+    "Fecha del anuncio"
+  ],
+  "EPS estimate": [
+    "EPS tahmini",
+    "BPA estimado"
+  ],
+  "Actual EPS": [
+    "Açıklanan EPS",
+    "BPA real"
+  ],
+  "EPS surprise": [
+    "EPS sapması",
+    "Sorpresa de BPA"
+  ],
+  "Market cap": [
+    "Piyasa değeri",
+    "Capitalización"
+  ],
+  "Not available": [
+    "Yok",
+    "No disponible"
+  ],
+  "On a watchlist": [
+    "Bir listede",
+    "En una lista"
+  ],
+  "Not on a watchlist": [
+    "Listede değil",
+    "Fuera de las listas"
+  ],
+  "Open company page": [
+    "Şirket sayfasını aç",
+    "Abrir la ficha"
+  ],
+  "EPS comparison": [
+    "EPS karşılaştırması",
+    "Comparación de BPA"
+  ],
+  "Estimate": [
+    "Tahmin",
+    "Estimación"
+  ],
+  "Actual": [
+    "Açıklanan",
+    "Real"
+  ],
+  "Difference": [
+    "Fark",
+    "Diferencia"
+  ],
+  "Surprise %": [
+    "Sapma %",
+    "% de sorpresa"
+  ],
+  "Above estimate": [
+    "Tahminin üzerinde",
+    "Por encima"
+  ],
+  "Below estimate": [
+    "Tahminin altında",
+    "Por debajo"
+  ],
+  "In line": [
+    "Uyumlu",
+    "En línea"
+  ],
+  "Percent not shown when the estimate is zero": [
+    "Tahmin sıfırken yüzde gösterilmez",
+    "Sin porcentaje si la estimación es cero"
+  ],
+  "Revenue, fiscal period, and company guidance are not in this Nasdaq calendar feed.": [
+    "Ciro, mali dönem ve şirket rehberi bu Nasdaq takviminde yok.",
+    "Ingresos, período fiscal y guidance no vienen en este calendario de Nasdaq."
+  ],
+  "Apply": [
+    "Uygula",
+    "Aplicar"
+  ],
+  "Reset": [
+    "Sıfırla",
+    "Restablecer"
+  ],
+  "Status": [
+    "Durum",
+    "Estado"
+  ],
+  "Jump to day": [
+    "Güne git",
+    "Ir al día"
+  ],
+  "None of your watchlists have companies in this week.": [
+    "Bu hafta listelerindeki şirketlerden biri yok.",
+    "Ninguna empresa de tus listas aparece esta semana."
   ]
 }
