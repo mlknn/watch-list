@@ -1,13 +1,18 @@
 'use client';
-import {useEffect} from 'react';
 import {AlertCircle} from 'lucide-react';
 import {PublicNav,PublicFooter} from '@/components/product/nav';
-import {T} from '@/components/product/language';
+import {T,useT} from '@/components/product/language';
 
 export function InvalidUrl(){
-  useEffect(()=>{
-    const timer=window.setTimeout(()=>{window.location.replace('/dashboard');},2000);
-    return()=>window.clearTimeout(timer);
-  },[]);
-  return <><PublicNav/><main className="message-page"><h1><T text="Invalid URL"/></h1><p className="error-banner" role="alert"><AlertCircle size={18}/><T text="This page does not exist."/></p><p role="status"><T text="Taking you to Markets…"/></p></main><PublicFooter/></>;
+  const t=useT();
+  return <><PublicNav/><main className="message-page">
+    <h1><T text="This page does not exist."/></h1>
+    <p className="error-banner" role="alert"><AlertCircle size={18}/>{t('The address is not a page in StockWatchlist.')}</p>
+    <p>{t('Use one of these paths to continue.')}</p>
+    <div className="not-found-actions">
+      <a className="solid-link" href="/">{t('Go home')}</a>
+      <a className="outline-link" href="/dashboard">{t('Browse markets')}</a>
+      <button type="button" className="outline-link" onClick={()=>window.history.length>1?window.history.back():window.location.assign('/')}>{t('Go back')}</button>
+    </div>
+  </main><PublicFooter/></>;
 }

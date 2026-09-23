@@ -33,7 +33,7 @@ export function normalizeChart(result,range){
   const previousClose=finite(meta.previousClose)??all[sessionStart-1]?.price??null;
   const points=range==='1d'?lastSession:all;
   const current=meta.regularMarketPrice;
-  return {symbol:meta.symbol,companyName:meta.longName||meta.shortName||meta.symbol,currency:meta.currency,exchange:meta.fullExchangeName||meta.exchangeName||'',timezone,range,sessionDate:latestDay,interval:CHART_RANGES[range].interval,points,earningsDates:earningsEventDays(result),
+  return {symbol:meta.symbol,companyName:meta.longName||meta.shortName||meta.symbol,currency:meta.currency,quoteType:meta.instrumentType||meta.quoteType||'',exchange:meta.fullExchangeName||meta.exchangeName||'',timezone,range,sessionDate:latestDay,interval:CHART_RANGES[range].interval,points,earningsDates:earningsEventDays(result),
     quote:{price:current,previousClose,change:previousClose===null?null:current-previousClose,changePercent:previousClose?((current-previousClose)/previousClose)*100:null,quoteTime:meta.regularMarketTime?new Date(meta.regularMarketTime*1000).toISOString():null,
       open:lastSession[0]?.open??null,dayLow:finite(meta.regularMarketDayLow),dayHigh:finite(meta.regularMarketDayHigh),fiftyTwoWeekLow:finite(meta.fiftyTwoWeekLow),fiftyTwoWeekHigh:finite(meta.fiftyTwoWeekHigh),volume:finite(meta.regularMarketVolume)},source:'Yahoo Finance',fetchedAt:new Date().toISOString()};
 }

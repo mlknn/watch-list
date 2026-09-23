@@ -28,10 +28,17 @@ export default function OpenSource() {
         <p>stockwatchlist.app is not a broker, not investment advice, and not a promise of real-time professional market data. Quotes come from Yahoo Finance’s unofficial public chart API and may be delayed or rate-limited. Keep <code>LOCAL_AUTH_ENABLED=false</code> on any public server.</p>
       </section>
       <section>
-        <h2>Directories</h2>
-        <p>Listed on GitHub as a public MIT repo. Submitted to awesome-selfhosted (waiting on their four-month maturity rule). OpenAlternative requires 10 GitHub stars before they accept a listing.</p>
+        <h2>Source, license, and setup</h2>
+        <p>MIT license. Setup and local run notes are in <a href="https://github.com/mlknn/watch-list/blob/main/docs/SETUP.md" rel="noopener noreferrer">docs/SETUP.md</a>. Issues and pull requests are welcome on GitHub.</p>
         <p><a className="solid-link" href="https://github.com/mlknn/watch-list" rel="noopener noreferrer">View source on GitHub</a></p>
       </section>
+      <section>
+        <h2>Hosted app versus self-hosting</h2>
+        <p>The ordinary product is the hosted app. Developer deployment, environment variables, and self-hosting notes stay in the repository documentation.</p>
+      </section>
+      <aside className="directory-note">
+        <p>Directory submissions are not product features. awesome-selfhosted is waiting on a maturity rule; OpenAlternative requires a star threshold.</p>
+      </aside>
     </main>
     <PublicFooter/>
   </>;

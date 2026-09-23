@@ -1155,3 +1155,35 @@ html.dark .example-preview .down,html.dark .home-panel .down{color:#ff9aa4}
   .welcome .home-watchlist-table th,.welcome .home-watchlist-table td{font-size:13px}
   .welcome .home-watchlist-table small{font-size:12px;max-width:140px}
 }
+.password-field{position:relative}
+.password-field input{padding-right:44px}
+.password-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);min-width:36px;min-height:36px;border:0;background:transparent;color:inherit;display:grid;place-items:center}
+.position-mode{display:flex;gap:8px;margin-bottom:12px}
+.position-mode-btn{min-height:44px;padding:0 12px;border:1px solid #d6deed;border-radius:8px;background:#fff;font-size:13px}
+.position-mode-btn.is-on{border-color:#3d6bd8;background:#eef3ff}
+.market-ticker-bar{display:flex;justify-content:flex-end;padding:4px 8px 0}
+.market-ticker-pause{min-height:32px;padding:0 10px;border:0;background:transparent;font-size:12px;color:inherit}
+.market-ticker.is-static .market-ticker-track{animation:none;flex-wrap:wrap}
+.stock-facts-group h3{margin:16px 0 8px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#6b7a91}
+.earnings-more{margin-top:8px}
+.earnings-more summary{min-height:36px;cursor:pointer;color:#5b6b82}
+.earnings-summary-strip{margin-bottom:16px}
+.privacy-toc{max-width:36rem;margin:16px 0 28px;padding:16px 18px;border:1px solid #e1e8f3;border-radius:12px}
+.privacy-toc ol{margin:8px 0 0;padding-left:18px}
+.privacy-page{max-width:760px}
+.compare-table-wrap{overflow-x:auto}
+.not-found-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
+.directory-note{margin-top:32px;font-size:13px;color:#6b7a91}
+html.dark .position-mode-btn{background:#141f1a;border-color:#2a4438}
+html.dark .position-mode-btn.is-on{background:#12301f;border-color:#3dff8f}
+html.dark .privacy-toc{border-color:#2a4438}
+@media(prefers-reduced-motion:reduce){
+  .market-ticker-track{animation:none!important}
+}
+@media(max-width:860px){
+  .earnings-cal-head .intro,.earnings-meta{font-size:13px}
+  .earnings-summary-strip{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+  .earnings-summary-strip>div{padding:8px 10px}
+  .earnings-summary-strip dd{font-size:18px}
+  .compare-table{min-width:640px}
+}

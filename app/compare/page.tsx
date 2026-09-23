@@ -54,7 +54,8 @@ export default function Compare() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(faqJsonLd).replace(/</g,'\\u003c')}}/>
       <p className="eyebrow">COMPARE</p>
       <h1>Watchlists, markets, and who reports this week</h1>
-      <p>Yahoo Finance, Google Finance, and TradingView are excellent at showing what a ticker does <em>today</em>. StockWatchlist is three public pages: watchlists that freeze the add-day price, a markets tape, and a US earnings calendar. No account is required to start. It is not a broker and not investment advice. Quotes are delayed public data.</p>
+      <p className="privacy-updated">Reviewed September 23, 2026. Competitor capabilities below are stated conservatively from public product pages and are not a complete feature audit.</p>
+      <p>StockWatchlist is three public pages: watchlists that freeze the add-day price, a markets tape, and a US earnings calendar. No account is required to start. It is not a broker and not investment advice. Quotes are delayed public data.</p>
 
       <section>
         <h2>Side by side</h2>
@@ -80,16 +81,16 @@ export default function Compare() {
               <tr>
                 <th scope="row">Starting price</th>
                 <td>Frozen when you add a pick</td>
-                <td>Today’s last price</td>
-                <td>Lots/cost if you enter them</td>
-                <td>Live chart marks</td>
+                <td>Last price (typical)</td>
+                <td>Cost if you enter it</td>
+                <td>Chart marks</td>
               </tr>
               <tr>
                 <th scope="row">Start without an account</th>
                 <td>Yes</td>
-                <td>Browse yes; save needs Yahoo</td>
-                <td>Needs Google</td>
-                <td>Browse yes; save needs account</td>
+                <td>Browse public; saving typically needs an account</td>
+                <td>Tied to a Google account</td>
+                <td>Browse public; saving typically needs an account</td>
               </tr>
               <tr>
                 <th scope="row">Watchlist currencies</th>
@@ -101,22 +102,22 @@ export default function Compare() {
               <tr>
                 <th scope="row">Markets page</th>
                 <td><a href="/dashboard">US, Europe, Canada, Global, Crypto</a></td>
-                <td>Full research terminal</td>
+                <td>Broad research site</td>
                 <td>Quotes and news</td>
-                <td>Full chart terminal</td>
+                <td>Chart-focused workspace</td>
               </tr>
               <tr>
                 <th scope="row">Earnings calendar</th>
                 <td><a href="/earnings">US-listed, above $1B, weekday columns</a></td>
-                <td>Yes, with news</td>
-                <td>Limited</td>
+                <td>Yes</td>
+                <td>Not independently verified here</td>
                 <td>Economic calendar</td>
               </tr>
               <tr>
                 <th scope="row">Read-only share link</th>
                 <td>Yes</td>
-                <td>Limited</td>
-                <td>Limited</td>
+                <td>Not independently verified here</td>
+                <td>Not independently verified here</td>
                 <td>Chart snapshots / ideas</td>
               </tr>
               <tr>

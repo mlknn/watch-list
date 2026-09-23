@@ -148,7 +148,8 @@ export async function accountAction(db,user,input) {
     try{assertQuoteCurrency(quote.currency,existing.map(row=>({currency:row.snapshot?.currency})));}
     catch(error){throw new AppError(error.message);}
   }
-  dbResult(await db.rpc('wl_advanced_action',{p_user:user.id,p_action:input.action,p_list:input.listId||null,p_name:input.name||null,p_symbol:quote?.symbol||null,p_quote:quote,p_stock:input.stockId||null,p_token:input.action==='shareList'?randomBytes(32).toString('base64url'):null,p_mode:'advanced',p_quantity:input.quantity??null,p_cost:input.costPerShare??quote?.price??null,p_acquired:input.acquiredAt||new Date().toISOString(),p_notes:String(input.notes||'').slice(0,500)}));
+  const hasPosition=input.quantity!==undefined&&input.quantity!==null&&input.quantity!=='';
+  dbResult(await db.rpc('wl_advanced_action',{p_user:user.id,p_action:input.action,p_list:input.listId||null,p_name:input.name||null,p_symbol:quote?.symbol||null,p_quote:quote,p_stock:input.stockId||null,p_token:input.action==='shareList'?randomBytes(32).toString('base64url'):null,p_mode:'advanced',p_quantity:hasPosition?input.quantity:null,p_cost:hasPosition?(input.costPerShare??quote?.price??null):null,p_acquired:hasPosition?(input.acquiredAt||new Date().toISOString()):null,p_notes:String(input.notes||'').slice(0,500)}));
   if(localMode())await exportLocalData();
   return accountState(db,user);
 }

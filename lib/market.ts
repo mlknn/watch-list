@@ -1,5 +1,5 @@
 export type ChartPoint={time:number;price:number;open:number|null;high:number|null;low:number|null;volume:number|null};
-export type MarketChart={symbol:string;companyName:string;currency:string;exchange:string;timezone:string;range:string;sessionDate:string|null;interval:string;points:ChartPoint[];earningsDates?:string[];quote:{price:number;previousClose:number|null;change:number|null;changePercent:number|null;quoteTime:string|null;open:number|null;dayLow:number|null;dayHigh:number|null;fiftyTwoWeekLow:number|null;fiftyTwoWeekHigh:number|null;volume:number|null};source:string;fetchedAt:string};
+export type MarketChart={symbol:string;companyName:string;currency:string;quoteType?:string;exchange:string;timezone:string;range:string;sessionDate:string|null;interval:string;points:ChartPoint[];earningsDates?:string[];quote:{price:number;previousClose:number|null;change:number|null;changePercent:number|null;quoteTime:string|null;open:number|null;dayLow:number|null;dayHigh:number|null;fiftyTwoWeekLow:number|null;fiftyTwoWeekHigh:number|null;volume:number|null};source:string;fetchedAt:string};
 const pending=new Map<string,Promise<MarketChart>>();
 const publicCharts=new Map<string,{at:number;data:MarketChart}>();
 export function stockDataFetch(path:string){return fetch(path,{cache:'no-store'});}

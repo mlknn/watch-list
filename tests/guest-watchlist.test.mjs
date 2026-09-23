@@ -96,3 +96,15 @@ test('guest workspaces allow one list and twenty stocks',()=>{
   for(let i=0;i<20;i++)state=applyGuestAction(state,{action:'addStock',listId,ticker:'T'+i,quantity:1,costPerShare:10,acquiredAt:'2026-01-02T00:00:00.000Z'},{...quote,symbol:'T'+i});
   assert.throws(()=>applyGuestAction(state,{action:'addStock',listId,ticker:'T20',quantity:1,costPerShare:10,acquiredAt:'2026-01-02T00:00:00.000Z'},{...quote,symbol:'T20'}),/Stock limit reached/);
 });
+
+test('guest can track a stock without inventing a share quantity',()=>{
+  const quote={symbol:'AAPL',companyName:'Apple',currency:'USD',exchange:'Nasdaq',price:190,quoteTime:'2026-09-10T20:00:00.000Z',checkedAt:'2026-09-10T20:00:00.000Z'};
+  let state=applyGuestAction(emptyGuestState(),{action:'createList'});
+  state=applyGuestAction(state,{action:'addStock',listId:state.watchlists[0].id,ticker:'AAPL',notes:'Idea'},quote);
+  const stock=state.watchlists[0].stocks[0];
+  assert.equal(stock.quantity,null);
+  assert.equal(stock.costPerShare,null);
+  assert.equal(stock.acquiredAt,null);
+  assert.equal(stock.addedPrice,190);
+  assert.equal(stock.notes,'Idea');
+});

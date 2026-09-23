@@ -2,6 +2,7 @@ export type Stock = {quantity:number|null;costPerShare:number|null;acquiredAt:st
 export type Watchlist = {mode:'basic'|'advanced';id:string;name:string;createdAt:string;stocks:Stock[];role:'owner'|'viewer';shareToken?:string|null};
 export type AccountState = {guest?:boolean;savePromptShown?:boolean;version:number;updatedAt:string;user:{analytics?:boolean;local:boolean;id:string;name:string;email:string;country:string|null;hasBilling:boolean};plan:{id:'free'|'pro';maxLists:number;maxStocks:number;pageSize:number;trialEndsAt:string|null;expired:boolean};watchlists:Watchlist[]};
 export {watchlistPerformance} from './watchlist-performance.mjs';
+export {quoteUnit} from './instrument.mjs';
 export const quoteTime=(value:string)=>new Date(value).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
 function priceDigits(value:number){
   const abs=Math.abs(value);
@@ -11,8 +12,9 @@ function priceDigits(value:number){
   if(abs<1)return 4;
   return 2;
 }
-export const price=(value:number,currency:string)=>{
+export const price=(value:number,currency:string,unit:'currency'|'points'='currency')=>{
   const digits=priceDigits(value);
+  if(unit==='points')return `${value.toLocaleString(undefined,{minimumFractionDigits:digits,maximumFractionDigits:digits})}`;
   if(!/^[A-Z]{3}$/.test(currency))return `${value.toFixed(digits)} ${currency}`;
   return new Intl.NumberFormat(undefined,{style:'currency',currency,minimumFractionDigits:Math.min(2,digits),maximumFractionDigits:digits}).format(value);
 };

@@ -137,7 +137,7 @@ test('warming later weeks waits for this week and never fetches it again',async(
 test('earnings markers sit on the first session on or after the report day',()=>{
   const points=Array.from({length:10},(_,i)=>({time:Date.parse('2026-01-05T20:00:00Z')+i*86400000,price:100+i}));
   assert.deepEqual(chartEventTimes(points,['2026-01-08','2026-01-20'],7,Date.parse('2026-01-20T12:00:00Z')),[Date.parse('2026-01-08T20:00:00Z')]);
-  assert.deepEqual(chartEventMarks(points,['2026-01-08'],7,Date.parse('2026-01-20T12:00:00Z')),[{time:Date.parse('2026-01-08T20:00:00Z'),date:'2026-01-08'}]);
+  assert.deepEqual(chartEventMarks(points,['2026-01-08'],7,Date.parse('2026-01-20T12:00:00Z')),[{time:Date.parse('2026-01-08T20:00:00Z'),date:'2026-01-08',when:'unknown'}]);
   assert.deepEqual(chartEventTimes(points,['2025-06-01'],7,Date.parse('2026-01-20T12:00:00Z')),[]);
 });
 
@@ -162,9 +162,9 @@ test('homepage preview pins $1T names this week and still shows later days',()=>
     {date:'2026-09-25',status:'ok',companies:[{symbol:'AAPL',reported:false,marketCap:3e12},{symbol:'MSFT',reported:false,marketCap:3.1e12}]},
   ];
   const rows=homePreviewRows(days,'2026-09-21','2026-09-21',{limit:5});
-  assert.deepEqual(rows.map(row=>row.symbol).slice(0,2),['MSFT','AAPL']);
-  assert.ok(rows.some(row=>row.symbol==='NKE'&&row.date==='2026-09-21'));
-  assert.ok(rows.some(row=>row.symbol==='INTC'&&row.date==='2026-09-22'));
+  assert.deepEqual(rows.map(row=>row.symbol),['COST','NKE','INTC','AAPL','MSFT']);
+  assert.equal(rows[0].date,'2026-09-21');
+  assert.equal(rows.at(-1).symbol,'MSFT');
   assert.equal(rows.length,5);
 });
 

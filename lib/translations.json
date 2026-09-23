@@ -256,8 +256,8 @@
     "Guarda tu cartera"
   ],
   "Start your watchlist": [
-    "Ücretsiz hesap oluştur",
-    "Crea una cuenta gratis"
+    "Listene başla",
+    "Empieza tu lista"
   ],
   "Build my watchlist": [
     "Listemi oluştur",
@@ -1559,6 +1559,10 @@
     "Her listede adet, maliyet ve performans vardır.",
     "Cada lista incluye unidades, costos y rendimiento."
   ],
+  "Shares and cost are optional. You can track price only.": [
+    "Adet ve maliyet isteğe bağlıdır. Yalnızca fiyatı da izleyebilirsiniz.",
+    "Las acciones y el costo son opcionales. También puedes seguir solo el precio."
+  ],
   "View plans": [
     "Planları gör",
     "Ver planes"
@@ -1892,7 +1896,7 @@
     "Resultados"
   ],
   "Earnings calendar": [
-    "Kazanç takvimi",
+    "Bilanço takvimi",
     "Calendario de resultados"
   ],
   "US EARNINGS": [
@@ -1944,12 +1948,12 @@
     "Calendario de resultados de EE.UU."
   ],
   "Before open": [
-    "Açılış öncesi",
+    "Açılıştan önce",
     "Antes de la apertura"
   ],
   "After close": [
-    "Kapanış sonrası",
-    "Después del cierre"
+    "Kapanıştan sonra",
+    "Tras el cierre"
   ],
   "During the session": [
     "Seans içinde",
@@ -2258,10 +2262,6 @@
   "Start with one watchlist. See where it leads.": [
     "Tek bir listeyle başla. Nereye gittiğini gör.",
     "Empieza con una lista. Mira a dónde llega."
-  ],
-  "Earnings calendar": [
-    "Bilanço takvimi",
-    "Calendario de resultados"
   ],
   "Upcoming and recent earnings for US-listed companies.": [
     "ABD’de işlem gören şirketlerin yaklaşan ve yeni açıklanan bilançoları.",
@@ -2599,14 +2599,6 @@
     "Tüm saatler",
     "Todas las horas"
   ],
-  "Before open": [
-    "Açılıştan önce",
-    "Antes de la apertura"
-  ],
-  "After close": [
-    "Kapanıştan sonra",
-    "Tras el cierre"
-  ],
   "Time not supplied": [
     "Saat belirtilmemiş",
     "Hora no indicada"
@@ -2623,13 +2615,21 @@
     "Tüm piyasa değerleri",
     "Todas las capitalizaciones"
   ],
-  "$1–10B": ["1–10 milyar $", "1000–10 000 M$"],
-  "$10–50B": ["10–50 milyar $", "10 000–50 000 M$"],
-  "$50–200B": ["50–200 milyar $", "50 000–200 000 M$"],
-  "$200B+": ["200 milyar $+", "Más de 200 000 M$"],
-  "My watchlists": [
-    "Listelerim",
-    "Mis listas"
+  "$1–10B": [
+    "1–10 milyar $",
+    "1000–10 000 M$"
+  ],
+  "$10–50B": [
+    "10–50 milyar $",
+    "10 000–50 000 M$"
+  ],
+  "$50–200B": [
+    "50–200 milyar $",
+    "50 000–200 000 M$"
+  ],
+  "$200B+": [
+    "200 milyar $+",
+    "Más de 200 000 M$"
   ],
   "Filters": [
     "Filtreler",
@@ -2658,10 +2658,6 @@
   "Pick a week": [
     "Hafta seç",
     "Elige una semana"
-  ],
-  "Export CSV": [
-    "CSV indir",
-    "Exportar CSV"
   ],
   "No earnings announcements in the available coverage for this period.": [
     "Bu dönem için kapsamdaki bir açıklama yok.",
@@ -2694,10 +2690,6 @@
   "EPS surprise": [
     "EPS sapması",
     "Sorpresa de BPA"
-  ],
-  "Market cap": [
-    "Piyasa değeri",
-    "Capitalización"
   ],
   "Not available": [
     "Yok",
@@ -2799,10 +2791,6 @@
     "İzlemek istediğin hisseleri kaydet, başlangıç fiyatından değişimi gör, piyasaları ve bilançoları yanında tut.",
     "Guarda las acciones que quieres seguir, mira el cambio desde tu precio inicial y ten mercados y resultados a mano."
   ],
-  "Start your watchlist": [
-    "Listene başla",
-    "Empieza tu lista"
-  ],
   "No account needed to start. Your guest watchlist stays on this device.": [
     "Başlamak için hesap gerekmez. Misafir listen bu cihazda kalır.",
     "No hace falta cuenta para empezar. La lista de invitado se queda en este dispositivo."
@@ -2895,10 +2883,6 @@
     "Bilanço verisi şu an yok.",
     "Los datos de resultados no están disponibles."
   ],
-  "How it works": [
-    "Nasıl çalışır",
-    "Cómo funciona"
-  ],
   "Add a company": [
     "Şirket ekle",
     "Añade una empresa"
@@ -2938,5 +2922,493 @@
   "Your lists are saved to your account.": [
     "Listelerin hesabına kaydedildi.",
     "Tus listas están guardadas en tu cuenta."
+  ],
+  "ANALYTICS": [
+    "ANALİTİK",
+    "ANALÍTICA"
+  ],
+  "Add position details": [
+    "Pozisyon ayrıntısı ekle",
+    "Añadir detalles de posición"
+  ],
+  "Announcement": [
+    "Açıklama",
+    "Anuncio"
+  ],
+  "Announcement history is not available for this symbol, so price-around-earnings analysis is omitted. Quarter-end dates are not used as a substitute.": [
+    "Bu sembol için açıklama geçmişi yok; kazanç çevresi analizi atlandı. Çeyrek sonu tarihleri yerine kullanılmaz.",
+    "No hay historial de anuncios para este símbolo, así que se omite el análisis de precio en resultados. No se usan cierres de trimestre."
+  ],
+  "Announcement session": [
+    "Açıklama seansı",
+    "Sesión del anuncio"
+  ],
+  "Announcement timing is not always supplied. After-close reports use the next regular session.": [
+    "Açıklama saati her zaman verilmez. Kapanış sonrası raporlar sonraki seansı kullanır.",
+    "La hora del anuncio no siempre se indica. Los informes tras el cierre usan la siguiente sesión."
+  ],
+  "Announcement timing may still be unconfirmed.": [
+    "Açıklama saati henüz kesin olmayabilir.",
+    "La hora del anuncio puede no estar confirmada."
+  ],
+  "Average of the displayed sample, equally weighted.": [
+    "Görünen örneklemin eşit ağırlıklı ortalaması.",
+    "Media igualmente ponderada de la muestra mostrada."
+  ],
+  "Average path of the split-adjusted close around verified announcement dates. This is price behavior around the event, not a cause.": [
+    "Doğrulanmış açıklama günleri çevresindeki temettü ayarlı kapanışın ortalama yolu. Bu, olay çevresindeki fiyat davranışı; neden değildir.",
+    "Recorrido medio del cierre ajustado alrededor de fechas de anuncio verificadas. Es comportamiento de precio, no una causa."
+  ],
+  "Average return around earnings announcements": [
+    "Bilanço açıklamaları çevresinde ortalama getiri",
+    "Rentabilidad media alrededor de los anuncios"
+  ],
+  "Avg. return · announcement session": [
+    "Ort. getiri · açıklama seansı",
+    "Rent. media · sesión del anuncio"
+  ],
+  "Back to sign in": [
+    "Girişe dön",
+    "Volver a iniciar sesión"
+  ],
+  "Browse markets": [
+    "Piyasaları aç",
+    "Explorar mercados"
+  ],
+  "CRYPTO BOARD": [
+    "KRİPTO PANOSU",
+    "TABLERO CRIPTO"
+  ],
+  "Change since added uses the recorded starting price.": [
+    "Eklenmeden beri değişim, kaydedilen başlangıç fiyatını kullanır.",
+    "El cambio desde el alta usa el precio inicial registrado."
+  ],
+  "Check your email and verify your account first.": [
+    "Önce e-postanı kontrol edip hesabını doğrula.",
+    "Revisa el correo y verifica la cuenta primero."
+  ],
+  "Choose a new password": [
+    "Yeni bir parola seç",
+    "Elige una contraseña nueva"
+  ],
+  "Company facts": [
+    "Şirket bilgileri",
+    "Datos de la empresa"
+  ],
+  "Continue browsing": [
+    "Gezinmeye devam et",
+    "Seguir explorando"
+  ],
+  "Could not complete sign-in": [
+    "Giriş tamamlanamadı",
+    "No se pudo completar el acceso"
+  ],
+  "Could not load this watchlist.": [
+    "Bu liste yüklenemedi.",
+    "No se pudo cargar esta lista."
+  ],
+  "Country for community map": [
+    "Topluluk haritası için ülke",
+    "País para el mapa comunitario"
+  ],
+  "Coverage and source": [
+    "Kapsam ve kaynak",
+    "Cobertura y fuente"
+  ],
+  "Create a free account to save": [
+    "Kaydetmek için ücretsiz hesap oluştur",
+    "Crea una cuenta gratis para guardar"
+  ],
+  "Create your account": [
+    "Hesabını oluştur",
+    "Crea tu cuenta"
+  ],
+  "Created a watchlist": [
+    "Liste oluşturdu",
+    "Creó una lista"
+  ],
+  "Daily change versus previous close": [
+    "Önceki kapanışa göre günlük değişim",
+    "Cambio diario frente al cierre previo"
+  ],
+  "Day": [
+    "Gün",
+    "Día"
+  ],
+  "Email delivery is simulated on this computer. Open the local link below to continue.": [
+    "E-posta bu bilgisayarda simüle edilir. Devam için aşağıdaki yerel bağlantıyı aç.",
+    "El correo se simula en este equipo. Abre el enlace local para continuar."
+  ],
+  "Enter the email on the account. We will send a reset link if it can receive mail.": [
+    "Hesaptaki e-postayı gir. Posta alabiliyorsa sıfırlama bağlantısı gönderilir.",
+    "Introduce el correo de la cuenta. Enviaremos un enlace si puede recibir mail."
+  ],
+  "Favorites need an account": [
+    "Favoriler için hesap gerekir",
+    "Los favoritos necesitan una cuenta"
+  ],
+  "Favorites pin names on Markets. They are not a watchlist and do not record a starting price. You can keep browsing without signing in.": [
+    "Favoriler Piyasalar’da isim sabitler. Liste değildir ve başlangıç fiyatı kaydetmez. Giriş yapmadan gezinmeye devam edebilirsin.",
+    "Los favoritos fijan nombres en Mercados. No son una lista ni guardan precio inicial. Puedes seguir sin iniciar sesión."
+  ],
+  "Favorites pin names on this page. They are not a watchlist and do not record a starting price.": [
+    "Favoriler bu sayfada isim sabitler. Liste değildir ve başlangıç fiyatı kaydetmez.",
+    "Los favoritos fijan nombres en esta página. No son una lista ni guardan precio inicial."
+  ],
+  "Finishing sign-in…": [
+    "Giriş tamamlanıyor…",
+    "Terminando el acceso…"
+  ],
+  "First-party counts stored in your database. Unique browsers use an anonymous browser id, not a person. Totals count every recorded action that day. Days are reported in UTC.": [
+    "Veritabanındaki birinci taraf sayımlar. Benzersiz tarayıcılar anonim bir kimlik kullanır, kişi değil. Toplamlar o günkü her eylemi sayar. Günler UTC’dir.",
+    "Conteos propios en tu base. Los navegadores únicos usan un id anónimo, no una persona. Los totales cuentan cada acción del día. Los días están en UTC."
+  ],
+  "Follow the link to choose a new password.": [
+    "Yeni parola seçmek için bağlantıyı izle.",
+    "Sigue el enlace para elegir una contraseña nueva."
+  ],
+  "Gainers in this selection": [
+    "Bu seçimdeki yükselenler",
+    "Ganadores de esta selección"
+  ],
+  "Go back": [
+    "Geri dön",
+    "Volver"
+  ],
+  "Go home": [
+    "Ana sayfaya git",
+    "Ir al inicio"
+  ],
+  "Hide password": [
+    "Parolayı gizle",
+    "Ocultar contraseña"
+  ],
+  "Identity": [
+    "Kimlik",
+    "Identidad"
+  ],
+  "If this email can receive the link, it’s on its way. Open it in this browser to continue.": [
+    "Bu e-posta bağlantıyı alabiliyorsa yolda. Devam için bu tarayıcıda aç.",
+    "Si este correo puede recibir el enlace, está en camino. Ábrelo en este navegador."
+  ],
+  "Last 14 days (UTC)": [
+    "Son 14 gün (UTC)",
+    "Últimos 14 días (UTC)"
+  ],
+  "Level": [
+    "Seviye",
+    "Nivel"
+  ],
+  "List limits": [
+    "Liste sınırları",
+    "Límites de listas"
+  ],
+  "Loading analytics…": [
+    "Analitik yükleniyor…",
+    "Cargando analítica…"
+  ],
+  "Local accounts · Saved on this computer. Verification links appear here; no email is sent. Google and Apple sign-in become available after service setup.": [
+    "Yerel hesaplar · Bu bilgisayarda saklanır. Doğrulama bağlantıları burada görünür; e-posta gitmez. Google ve Apple, kurulumdan sonra açılır.",
+    "Cuentas locales · Guardadas en este equipo. Los enlaces aparecen aquí; no se envía correo. Google y Apple se activan tras la configuración."
+  ],
+  "Losers in this selection": [
+    "Bu seçimdeki düşenler",
+    "Perdedores de esta selección"
+  ],
+  "Market tape": [
+    "Piyasa şeridi",
+    "Cinta de mercado"
+  ],
+  "New password": [
+    "Yeni parola",
+    "Nueva contraseña"
+  ],
+  "Next earnings date (estimated)": [
+    "Sonraki bilanço tarihi (tahmini)",
+    "Próxima fecha de resultados (estimada)"
+  ],
+  "No analytics events in this period yet.": [
+    "Bu dönemde henüz analitik olay yok.",
+    "Aún no hay eventos de analítica en este periodo."
+  ],
+  "Owner-only counts of unique browsers and events.": [
+    "Yalnızca sahibin gördüğü benzersiz tarayıcı ve olay sayıları.",
+    "Conteos solo del propietario de navegadores únicos y eventos."
+  ],
+  "PINNED ON MARKETS": [
+    "PİYASALARDA SABİT",
+    "FIJADOS EN MERCADOS"
+  ],
+  "Password updated. You can now sign in.": [
+    "Parola güncellendi. Şimdi giriş yapabilirsin.",
+    "Contraseña actualizada. Ya puedes iniciar sesión."
+  ],
+  "Pause tape": [
+    "Şeridi durdur",
+    "Pausar cinta"
+  ],
+  "Please verify your email first.": [
+    "Önce e-postanı doğrula.",
+    "Verifica tu correo primero."
+  ],
+  "Positive after 30 sessions": [
+    "30 seans sonra pozitif",
+    "Positivos a 30 sesiones"
+  ],
+  "Preferences": [
+    "Tercihler",
+    "Preferencias"
+  ],
+  "Price around past earnings announcements": [
+    "Geçmiş bilanço açıklamaları çevresindeki fiyat",
+    "Precio alrededor de anuncios de resultados"
+  ],
+  "Profitability": [
+    "Kârlılık",
+    "Rentabilidad"
+  ],
+  "Quantity and purchase details are fixed after saving.": [
+    "Miktar ve alım ayrıntıları kayıttan sonra sabitlenir.",
+    "La cantidad y la compra quedan fijas al guardar."
+  ],
+  "Related news from the same session:": [
+    "Aynı seansın ilgili haberi:",
+    "Noticia relacionada de la misma sesión:"
+  ],
+  "Related news:": [
+    "İlgili haber:",
+    "Noticia relacionada:"
+  ],
+  "Resend verification email": [
+    "Doğrulama e-postasını yeniden gönder",
+    "Reenviar correo de verificación"
+  ],
+  "Save your watchlist with a free account before sharing a read-only link.": [
+    "Salt okunur bağlantı paylaşmadan önce listeyi ücretsiz hesapla kaydet.",
+    "Guarda la lista con una cuenta gratis antes de compartir un enlace de solo lectura."
+  ],
+  "Searched": [
+    "Arama",
+    "Buscó"
+  ],
+  "Searched a stock": [
+    "Hisse aradı",
+    "Buscó una acción"
+  ],
+  "Show password": [
+    "Parolayı göster",
+    "Mostrar contraseña"
+  ],
+  "Show tape": [
+    "Şeridi göster",
+    "Mostrar cinta"
+  ],
+  "Showing cached results.": [
+    "Önbellekteki sonuçlar gösteriliyor.",
+    "Mostrando resultados en caché."
+  ],
+  "Showing last loaded values after a refresh failed.": [
+    "Yenileme başarısız; son yüklenen değerler gösteriliyor.",
+    "Tras un fallo de actualización se muestran los últimos valores."
+  ],
+  "Sign-in was canceled.": [
+    "Giriş iptal edildi.",
+    "Se canceló el acceso."
+  ],
+  "Sign-up and sign-in will open once account setup is complete.": [
+    "Hesap kurulumu bitince kayıt ve giriş açılır.",
+    "El registro y el acceso se abrirán al terminar la configuración."
+  ],
+  "Signed up": [
+    "Kayıt oldu",
+    "Se registró"
+  ],
+  "THIS SELECTION": [
+    "BU SEÇİM",
+    "ESTA SELECCIÓN"
+  ],
+  "The address is not a page in StockWatchlist.": [
+    "Bu adres StockWatchlist’te bir sayfa değil.",
+    "Esta dirección no es una página de StockWatchlist."
+  ],
+  "The estimated earnings date is next week, on": [
+    "Tahmini bilanço tarihi gelecek hafta,",
+    "La fecha estimada de resultados es la semana que viene, el"
+  ],
+  "The estimated earnings date is this week, on": [
+    "Tahmini bilanço tarihi bu hafta,",
+    "La fecha estimada de resultados es esta semana, el"
+  ],
+  "The estimated earnings date is today,": [
+    "Tahmini bilanço tarihi bugün,",
+    "La fecha estimada de resultados es hoy,"
+  ],
+  "The next estimated earnings date is": [
+    "Sonraki tahmini bilanço tarihi",
+    "La próxima fecha estimada de resultados es"
+  ],
+  "This adds the latest quote as a starting price. You can add shares and cost later, once.": [
+    "Bu, son kotasyonu başlangıç fiyatı olarak ekler. Hisse ve maliyeti sonra bir kez ekleyebilirsin.",
+    "Esto añade la última cotización como precio inicial. Puedes añadir acciones y coste después, una vez."
+  ],
+  "This link expired or was opened in a different browser. Sign in or request another link.": [
+    "Bağlantının süresi doldu veya başka tarayıcıda açıldı. Giriş yap veya yeni bağlantı iste.",
+    "El enlace caducó o se abrió en otro navegador. Entra o pide otro enlace."
+  ],
+  "This link is unavailable or has been turned off.": [
+    "Bu bağlantı yok veya kapatılmış.",
+    "Este enlace no está disponible o se ha desactivado."
+  ],
+  "This list is": [
+    "Bu liste",
+    "Esta lista es"
+  ],
+  "This optional country is only used for the public community map. It is not used for quotes, tax, or billing.": [
+    "Bu isteğe bağlı ülke yalnızca kamu haritası içindir. Kotasyon, vergi veya fatura için kullanılmaz.",
+    "Este país opcional solo se usa en el mapa público. No sirve para cotizaciones, impuestos ni facturación."
+  ],
+  "This watchlist doesn’t have any stocks yet. Check back for the owner’s next idea.": [
+    "Bu listede henüz hisse yok. Sahibinin sonraki fikrini sonra kontrol et.",
+    "Esta lista aún no tiene acciones. Vuelve para la próxima idea del propietario."
+  ],
+  "Time unavailable": [
+    "Saat yok",
+    "Hora no disponible"
+  ],
+  "Track price only": [
+    "Yalnızca fiyatı izle",
+    "Solo seguir el precio"
+  ],
+  "Track the latest quote, or optionally add shares and cost. Quantity and purchase details stay fixed after saving.": [
+    "Son kotasyonu izle veya isteğe bağlı hisse ve maliyet ekle. Miktar ve alım ayrıntıları kayıttan sonra sabit kalır.",
+    "Sigue la última cotización o añade acciones y coste. La cantidad y la compra quedan fijas al guardar."
+  ],
+  "Trading": [
+    "İşlem",
+    "Negociación"
+  ],
+  "US, Europe (EUR), Canada (CAD), and Turkey (TRY). A list stays in the currency of the first stock you add.": [
+    "ABD, Avrupa (EUR), Kanada (CAD) ve Türkiye (TRY). Liste, eklediğin ilk hissenin para biriminde kalır.",
+    "EE. UU., Europa (EUR), Canadá (CAD) y Turquía (TRY). La lista se queda en la moneda de la primera acción."
+  ],
+  "USD quotes for bitcoin, ether, and the coins that move with them. Quotes may be delayed.": [
+    "Bitcoin, ether ve birlikte hareket eden coinler için USD kotasyonları. Kotasyonlar gecikmeli olabilir.",
+    "Cotizaciones en USD de bitcoin, éter y monedas relacionadas. Pueden ir con retraso."
+  ],
+  "Unique browsers / event totals.": [
+    "Benzersiz tarayıcılar / olay toplamları.",
+    "Navegadores únicos / totales de eventos."
+  ],
+  "Update password": [
+    "Parolayı güncelle",
+    "Actualizar contraseña"
+  ],
+  "Use one of these paths to continue.": [
+    "Devam etmek için bu yollardan birini kullan.",
+    "Usa uno de estos caminos para continuar."
+  ],
+  "Used": [
+    "Kullanılan",
+    "Usado"
+  ],
+  "Valuation": [
+    "Değerleme",
+    "Valoración"
+  ],
+  "Verify your email before signing in.": [
+    "Girişten önce e-postanı doğrula.",
+    "Verifica el correo antes de iniciar sesión."
+  ],
+  "Visited": [
+    "Ziyaret",
+    "Visitó"
+  ],
+  "Watchlists could not be loaded. The calendar is shown without your list filter.": [
+    "Listeler yüklenemedi. Takvim, liste filtresi olmadan gösteriliyor.",
+    "No se pudieron cargar las listas. El calendario se muestra sin tu filtro."
+  ],
+  "We will email a reset link if this address has an account.": [
+    "Bu adreste hesap varsa sıfırlama bağlantısı e-postalanır.",
+    "Enviaremos un enlace de restablecimiento si esta dirección tiene cuenta."
+  ],
+  "Your guest watchlist is still on this device. Open Watchlists and try saving again.": [
+    "Misafir listen hâlâ bu cihazda. Listeleri açıp yeniden kaydetmeyi dene.",
+    "Tu lista de invitado sigue en este dispositivo. Abre Listas e intenta guardar de nuevo."
+  ],
+  "Your guest watchlist stays on this device until it is saved to the account.": [
+    "Misafir listen hesaba kaydedilene kadar bu cihazda kalır.",
+    "La lista de invitado permanece en este dispositivo hasta guardarla en la cuenta."
+  ],
+  "Your holdings on this device stay with the account.": [
+    "Bu cihazdaki pozisyonlar hesapla birlikte kalır.",
+    "Tus posiciones en este dispositivo se quedan con la cuenta."
+  ],
+  "Your local inbox": [
+    "Yerel gelen kutun",
+    "Tu bandeja local"
+  ],
+  "Your watchlists are just a moment away.": [
+    "Listelerin bir an sonra hazır.",
+    "Tus listas están a un momento."
+  ],
+  "announcements": [
+    "açıklama",
+    "anuncios"
+  ],
+  "events today": [
+    "olay bugün",
+    "eventos hoy"
+  ],
+  "only. Add a matching quote, or start a new list.": [
+    "yalnızca. Uyumlu bir kotasyon ekle veya yeni liste başlat.",
+    "solo. Añade una cotización compatible o empieza otra lista."
+  ],
+  "points": [
+    "puan",
+    "puntos"
+  ],
+  "quoted names.": [
+    "kotasyonlu isim.",
+    "nombres cotizados."
+  ],
+  "samples": [
+    "örnek",
+    "muestras"
+  ],
+  "stocks": [
+    "hisse",
+    "acciones"
+  ],
+  "stocks across lists": [
+    "listelerdeki hisse",
+    "acciones en las listas"
+  ],
+  "unique browsers": [
+    "benzersiz tarayıcı",
+    "navegadores únicos"
+  ],
+  "watchlists": [
+    "izleme listesi",
+    "listas"
+  ],
+  "your watchlist": [
+    "izleme listen",
+    "tu lista"
+  ],
+  "← Earnings": [
+    "← Bilançolar",
+    "← Resultados"
+  ],
+  "← Home": [
+    "← Ana sayfa",
+    "← Inicio"
+  ],
+  "← Watchlists": [
+    "← Listeler",
+    "← Listas"
+  ],
+  "Regular hours": [
+    "Normal seans",
+    "Horario regular"
   ]
 }

@@ -34,6 +34,7 @@ export async function getQuote(value) {
         const quote = {
           symbol: normalizeTicker(meta.symbol || symbol), companyName: meta.longName || meta.shortName,
           currency: meta.currency, price: meta.regularMarketPrice, previousClose, changePercent,
+          quoteType: meta.instrumentType || meta.quoteType || '',
           quoteTime: new Date(meta.regularMarketTime * 1000).toISOString(),
           checkedAt: new Date().toISOString(), exchange: meta.fullExchangeName || meta.exchangeName || '', source: 'Yahoo Finance',
         };

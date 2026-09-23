@@ -49,7 +49,7 @@ export function DailyMove({symbol,chart,earningsDate}:{symbol:string;chart:Marke
     <p className="eyebrow">{t("TODAY'S MOVE")}</p>
     {move.lines.map(line=><p key={line.key}>{lineText(t,line.key,line.vars)}</p>)}
     {headline&&<>
-      <p>{headline.sameDay?t("Today's Yahoo Finance headline may help explain the move:"):t('Recent Yahoo Finance news:')}</p>
+      <p>{headline.sameDay?t('Related news from the same session:'):t('Related news:')}</p>
       <a className="daily-move-headline" href={headline.link} target="_blank" rel="noopener noreferrer">{headline.title}</a>
       <small>{headline.publisher}</small>
     </>}

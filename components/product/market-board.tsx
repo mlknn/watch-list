@@ -9,7 +9,8 @@ import {StockSearch} from './stock-search';
 import {Button} from '@/components/ui/button';
 import {Dialog,DialogContent,DialogDescription,DialogTitle} from '@/components/ui/dialog';
 import {Tabs,TabsList,TabsTrigger} from '@/components/ui/tabs';
-import {price} from '@/lib/watchlist';
+import {price,quoteUnit} from '@/lib/watchlist';
+import {stockHref} from '@/lib/safe-return.mjs';
 import {marketChart,type MarketChart} from '@/lib/market';
 import {chartPeriodStats} from '@/lib/chart-period.mjs';
 import {exchangeSession,sectorAverage,tapeBreadth,tapeMovers} from '@/lib/market-tape.mjs';
@@ -20,14 +21,16 @@ import {apiJson} from '@/lib/auth-client';
 type Row={symbol:string;name?:string;short?:string;chart:MarketChart|null;error:string|null};
 type Group={id:string;title:string;blurb:string;stocks:Row[];kind?:string};
 type Board={fetchedAt:string;indices:(Row&{name:string})[];groups:Group[]};
-type FavoriteState={signedIn:boolean;ids:Set<string>;rows:Row[];toggle:(symbol:string)=>void};
+type FavoriteState={signedIn:boolean;ids:Set<string>;rows:Row[];toggle:(symbol:string)=>void;askSignIn:()=>void};
 type Market=ReturnType<typeof getMarket>;
 
-const Favorites=createContext<FavoriteState>({signedIn:false,ids:new Set(),rows:[],toggle:()=>{}});
+const Favorites=createContext<FavoriteState>({signedIn:false,ids:new Set(),rows:[],toggle:()=>{},askSignIn:()=>{}});
 type Sort={key:'name'|'price'|'change';dir:1|-1};
 
 function dayPct(row:Row){return typeof row.chart?.quote.changePercent==='number'?row.chart.quote.changePercent:null;}
 function fmtPct(pct:number|null){return pct===null||pct===undefined?'—':`${pct>=0?'+':''}${pct.toFixed(2)}%`;}
+
+function quoteText(chart:MarketChart){return price(chart.quote.price,chart.currency,quoteUnit({symbol:chart.symbol,quoteType:chart.quoteType}));}
 
 function LiveTicker({market,groups,ready}:{market:Market;groups:Board['groups'];ready:Record<string,boolean>}){
   const [indexes,setIndexes]=useState<(Row&{name:string;short?:string})[]>([]);
@@ -39,25 +42,46 @@ function LiveTicker({market,groups,ready}:{market:Market;groups:Board['groups'];
   const items=[
     ...(indexes.length?indexes:market.indices.map(item=>({...item,chart:null,error:null}))).map(row=>{
       const slug=String(row.short||row.name).replace(/[^a-zA-Z]/g,'').toLowerCase();
-      return {key:'i-'+row.symbol,href:'#index-'+slug,label:row.short||row.name,price:row.chart?price(row.chart.quote.price,row.chart.currency):null,pct:dayPct(row)};
+      return {key:'i-'+row.symbol,href:'#index-'+slug,label:row.short||row.name,price:row.chart?quoteText(row.chart):null,pct:dayPct(row)};
     }),
     ...groups.map(group=>({key:'g-'+group.id,href:'#'+group.id,label:group.title,price:null as string|null,pct:ready[group.id]?sectorAverage(group.stocks):null})),
   ];
+  const t=useT();
+  const [paused,setPaused]=useState(false);
+  const [reduce,setReduce]=useState(false);
+  useEffect(()=>{
+    const media=window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync=()=>setReduce(media.matches);
+    sync();
+    media.addEventListener('change',sync);
+    return()=>media.removeEventListener('change',sync);
+  },[]);
   function go(e:React.MouseEvent<HTMLAnchorElement>,href:string){
     e.preventDefault();
-    document.querySelector(href)?.scrollIntoView({behavior:'smooth',block:'start'});
+    document.querySelector(href)?.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});
   }
-  const track=[...items,...items];
-  return <nav className="market-ticker" aria-label="Live market tape">
-    <div className="market-ticker-track">
-      {track.map((item,i)=>
-        <a key={item.key+i} href={item.href} onClick={e=>go(e,item.href)} className={item.pct==null?'':item.pct>=0?'is-up':'is-down'}>
+  const moving=!paused&&!reduce;
+  return <nav className={'market-ticker'+(moving?'':' is-static')} aria-label={t('Market tape')}>
+    <div className="market-ticker-bar">
+      <button type="button" className="market-ticker-pause" aria-pressed={paused||reduce} onClick={()=>setPaused(v=>!v)}>{paused||reduce?t('Show tape'):t('Pause tape')}</button>
+    </div>
+    <div className="market-ticker-track" aria-hidden={moving}>
+      {items.map(item=>
+        <a key={item.key} href={item.href} tabIndex={moving?-1:0} onClick={e=>go(e,item.href)} className={item.pct==null?'':item.pct>=0?'is-up':'is-down'}>
+          <strong>{item.label}</strong>
+          {item.price&&<span>{item.price}</span>}
+          {item.pct!=null&&<small>{fmtPct(item.pct)}</small>}
+        </a>
+      )}
+      {moving&&items.map(item=>
+        <a key={item.key+'-dup'} href={item.href} tabIndex={-1} aria-hidden="true" onClick={e=>go(e,item.href)} className={item.pct==null?'':item.pct>=0?'is-up':'is-down'}>
           <strong>{item.label}</strong>
           {item.price&&<span>{item.price}</span>}
           {item.pct!=null&&<small>{fmtPct(item.pct)}</small>}
         </a>
       )}
     </div>
+    {moving&&<ul className="sr-only">{items.map(item=><li key={item.key}><a href={item.href} onClick={e=>go(e,item.href)}>{item.label}{item.price?` ${item.price}`:''}{item.pct!=null?` ${fmtPct(item.pct)}`:''}</a></li>)}</ul>}
   </nav>;
 }
 
@@ -68,7 +92,7 @@ function SessionBadge({market}:{market:Market}){
   const session=exchangeSession(now,market.session);
   const clock=new Intl.DateTimeFormat(undefined,{timeZone:market.session.tz,hour:'numeric',minute:'2-digit'}).format(now);
   const always=!!market.session.alwaysOpen;
-  const label=always?t('24 hours'):session.code==='open'?t('Session open'):t(session.label);
+  const label=always?t('24 hours'):t(session.label);
   const detail=always?t('Trades around the clock.'):session.detail;
   return <aside className={'market-session is-'+session.code+(always?' is-always':'')} aria-live="polite">
     <strong><span className="market-session-dot" aria-hidden="true"/>{label}</strong>
@@ -90,13 +114,13 @@ function TapeStrip({rows,onCoin}:{rows:Row[];onCoin:(symbol:string,name?:string)
   return <section className="market-tape" aria-label={t('Today')}>
     <div className="market-movers">
       <div>
-        <p className="eyebrow"><T text="LEADERS"/></p>
-        <h3><T text="Gainers"/></h3>
+        <p className="eyebrow"><T text="THIS SELECTION"/></p>
+        <h3><T text="Gainers in this selection"/></h3>
         {gainers.map(row=><a key={'g-'+row.symbol} href={isCryptoCoin(row.symbol)?'#':('/stocks/'+encodeURIComponent(row.symbol))} onClick={e=>open(e,row)}>{!isCryptoCoin(row.symbol)?<CompanyIcon symbol={row.symbol}/>:null}<span>{tapeLabel(row)}</span><em className="up">{fmtPct(dayPct(row))}</em></a>)}
       </div>
       <div>
-        <p className="eyebrow"><T text="LAGGARDS"/></p>
-        <h3><T text="Losers"/></h3>
+        <p className="eyebrow"><T text="THIS SELECTION"/></p>
+        <h3><T text="Losers in this selection"/></h3>
         {losers.map(row=><a key={'l-'+row.symbol} href={isCryptoCoin(row.symbol)?'#':('/stocks/'+encodeURIComponent(row.symbol))} onClick={e=>open(e,row)}>{!isCryptoCoin(row.symbol)?<CompanyIcon symbol={row.symbol}/>:null}<span>{tapeLabel(row)}</span><em className="down">{fmtPct(dayPct(row))}</em></a>)}
       </div>
     </div>
@@ -139,9 +163,9 @@ function Change({chart}:{chart:MarketChart}){
 }
 
 function FavoriteStar({symbol}:{symbol:string}){
-  const {signedIn,ids,toggle}=useContext(Favorites);
+  const {signedIn,ids,toggle,askSignIn}=useContext(Favorites);
   const on=ids.has(symbol);
-  return <button type="button" className={'favorite-star'+(on?' is-on':'')} aria-label={on?'Remove from favorites':'Add to favorites'} title={on?'Remove from favorites':'Add to favorites'} onClick={e=>{e.preventDefault();e.stopPropagation();if(!signedIn){window.location.assign('/signup');return;}toggle(symbol);}}>
+  return <button type="button" className={'favorite-star'+(on?' is-on':'')} aria-label={on?'Remove from favorites':'Add to favorites'} title={on?'Remove from favorites':'Add to favorites'} onClick={e=>{e.preventDefault();e.stopPropagation();if(!signedIn){askSignIn();return;}toggle(symbol);}}>
     <Star size={13} strokeWidth={2} fill={on?'currentColor':'none'}/>
   </button>;
 }
@@ -187,7 +211,7 @@ function IndexHero({indices,variant}:{indices:(Row&{name:string})[];variant?:'cr
               <p className="eyebrow">{row.short||row.name}</p>
               <h3>{row.name}</h3>
             </div>
-            {chart?<div className="market-index-quote"><strong>{price(chart.quote.price,chart.currency)}</strong><Change chart={chart}/></div>:<p className="market-card-error">{errors[row.symbol]||t('Loading…')}</p>}
+            {chart?<div className="market-index-quote"><strong>{quoteText(chart)}</strong><Change chart={chart}/></div>:<p className="market-card-error">{errors[row.symbol]||t('Loading…')}</p>}
             <button type="button" className="index-expand" aria-label={'Expand '+row.name+' chart'} title="Expand chart" onClick={()=>setExpanded(row.symbol)}><Maximize2 size={13}/></button>
           </div>
           {chart&&chart.range===range?<PriceChart data={chart} compact style={style} className="index-hero-chart"/>:busy?<div className="market-loading"><LoaderCircle className="spin"/></div>:<p className="market-card-error">{errors[row.symbol]||t('Chart unavailable.')}</p>}
@@ -200,7 +224,7 @@ function IndexHero({indices,variant}:{indices:(Row&{name:string})[];variant?:'cr
       return <Dialog open={!!expanded} onOpenChange={v=>{if(!v)setExpanded(null);}}>
         <DialogContent className="full-chart-dialog index-chart-dialog">
           <DialogTitle>{row?.name||expanded}</DialogTitle>
-          <DialogDescription>{chart?`${price(chart.quote.price,chart.currency)} · ${chart.sessionDate||chart.range}`:'Expanded index chart'}</DialogDescription>
+          <DialogDescription>{chart?`${quoteText(chart)} · ${chart.sessionDate||chart.range}`:'Expanded index chart'}</DialogDescription>
           <div className="market-index-toolbar">
             <Tabs value={style} onValueChange={v=>setStyle(v as ChartStyle)}>
               <TabsList className="chart-ranges market-index-style" aria-label="Chart type">
@@ -271,7 +295,7 @@ function CryptoHeat({group,ready,onOpen}:{group:Group;ready:boolean;onOpen:(row:
   const leads=new Set(['BTC-USD','ETH-USD','SOL-USD']);
   return <section id={group.id} className="crypto-heat-wrap">
     <div className="market-group-copy crypto-heat-copy">
-      <p className="eyebrow"><T text="LIVE BOARD"/></p>
+      <p className="eyebrow"><T text="CRYPTO BOARD"/></p>
       <h2>{t(group.title)}{avg!==null&&<span className={avg>=0?'up':'down'}>{fmtPct(avg)}</span>}</h2>
       <p>{t(group.blurb)}</p>
     </div>
@@ -295,7 +319,7 @@ function StockRow({row,pending,onCoin}:{row:Row;pending:boolean;onCoin?:(symbol:
   const t=useT();
   const chart=row.chart;
   const crypto=isCryptoCoin(row.symbol);
-  const href=crypto?'#':('/stocks/'+encodeURIComponent(row.symbol));
+  const href=crypto?'#':stockHref(row.symbol,'/dashboard');
   function open(e:React.MouseEvent){
     if(!crypto||!onCoin)return;
     e.preventDefault();
@@ -314,8 +338,9 @@ function FavoritesBoard({rows,onCoin}:{rows:Row[];onCoin?:(symbol:string,name?:s
   if(!rows.length)return null;
   return <section className="market-group market-favorites" aria-label={t('Favorites')}>
     <div className="market-group-copy">
-      <p className="eyebrow"><T text="SAVED FOR THE TAPE"/></p>
+      <p className="eyebrow"><T text="PINNED ON MARKETS"/></p>
       <h2><T text="Favorites"/></h2>
+      <p>{t('Favorites pin names on this page. They are not a watchlist and do not record a starting price.')}</p>
     </div>
     <div className="market-table" role="table" aria-label={t('Favorites')}>
       <div className="market-table-head" role="row">
@@ -329,10 +354,11 @@ function FavoritesBoard({rows,onCoin}:{rows:Row[];onCoin?:(symbol:string,name?:s
 function GroupTable({group,ready,sort,onSort,onCoin}:{group:Group;ready:boolean;sort:Sort|null;onSort:(key:Sort['key'])=>void;onCoin?:(symbol:string,name?:string)=>void}){
   const t=useT();
   const avg=ready?sectorAverage(group.stocks):null;
+  const quoted=group.stocks.filter(row=>Number.isFinite(row.chart?.quote.changePercent)).length;
   return <section id={group.id} className={'market-group'+(group.kind==='etfs'?' is-etfs':'')}>
     <div className="market-group-copy">
       <h2>{t(group.title)}{avg!==null&&<span className={avg>=0?'up':'down'}>{fmtPct(avg)}</span>}</h2>
-      <p>{t(group.blurb)}</p>
+      <p>{t(group.blurb)}{ready&&avg!==null?` ${t('Average of the displayed sample, equally weighted.')} ${quoted} ${t('quoted names.')}`:''}</p>
     </div>
     <div className="market-table" role="table" aria-label={group.title+' stocks'}>
       <div className="market-table-head" role="row">
@@ -360,6 +386,7 @@ export function MarketBoard(){
   const [favoriteRows,setFavoriteRows]=useState<Row[]>([]);
   const [sorts,setSorts]=useState<Record<string,Sort|null>>({});
   const [coinChart,setCoinChart]=useState<{symbol:string;name?:string}|null>(null);
+  const [favoritePrompt,setFavoritePrompt]=useState(false);
   useEffect(()=>{setData(skeleton(market));setReady({});setError('');},[market]);
   useEffect(()=>{let alive=true;
     const loaded=new Set<string>();
@@ -402,7 +429,7 @@ export function MarketBoard(){
   }
   async function openStock(symbol:string){
     if(isCryptoCoin(symbol)){openCoin(symbol);return;}
-    router.push('/stocks/'+encodeURIComponent(symbol));
+    router.push(stockHref(symbol,market.id==='us'?'/dashboard':'/dashboard?market='+market.id));
   }
   async function search(e:React.FormEvent){
     e.preventDefault();
@@ -423,7 +450,7 @@ export function MarketBoard(){
       setError((e as Error).message);
     }
   }
-  const favoriteState:FavoriteState={signedIn,ids:new Set(favoriteRows.map(row=>row.symbol)),rows:favoriteRows,toggle};
+  const favoriteState:FavoriteState={signedIn,ids:new Set(favoriteRows.map(row=>row.symbol)),rows:favoriteRows,toggle,askSignIn:()=>setFavoritePrompt(true)};
   const quotedRows=data.groups.flatMap(group=>group.stocks);
   const isCrypto=market.kind==='crypto';
   const isGlobal=market.id==='global';
@@ -446,8 +473,8 @@ export function MarketBoard(){
     <div className="page-heading market-heading" id="todays-tape">
       <div>
         <p className="eyebrow">{isCrypto?t('CRYPTO, AROUND THE CLOCK'):t('MARKETS, IN ONE PLACE')}</p>
-        <h2>{isCrypto?t('The tape never sleeps.'):t('Today’s tape.')}</h2>
-        <p className="intro">{isCrypto?t('Live USD quotes for bitcoin, ether, and the coins that move with them.'):isGlobal?t('Indexes and leaders from Japan, China, India, Korea, and the other large cash markets.'):t('Pick a market, then look up stocks, ETFs, charts, and company details.')}</p>
+        <h1>{t('Markets')}</h1>
+        <p className="intro">{isCrypto?t('USD quotes for bitcoin, ether, and the coins that move with them. Quotes may be delayed.'):isGlobal?t('Indexes and leaders from Japan, China, India, Korea, and the other large cash markets.'):t('Pick a market, then look up stocks, ETFs, charts, and company details.')} {t('Today’s tape.')}</p>
         {isCrypto&&!!ready[coinGroup?.id||'']&&breadth.quoted>0&&<p className="crypto-breadth" aria-live="polite"><span className="up">{breadth.up} {t('advancing')}</span><span className="down">{breadth.down} {t('declining')}</span></p>}
         <div className="market-picks" role="group" aria-label={t('Change the market')}>
           {listMarkets().map(item=>{
@@ -476,5 +503,15 @@ export function MarketBoard(){
     </div>}
     <p className="market-footnote">{t('Yahoo Finance · Quotes may be delayed')}{data.fetchedAt?` · ${new Date(data.fetchedAt).toLocaleString()}`:''}. {isCrypto?t('Crypto never closes. Click a coin for the chart. Not advice.'):t('Charts are for looking, not advice. Click any row for details and quarterly earnings.')}</p>
     <CoinChartDialog symbol={coinChart?.symbol||null} name={coinChart?.name} onClose={()=>setCoinChart(null)}/>
+    <Dialog open={favoritePrompt} onOpenChange={setFavoritePrompt}>
+      <DialogContent className="list-dialog">
+        <DialogTitle>{t('Favorites need an account')}</DialogTitle>
+        <DialogDescription>{t('Favorites pin names on Markets. They are not a watchlist and do not record a starting price. You can keep browsing without signing in.')}</DialogDescription>
+        <div className="add-stock-actions">
+          <Button variant="outline" className="outline-button" onClick={()=>setFavoritePrompt(false)}>{t('Continue browsing')}</Button>
+          <a className="solid-link" href={'/login?next='+encodeURIComponent(market.id==='us'?'/dashboard':'/dashboard?market='+market.id)}>{t('Sign in')}</a>
+        </div>
+      </DialogContent>
+    </Dialog>
   </main></Favorites.Provider>;
 }

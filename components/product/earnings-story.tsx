@@ -27,8 +27,8 @@ function NextReportNotice({iso}:{iso?:string}){
   const tone=nextEarningsTone(day,todayInMarket());
   if(!tone)return null;
   const label=new Date(day+'T12:00:00Z').toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric',timeZone:'UTC'});
-  const prefix=tone==='today'?t('The earnings report will be released today,'):tone==='this-week'?t('The earnings report will be released this week, on'):tone==='next-week'?t('The earnings report will be released next week, on'):t('The next earnings report will be released on');
-  return <p className={'story-next'+(nextEarningsSoon(tone)?' is-soon':'')} role={nextEarningsSoon(tone)?'status':undefined}>{prefix} {label}.</p>;
+  const prefix=tone==='today'?t('The estimated earnings date is today,'):tone==='this-week'?t('The estimated earnings date is this week, on'):tone==='next-week'?t('The estimated earnings date is next week, on'):t('The next estimated earnings date is');
+  return <p className={'story-next'+(nextEarningsSoon(tone)?' is-soon':'')} role={nextEarningsSoon(tone)?'status':undefined}>{prefix} {label}. {t('Announcement timing may still be unconfirmed.')}</p>;
 }
 
 export function EarningsStory({symbol,nextDate}:{symbol:string;nextDate?:string}){
@@ -61,7 +61,7 @@ export function EarningsStory({symbol,nextDate}:{symbol:string;nextDate?:string}
     ]).then(([data,chart])=>{
       if(!alive)return;
       setReports(data);
-      setWindows(eventWindows(chart?.points||[],(data.quarters||[]).map(q=>q.periodEnd),10));
+      setWindows(eventWindows(chart?.points||[],chart?.earningsDates||[],10));
     }).catch(e=>{if(alive)setError(e.message);}).finally(()=>{if(alive)setLoading(false);});
     return()=>{alive=false;};
   },[symbol]);
@@ -81,15 +81,16 @@ export function EarningsStory({symbol,nextDate}:{symbol:string;nextDate?:string}
     <section className="story-card">
       <p className="eyebrow"><T text="EARNINGS STORY"/></p>
       {nextNotice}
-      <h2><T text="Historical earnings impact"/></h2>
-      <p><T text="Average path of the split-adjusted close around each reported quarter-end, using the last five years of daily prices."/></p>
-      <p className="story-meta">{t('Based on')} {impact.samples} {t('quarter-ends')}</p>
-      <div className="story-chart" role="img" aria-label={t('Average return before and after quarter-end')}>
+      <h2><T text="Price around past earnings announcements"/></h2>
+      {impact.samples?<>
+      <p><T text="Average path of the split-adjusted close around verified announcement dates. This is price behavior around the event, not a cause."/></p>
+      <p className="story-meta">{t('Announcement timing is not always supplied. After-close reports use the next regular session.')} {t('Based on')} {impact.samples} {t('announcements')}.</p>
+      <div className="story-chart" role="img" aria-label={t('Average return around earnings announcements')}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={impact.path} margin={{top:12,right:8,bottom:0,left:0}}>
-            <XAxis dataKey="offset" tickFormatter={v=>v===0?t('Report'):String(v)} tick={{fontSize:11}} tickLine={false} axisLine={false}/>
+            <XAxis dataKey="offset" tickFormatter={v=>v===0?t('Announcement'):String(v)} tick={{fontSize:11}} tickLine={false} axisLine={false}/>
             <YAxis orientation="right" tickFormatter={v=>`${v}%`} width={44} tick={{fontSize:11}} tickLine={false} axisLine={false}/>
-            <Tooltip formatter={(value)=>[typeof value==='number'?`${value>=0?'+':''}${value.toFixed(2)}%`: '—',t('Avg. return')]} labelFormatter={v=>v===0?t('Quarter-end'):`${Number(v)>0?'+':''}${v} ${t('sessions')}`}/>
+            <Tooltip formatter={(value)=>[typeof value==='number'?`${value>=0?'+':''}${value.toFixed(2)}%`: '—',t('Avg. return')]} labelFormatter={v=>v===0?t('Announcement session'):`${Number(v)>0?'+':''}${v} ${t('sessions')}`}/>
             <ReferenceLine x={0} stroke={palette.ref} strokeDasharray="3 4"/>
             <ReferenceLine y={0} stroke={palette.grid}/>
             <Area type="monotone" dataKey="percent" stroke={palette.up} fill={palette.up} fillOpacity={0.18} strokeWidth={2} connectNulls={false} isAnimationActive={false}/>
@@ -97,13 +98,14 @@ export function EarningsStory({symbol,nextDate}:{symbol:string;nextDate?:string}
         </ResponsiveContainer>
       </div>
       <div className="story-pills">
-        <article><strong className={(impact.day||0)>=0?'up':'down'}>{pct(impact.day)}</strong><span>{t('Avg. return · report day')}</span></article>
-        <article><strong className={(impact.after3||0)>=0?'up':'down'}>{pct(impact.after3)}</strong><span>{t('Avg. return · 3 sessions later')}</span></article>
-        <article><strong className={(impact.after30||0)>=0?'up':'down'}>{pct(impact.after30)}</strong><span>{t('Avg. return · 30 sessions later')}</span></article>
-        <article><strong className="up">{impact.positive}/{impact.samples}</strong><span>{t('Positive 30-session quarters')}</span></article>
+        <article><strong className={(impact.day||0)>=0?'up':'down'}>{pct(impact.day)}</strong><span>{t('Avg. return · announcement session')} · {impact.daySamples} {t('samples')}</span></article>
+        <article><strong className={(impact.after3||0)>=0?'up':'down'}>{pct(impact.after3)}</strong><span>{t('Avg. return · 3 sessions later')} · {impact.after3Samples} {t('samples')}</span></article>
+        <article><strong className={(impact.after30||0)>=0?'up':'down'}>{pct(impact.after30)}</strong><span>{t('Avg. return · 30 sessions later')} · {impact.after30Samples} {t('samples')}</span></article>
+        <article><strong className="up">{impact.positive}/{impact.after30Samples}</strong><span>{t('Positive after 30 sessions')}</span></article>
         <article><strong className="up">{pct(impact.best.percent)}</strong><span>{t('Best')} {impact.best.date||'—'}</span></article>
         <article><strong className="down">{pct(impact.worst.percent)}</strong><span>{t('Worst')} {impact.worst.date||'—'}</span></article>
       </div>
+      </>:<p className="story-meta">{t('Announcement history is not available for this symbol, so price-around-earnings analysis is omitted. Quarter-end dates are not used as a substitute.')}</p>}
     </section>
     <section className="story-card">
       <p className="eyebrow"><T text="REPORTED RESULTS"/></p>
@@ -137,8 +139,9 @@ export function EarningsStory({symbol,nextDate}:{symbol:string;nextDate?:string}
   </div>;
 }
 
-export function StockFactsRail({open,onToggle,facts,note}:{open:boolean;onToggle:()=>void;facts:[string,string][];note:string}){
+export function StockFactsRail({open,onToggle,facts,note,groups}:{open:boolean;onToggle:()=>void;facts:[string,string][];note:string;groups?:{title:string;items:[string,string][]}[]}){
   const t=useT();
+  const sections=groups?.length?groups:[{title:'',items:facts}];
   return <aside className={'stock-facts-rail'+(open?' is-open':'')}>
     <div className="stock-facts-toolbar">
       <h2><T text="Statistics"/></h2>
@@ -146,7 +149,7 @@ export function StockFactsRail({open,onToggle,facts,note}:{open:boolean;onToggle
         {open?<PanelRightClose size={18}/>:<PanelRightOpen size={18}/>}
       </Button>
     </div>
-    {open&&<dl className="stock-facts-list">{facts.map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>}
+    {open&&sections.map(section=><section key={section.title||'facts'} className="stock-facts-group">{section.title&&<h3>{section.title}</h3>}<dl className="stock-facts-list">{section.items.map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl></section>)}
     {open&&<p className="metrics-note">{note}</p>}
   </aside>;
 }

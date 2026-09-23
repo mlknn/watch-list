@@ -30,6 +30,7 @@ function asRow(quote){
       symbol:quote.symbol,
       companyName:quote.companyName,
       currency:quote.currency,
+      quoteType:quote.quoteType||'',
       exchange:quote.exchange||'',
       timezone:'',
       range:'1d',

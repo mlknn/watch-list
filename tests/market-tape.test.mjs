@@ -31,3 +31,10 @@ test('tape breadth and movers come from unique quoted names',()=>{
   assert.equal(losers[0].symbol,'NVDA');
   assert.equal(sectorAverage([row('AAPL',2),row('MSFT',4)]),3);
 });
+
+test('gainers never include negative names just because they lost less',()=>{
+  const rows=[row('A',-1),row('B',-3),row('C',0)];
+  const {gainers,losers}=tapeMovers(rows,3);
+  assert.equal(gainers.length,0);
+  assert.deepEqual(losers.map(r=>r.symbol),['B','A']);
+});

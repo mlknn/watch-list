@@ -1,3 +1,3 @@
-import {InvalidUrl} from '@/components/product/invalid-url';
+import {notFound} from 'next/navigation';
 export const metadata={title:'Invalid URL — StockWatchlist',robots:{index:false,follow:false}};
-export default function UnknownPath(){return <InvalidUrl/>;}
+export default function UnknownPath(){notFound();}

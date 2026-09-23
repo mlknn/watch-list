@@ -14,7 +14,8 @@ import {apiJson,signedIn} from '@/lib/auth-client';
 import {readGuestState} from '@/lib/guest-watchlist.mjs';
 import {addDays,mondayOnOrBefore,todayInMarket} from '@/lib/next-earnings.mjs';
 import type {AccountState} from '@/lib/watchlist';
-import {epsSurprise,filterEarningsRows,formatCap,formatEps,formatSurprise,parseEps,summaryCounts,weekRangeLabel} from '@/lib/earnings-compare.mjs';
+import {earningsCsv,epsSurprise,filterEarningsRows,formatCap,formatEps,formatSurprise,sortEarningsRows,summaryCounts,weekRangeLabel} from '@/lib/earnings-compare.mjs';
+import {stockHref} from '@/lib/safe-return.mjs';
 
 type Company={symbol:string;name:string;when:string;reported:boolean;eps:string;epsForecast:string;marketCap?:number};
 type Day={date:string;status:string;companies:Company[]};
@@ -24,7 +25,7 @@ type Session='bmo'|'amc'|'during'|'unknown';
 type Status='upcoming'|'reported';
 type Cap='1-10'|'10-50'|'50-200'|'200+';
 type View='calendar'|'table';
-type SortKey='symbol'|'date'|'session'|'status'|'estimate'|'actual'|'surprise'|'cap';
+type SortKey='symbol'|'date'|'session'|'status'|'estimate'|'actual'|'surprisePct'|'surpriseAbs'|'cap';
 
 function shiftWeek(monday:string,delta:number){
   return addDays(monday,delta*7);
@@ -70,6 +71,8 @@ export function EarningsCalendar(){
   const [attempt,setAttempt]=useState(0);
   const [query,setQuery]=useState(params.get('q')||'');
   const [watchSymbols,setWatchSymbols]=useState<Set<string>>(new Set());
+  const [watchError,setWatchError]=useState('');
+  const [staleNotice,setStaleNotice]=useState('');
   const [selected,setSelected]=useState<Row|null>(null);
   const [sort,setSort]=useState<{key:SortKey;dir:'asc'|'desc'}>({key:'cap',dir:'desc'});
   const [mobileFilters,setMobileFilters]=useState(false);
@@ -95,11 +98,20 @@ export function EarningsCalendar(){
           if(!alive)return;
           const symbols=new Set(state.watchlists.flatMap(list=>list.stocks.map(stock=>stock.symbol)));
           setWatchSymbols(symbols);
+          setWatchError('');
           return;
         }
-      }catch{/* Fall through to the device list. */}
+      }catch{
+        if(alive)setWatchError(t('Watchlists could not be loaded. The calendar is shown without your list filter.'));
+        const guest=readGuestState(window.localStorage);
+        if(!alive)return;
+        const symbols=new Set(guest.watchlists.flatMap(list=>list.stocks.map(stock=>stock.symbol)));
+        setWatchSymbols(symbols);
+        return;
+      }
       const guest=readGuestState(window.localStorage);
       if(!alive)return;
+      setWatchError('');
       const symbols=new Set(guest.watchlists.flatMap(list=>list.stocks.map(stock=>stock.symbol)));
       setWatchSymbols(symbols);
     })();
@@ -109,9 +121,9 @@ export function EarningsCalendar(){
   useEffect(()=>{
     let alive=true;
     const hit=cachedWeek(week);
-    if(hit){setData(hit);setLoading(false);setError('');}
-    else{setLoading(true);setError('');}
-    void pullWeek(week).then(result=>{if(!alive)return;setData(result);setLoading(false);}).catch(e=>{if(alive&&!hit){setError(e.message||UNAVAILABLE);setLoading(false);}});
+    if(hit){setData(hit);setLoading(false);setError('');setStaleNotice('');}
+    else{setLoading(true);setError('');setStaleNotice('');}
+    void pullWeek(week).then(result=>{if(!alive)return;setData(result);setLoading(false);setStaleNotice('');}).catch(e=>{if(!alive)return;if(hit){setStaleNotice(e.message||UNAVAILABLE);setLoading(false);return;}setError(e.message||UNAVAILABLE);setLoading(false);});
     return()=>{alive=false;};
   },[week,attempt]);
 
@@ -133,15 +145,18 @@ export function EarningsCalendar(){
     return()=>{cancelled=true;};
   },[data?.weekStart,data?.todayMonday,data?.maxWeek]);
 
-  const replace=(patch:Record<string,string|null>)=>{
+  const writeUrl=(patch:Record<string,string|null>,mode:'push'|'replace'='push')=>{
     const next=new URLSearchParams(params.toString());
     for(const [key,value] of Object.entries(patch)){
       if(!value)next.delete(key);
       else next.set(key,value);
     }
     const queryString=next.toString();
-    router.push(queryString?'/earnings?'+queryString:'/earnings');
+    const href=queryString?'/earnings?'+queryString:'/earnings';
+    if(mode==='replace')router.replace(href);
+    else router.push(href);
   };
+  const replace=(patch:Record<string,string|null>)=>writeUrl(patch,'push');
 
   const go=useCallback((next:string)=>{
     if(!data||next<data.minWeek||next>data.maxWeek)return;
@@ -168,7 +183,7 @@ export function EarningsCalendar(){
     const timer=window.setTimeout(()=>{
       const current=new URLSearchParams(paramKey);
       if(query===(current.get('q')||''))return;
-      replace({q:query.trim()||null});
+      writeUrl({q:query.trim()||null},'replace');
     },250);
     return()=>window.clearTimeout(timer);
   },[query,paramKey]);
@@ -191,38 +206,18 @@ export function EarningsCalendar(){
       list.push(row);
       map.set(row.date,list);
     }
-    for(const list of map.values())list.sort((a,b)=>(b.marketCap||0)-(a.marketCap||0));
+    for(const list of map.values())list.sort((a,b)=>{
+      const av=Number.isFinite(a.marketCap)?a.marketCap as number:null;
+      const bv=Number.isFinite(b.marketCap)?b.marketCap as number:null;
+      if(av===null&&bv===null)return a.symbol.localeCompare(b.symbol);
+      if(av===null)return 1;
+      if(bv===null)return -1;
+      return bv-av || a.symbol.localeCompare(b.symbol);
+    });
     return map;
   },[rows]);
 
-  const sortedRows=useMemo(()=>{
-    const copy=[...rows];
-    const dir=sort.dir==='asc'?1:-1;
-    const surpriseValue=(row:Row)=>{
-      const result=epsSurprise(row.eps,row.epsForecast);
-      return result.percent??(result.difference===null?null:result.difference);
-    };
-    copy.sort((a,b)=>{
-      const missing=(value:number|null)=>value===null||!Number.isFinite(value);
-      let av:number|string|null=0,bv:number|string|null=0;
-      if(sort.key==='symbol'){av=a.symbol;bv=b.symbol;}
-      else if(sort.key==='date'){av=a.date;bv=b.date;}
-      else if(sort.key==='session'){av=a.when;bv=b.when;}
-      else if(sort.key==='status'){av=a.reported?1:0;bv=b.reported?1:0;}
-      else if(sort.key==='estimate'){av=parseEps(a.epsForecast);bv=parseEps(b.epsForecast);}
-      else if(sort.key==='actual'){av=parseEps(a.eps);bv=parseEps(b.eps);}
-      else if(sort.key==='surprise'){av=surpriseValue(a);bv=surpriseValue(b);}
-      else {av=a.marketCap||0;bv=b.marketCap||0;}
-      if(typeof av==='number'||av===null||typeof bv==='number'||bv===null){
-        if(missing(av as number|null)&&missing(bv as number|null))return a.symbol.localeCompare(b.symbol);
-        if(missing(av as number|null))return 1;
-        if(missing(bv as number|null))return -1;
-        return ((av as number)-(bv as number))*dir || a.symbol.localeCompare(b.symbol);
-      }
-      return String(av).localeCompare(String(bv))*dir || a.symbol.localeCompare(b.symbol);
-    });
-    return copy;
-  },[rows,sort]);
+  const sortedRows=useMemo(()=>sortEarningsRows(rows,sort),[rows,sort]);
 
   const days=data?.days||[];
   const prev=data?shiftWeek(data.weekStart,-1):'';
@@ -253,22 +248,8 @@ export function EarningsCalendar(){
     triggerRef.current?.focus();
   }
   function exportCsv(){
-    const header=['Ticker','Company','Announcement date','Session','Status','EPS estimate','Actual EPS','EPS surprise','Market cap USD'];
-    const lines=sortedRows.map(row=>{
-      const surprise=epsSurprise(row.eps,row.epsForecast);
-      return [
-        row.symbol,
-        `"${row.name.replace(/"/g,'""')}"`,
-        row.date,
-        timing(row.when),
-        row.reported?t('Reported'):t('Upcoming'),
-        row.epsForecast||'',
-        row.eps||'',
-        formatSurprise(surprise),
-        row.marketCap||'',
-      ].join(',');
-    });
-    const blob=new Blob([[header.join(','),`Timezone,America/New_York`,`Source,Nasdaq`,`Updated,${data?.fetchedAt||''}`,'',...lines].join('\n')],{type:'text/csv'});
+    const csv=earningsCsv(sortedRows,{timezone:data?.timezone||'America/New_York',source:data?.source||'Nasdaq',fetchedAt:data?.fetchedAt||'',sessionLabel:timing});
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
     a.href=url;
@@ -315,20 +296,25 @@ export function EarningsCalendar(){
   return <main className="earnings-cal-page">
     <div className="earnings-cal-head">
       <h1><T text="Earnings calendar"/></h1>
-      <p className="intro"><T text="Track upcoming announcements and compare reported results with market expectations."/></p>
-      <p className="earnings-meta">
-        {t('Source: Nasdaq')} · {t('US-listed companies above $1B')} · {t('New York time')} · {t('Past weeks go back two quarters.')}
-        {data?` · ${t('Last successful update')} ${stampFormat(data.fetchedAt,locale)}.`:''}
-        {failedDays?` ${t('Some days in this week could not be refreshed.')}`:''}
-      </p>
+      <details className="earnings-more">
+        <summary>{t('Coverage and source')}</summary>
+        <p className="intro"><T text="Track upcoming announcements and compare reported results with market expectations."/></p>
+        <p className="earnings-meta">
+          {t('Source: Nasdaq')} · {t('US-listed companies above $1B')} · {t('New York time')} · {t('Past weeks go back two quarters.')}
+          {data?` · ${t('Last successful update')} ${stampFormat(data.fetchedAt,locale)}.`:''}
+          {failedDays?` ${t('Some days in this week could not be refreshed.')}`:''}
+        </p>
+      </details>
     </div>
 
-    <dl className="earnings-summary">
+    <dl className="earnings-summary earnings-summary-strip">
       <div><dt>{t('This week')}</dt><dd>{summary.week}</dd></div>
       <div><dt>{t('Today')}</dt><dd>{summary.today}</dd></div>
       <div><dt>{t('Reported')}</dt><dd>{summary.reported}</dd></div>
       <div><dt>{t('In my watchlists')}</dt><dd>{summary.watch}</dd></div>
     </dl>
+    {watchError&&<p className="error-banner" role="alert">{watchError}</p>}
+    {staleNotice&&<p className="quote-warning" role="status">{t('Showing cached results.')} {staleNotice===UNAVAILABLE?t(UNAVAILABLE):staleNotice} <Button variant="ghost" onClick={()=>setAttempt(n=>n+1)}>{t('Retry')}</Button></p>}
 
     <div className="earnings-tools">
       <label className="earnings-search">
@@ -400,7 +386,7 @@ export function EarningsCalendar(){
           <caption className="sr-only">{t('Earnings comparison')}</caption>
           <thead>
             <tr>
-              {([['symbol',t('Company / ticker')],['date',t('Announcement date')],['session',t('Announcement time')],['status',t('Status')],['estimate',t('EPS estimate')],['actual',t('Actual EPS')],['surprise',t('EPS surprise')],['cap',t('Market cap')]] as const).map(([key,label])=>
+              {([['symbol',t('Company / ticker')],['date',t('Announcement date')],['session',t('Announcement time')],['status',t('Status')],['estimate',t('EPS estimate')],['actual',t('Actual EPS')],['surpriseAbs',t('Difference')],['surprisePct',t('Surprise %')],['cap',t('Market cap')]] as const).map(([key,label])=>
                 <th key={key} scope="col" aria-sort={sort.key===key?(sort.dir==='asc'?'ascending':'descending'):'none'}>
                   <button type="button" onClick={()=>setSort(current=>current.key===key?{key,dir:current.dir==='asc'?'desc':'asc'}:{key,dir:key==='symbol'||key==='date'?'asc':'desc'})}>{label}{sort.key===key?(sort.dir==='asc'?' ↑':' ↓'):''}</button>
                 </th>
@@ -423,8 +409,9 @@ export function EarningsCalendar(){
                 <td>{row.reported?t('Reported'):t('Upcoming')}</td>
                 <td className="num">{row.epsForecast?formatEps(row.epsForecast):<span aria-label={t('Not available')}>—</span>}</td>
                 <td className="num">{row.eps?formatEps(row.eps):<span aria-label={t('Not available')}>—</span>}</td>
-                <td className={'num '+(surprise.tone==='above'?'up':surprise.tone==='below'?'down':'')}>{surprise.difference===null?<span aria-label={t('Not available')}>—</span>:<>{formatSurprise(surprise)} <small>{toneLabel(surprise.tone)}</small></>}</td>
-                <td className="num">{formatCap(row.marketCap||0)||'—'}</td>
+                <td className={'num '+(surprise.tone==='above'?'up':surprise.tone==='below'?'down':'')}>{surprise.difference===null?<span aria-label={t('Not available')}>—</span>:formatEps(surprise.difference)}</td>
+                <td className={'num '+(surprise.tone==='above'?'up':surprise.tone==='below'?'down':'')}>{surprise.percent===null?<span aria-label={t('Not available')}>—</span>:`${surprise.percent>0?'+':''}${surprise.percent.toFixed(1)}%`}</td>
+                <td className="num">{formatCap(row.marketCap)||'—'}</td>
               </tr>;
             })}
           </tbody>
@@ -469,7 +456,7 @@ export function EarningsCalendar(){
       <SheetContent className="earnings-detail-sheet sm:max-w-[480px]" side="right">
         {selected&&<>
           <SheetHeader className="earnings-detail-header">
-            <a className="earnings-detail-company" href={'/stocks/'+encodeURIComponent(selected.symbol)}>
+            <a className="earnings-detail-company" href={stockHref(selected.symbol,'/earnings'+(paramKey?'?'+paramKey:''))}>
               <CompanyIcon symbol={selected.symbol}/>
               <span>
                 <SheetTitle>{selected.symbol}</SheetTitle>
@@ -478,13 +465,13 @@ export function EarningsCalendar(){
             </a>
           </SheetHeader>
           <div className="earnings-detail">
-            <a className="solid-link earnings-detail-action" href={'/stocks/'+encodeURIComponent(selected.symbol)}>{t('Stock details')}</a>
+            <a className="solid-link earnings-detail-action" href={stockHref(selected.symbol,'/earnings'+(paramKey?'?'+paramKey:''))}>{t('Stock details')}</a>
             <p>{watchSymbols.has(selected.symbol)?t('On a watchlist'):t('Not on a watchlist')} · <a href="/">{t('Open watchlists')}</a></p>
             <dl>
               <div><dt>{t('Announcement date')}</dt><dd>{dayFormat(selected.date,{weekday:'long',month:'long',day:'numeric',year:'numeric'},locale)}</dd></div>
               <div><dt>{t('Announcement time')}</dt><dd>{timing(selected.when)} · {t('New York time')}</dd></div>
               <div><dt>{t('Status')}</dt><dd>{selected.reported?t('Reported'):t('Upcoming')}</dd></div>
-              <div><dt>{t('Market cap')}</dt><dd>{formatCap(selected.marketCap||0)||'—'}</dd></div>
+              <div><dt>{t('Market cap')}</dt><dd>{formatCap(selected.marketCap)||'—'}</dd></div>
             </dl>
             <section>
               <h3>{t('EPS comparison')}</h3>

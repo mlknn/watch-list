@@ -281,7 +281,8 @@ export function homePreviewRows(days,today,weekStart,{limit=5}={}){
   for(const date of [...byDay.keys()].sort())add(byDay.get(date));
   const rest=upcoming.filter(row=>!seen.has(row.symbol)).sort((a,b)=>b.marketCap-a.marketCap||a.date.localeCompare(b.date));
   for(const row of rest)add(row);
-  return picked;
+  const sessionOrder={bmo:0,during:1,amc:2,unknown:3};
+  return picked.sort((a,b)=>a.date.localeCompare(b.date)||(sessionOrder[a.when]??4)-(sessionOrder[b.when]??4)||a.symbol.localeCompare(b.symbol));
 }
 
 /** Label the homepage teaser from the dates that are actually shown. */
