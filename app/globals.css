@@ -631,9 +631,16 @@ html.dark .tool-preview-value.down{color:#ff9aa4}
 .earnings-cal-head h1{font-size:clamp(28px,3vw,38px)}
 .earnings-cal-head .intro{margin-top:10px;color:#5b6a80}
 .earnings-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-bottom:14px;margin-bottom:16px;border-bottom:1px solid #e3e9f2}
-.earnings-range{display:flex;align-items:center;gap:10px;min-width:0}
-.earnings-range strong{font-size:17px;letter-spacing:-.3px}
-.earnings-range-tag{font-size:11px;letter-spacing:.6px;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:#eef3ff;color:#3d5cae}
+.earnings-week-bar{display:flex;align-items:center;gap:14px;min-width:0;flex:1}
+.earnings-week-label{margin:0;font-size:15px;font-weight:650;letter-spacing:-.2px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.earnings-week-switch{display:flex;min-width:0;border:1px solid #d6deed;border-radius:12px;overflow:hidden;background:#fff}
+.earnings-week-switch button{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:44px;padding:0 14px;border:0;border-right:1px solid #d6deed;background:transparent;font:inherit;font-size:13px;font-weight:600;color:inherit}
+.earnings-week-switch button:last-child{border-right:0}
+.earnings-week-switch button:disabled{opacity:.45}
+.earnings-week-switch button.is-current{background:#eef3ff;color:#2746b3;opacity:1}
+.earnings-week-switch button:focus-visible{outline:3px solid #8fa9ff;outline-offset:-3px}
+.earnings-week-switch .week-short{display:none}
+.earnings-export{height:44px}
 .earnings-cal-nav{display:flex;gap:8px;flex-wrap:wrap}
 .earnings-cal-nav .outline-button{height:40px;font-size:13px;gap:4px}
 .earnings-cal-nav .is-week-glow{position:relative;z-index:1;border-color:#2f9a68;color:#146c4c}
@@ -665,7 +672,9 @@ html.dark .earnings-cal-nav .is-week-glow::after{box-shadow:0 0 0 2px rgba(255,2
 .earnings-cal-page .market-footnote{margin-top:20px;line-height:1.6}
 html.dark .earnings-toolbar{border-color:#2a4438}
 html.dark .earnings-cal-head .intro{color:#cfe2d6}
-html.dark .earnings-range-tag{background:#14301f;color:#7cffb4}
+html.dark .earnings-week-switch{background:#141f1a;border-color:#2a4438}
+html.dark .earnings-week-switch button{border-color:#2a4438}
+html.dark .earnings-week-switch button.is-current{background:#12301f;color:#7cffb4}
 html.dark .earnings-day.is-future:not(.is-today){border-color:#2a4438}
 html.dark .earnings-day.is-today{border-color:#3f8a64;box-shadow:inset 0 0 0 1px #3f8a64}
 html.dark .earnings-today-tag{background:#14301f;color:#7cffb4}
@@ -714,15 +723,17 @@ html.dark .earnings-day-note.is-error{color:#ff9aa4}
   .topbar .account-nav .solid-link{padding:7px 11px;font-size:12.5px}
   .topbar .theme-toggle{width:34px;height:34px}
   .earnings-day-list{grid-template-columns:1fr}
-  .earnings-toolbar{align-items:flex-start;flex-direction:column;gap:10px}
-  .earnings-cal-nav{width:100%}
-  .earnings-cal-nav .outline-button{flex:1 1 auto}
+  .earnings-toolbar{align-items:stretch;flex-direction:column;gap:10px}
+  .earnings-week-bar{flex-direction:column;align-items:stretch;gap:8px}
+  .earnings-week-switch{width:100%}
+  .earnings-week-switch button{flex:1}
+  .earnings-export{width:100%}
   .home-sample-head h2{font-size:22px}
 }
 @media(max-width:420px){
   .home-hero h1{font-size:30px;letter-spacing:-1.2px}
   .home-hero>p{font-size:16px}
-  .earnings-cal-nav .outline-button{padding:0 10px;font-size:12px}
+  .earnings-week-switch button{padding:0 8px;font-size:13px}
   .topbar{padding:10px 12px}
   .topbar .brand{font-size:17px}
   .topbar .brand .brand-light{display:none}
@@ -993,12 +1004,12 @@ html.dark .tool-preview-head{color:#9ab0a3}
 .earnings-view-switch{display:flex;border:1px solid #d6deed;border-radius:10px;overflow:hidden;margin-left:auto}
 .earnings-view-switch button{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 12px;border:0;background:#fff;color:inherit;font-size:13px}
 .earnings-view-switch button.is-active{background:#e9f4ef;color:#12694a;font-weight:650}
-.earnings-view-switch button:focus-visible,.earnings-filter select:focus-visible,.earnings-search input:focus-visible,.earnings-range-button:focus-visible,.earnings-chip-filter:focus-visible,.earnings-clear:focus-visible{outline:3px solid #8fa9ff;outline-offset:2px}
+.earnings-view-switch button:focus-visible,.earnings-filter select:focus-visible,.earnings-search input:focus-visible,.earnings-week-switch button:focus-visible,.earnings-chip-filter:focus-visible,.earnings-clear:focus-visible{outline:3px solid #8fa9ff;outline-offset:2px}
 .earnings-filters-trigger{display:none}
 .earnings-chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px;font-size:12px}
 .earnings-chip-filter,.earnings-clear{display:inline-flex;align-items:center;gap:4px;border:1px solid #d6deed;border-radius:999px;background:#fff;padding:4px 10px;font-size:12px}
 .earnings-count{color:#6b7a91}
-.earnings-range-button{border:0;background:transparent;font:inherit;font-size:17px;font-weight:650;letter-spacing:-.3px;padding:0;color:inherit;text-decoration:underline;text-underline-offset:3px}
+.earnings-range-button{display:none}
 .earnings-date-pop{width:auto;max-width:none}
 .earnings-empty{margin:16px 0;font-size:14px;color:#5b6a80}
 .earnings-table-wrap{overflow-x:auto;border:1px solid #e1e8f3;border-radius:12px;background:#fff}
@@ -1058,7 +1069,8 @@ html.dark .earnings-meta,html.dark .earnings-summary dt,html.dark .earnings-coun
   .earnings-filters-desktop{display:none}
   .earnings-filters-trigger{display:inline-flex}
   .earnings-view-switch{margin-left:0}
-  .earnings-cal-nav .outline-button span{display:none}
+  .earnings-week-switch .week-full{display:none}
+  .earnings-week-switch .week-short{display:inline}
   .earnings-day-jump{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;margin:0 0 12px;padding-bottom:4px}
   .earnings-day-jump a{flex:0 0 auto;min-height:44px;display:inline-flex;align-items:center;padding:0 12px;border:1px solid #d6deed;border-radius:999px;background:#fff;font-size:13px;color:inherit;text-decoration:none}
   .earnings-detail-sheet{width:100%;max-width:none}

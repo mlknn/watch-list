@@ -3410,5 +3410,17 @@
   "Regular hours": [
     "Normal seans",
     "Horario regular"
+  ],
+  "Week": [
+    "Hafta",
+    "Semana"
+  ],
+  "Previous": [
+    "Önceki",
+    "Anterior"
+  ],
+  "Next": [
+    "Sonraki",
+    "Siguiente"
   ]
 }

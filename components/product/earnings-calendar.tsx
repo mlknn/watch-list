@@ -7,12 +7,10 @@ import {CalendarDays,ChevronLeft,ChevronRight,Download,List,LoaderCircle,Search,
 import {CompanyIcon} from './company-icon';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
-import {Calendar} from '@/components/ui/calendar';
-import {Popover,PopoverContent,PopoverTrigger} from '@/components/ui/popover';
 import {Sheet,SheetContent,SheetDescription,SheetHeader,SheetTitle} from '@/components/ui/sheet';
 import {apiJson,signedIn} from '@/lib/auth-client';
 import {readGuestState} from '@/lib/guest-watchlist.mjs';
-import {addDays,mondayOnOrBefore,todayInMarket} from '@/lib/next-earnings.mjs';
+import {addDays,todayInMarket} from '@/lib/next-earnings.mjs';
 import type {AccountState} from '@/lib/watchlist';
 import {earningsCsv,epsSurprise,filterEarningsRows,formatCap,formatEps,formatSurprise,sortEarningsRows,summaryCounts,weekRangeLabel} from '@/lib/earnings-compare.mjs';
 import {stockHref} from '@/lib/safe-return.mjs';
@@ -337,33 +335,25 @@ export function EarningsCalendar(){
     </div>}
 
     <div className="earnings-toolbar">
-      <div className="earnings-range">
-        <Popover>
-          <PopoverTrigger render={<button type="button" className="earnings-range-button" aria-label={t('Pick a week')}/>}>{range||'—'}</PopoverTrigger>
-          <PopoverContent className="earnings-date-pop" align="start">
-            {data&&<Calendar
-              mode="single"
-              selected={new Date(data.weekStart+'T12:00:00Z')}
-              onSelect={date=>{
-                if(!date)return;
-                const iso=`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
-                go(mondayOnOrBefore(iso));
-              }}
-              disabled={date=>{
-                const iso=`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
-                const monday=mondayOnOrBefore(iso);
-                return !data||monday<data.minWeek||monday>data.maxWeek;
-              }}
-            />}
-          </PopoverContent>
-        </Popover>
+      <div className="earnings-week-bar">
+        <p className="earnings-week-label">{range||'—'}</p>
+        <div className="earnings-week-switch" role="group" aria-label={t('Week')}>
+          <button type="button" disabled={!canPrev||loading} aria-label={t('Previous week')} onClick={()=>go(prev)}>
+            <ChevronLeft size={16} aria-hidden="true"/>
+            <span className="week-full">{t('Previous week')}</span>
+            <span className="week-short">{t('Previous')}</span>
+          </button>
+          <button type="button" disabled={!data||loading||onThisWeek} aria-pressed={onThisWeek} className={onThisWeek?'is-current':undefined} onClick={()=>go(data?.todayMonday||'')}>
+            {t('This week')}
+          </button>
+          <button type="button" disabled={!canNext||loading} aria-label={t('Next week')} onClick={()=>go(next)}>
+            <span className="week-full">{t('Next week')}</span>
+            <span className="week-short">{t('Next')}</span>
+            <ChevronRight size={16} aria-hidden="true"/>
+          </button>
+        </div>
       </div>
-      <div className="earnings-cal-nav">
-        <Button variant="outline" className="outline-button" disabled={!canPrev} aria-label={t('Previous week')} onClick={()=>go(prev)}><ChevronLeft size={16}/><span>{t('Previous week')}</span></Button>
-        <Button variant="outline" className="outline-button" disabled={!data||onThisWeek} onClick={()=>go(data?.todayMonday||'')}><T text="This week"/></Button>
-        <Button variant="outline" className="outline-button" disabled={!canNext} aria-label={t('Next week')} onClick={()=>go(next)}><span>{t('Next week')}</span><ChevronRight size={16}/></Button>
-        <Button variant="outline" className="outline-button" disabled={!rows.length} onClick={exportCsv}><Download size={15}/>{t('Export CSV')}</Button>
-      </div>
+      <Button variant="outline" className="outline-button earnings-export" disabled={!rows.length} onClick={exportCsv}><Download size={15}/>{t('Export CSV')}</Button>
     </div>
 
     {error&&<div className="error-banner" role="alert">{error===UNAVAILABLE?t(UNAVAILABLE):error}<Button variant="ghost" onClick={()=>setAttempt(n=>n+1)}><T text="Retry"/></Button></div>}
