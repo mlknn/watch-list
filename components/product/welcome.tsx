@@ -92,7 +92,7 @@ export function Welcome(){
       </article>
     </section>}
 
-    <details className="home-example">
+    <details className="home-example" open>
       <summary><T text="Explore the example watchlist."/></summary>
       <SamplePortfolio data={showcase.data} error={showcase.error}/>
     </details>
