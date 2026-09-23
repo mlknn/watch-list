@@ -187,7 +187,7 @@ h2 { font-size:19px; margin:0; letter-spacing:-.3px; font-weight:600; }
 .watchlist-chart-pane{width:100%}.watchlist-chart-pane .portfolio-chart{height:320px;width:100%}.watchlist-chart-pane .portfolio-metrics{grid-template-columns:repeat(4,minmax(0,1fr))}.watchlist-chart-pane .portfolio-chart-heading{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}@media(max-width:700px){.watchlist-chart-pane .portfolio-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.watchlist-chart-pane .portfolio-chart{height:260px}}
 
 /* Daily charts, aligned showcase cards, and footer language control. */
-.public-footer .language-select,.workspace-footer .language-select{display:block;max-width:140px;min-height:44px;padding:8px 12px;font-size:13px}
+.public-footer .language-select,.workspace-footer .language-select{display:block;width:auto;min-width:132px;max-width:168px;min-height:44px;padding:8px 32px 8px 12px;font-size:13px}
 .workspace-footer{flex-wrap:wrap;gap:16px;align-items:center}
 .chart-period-return{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 14px;margin:12px 0 4px;font-variant-numeric:tabular-nums}.chart-period-return strong{font-size:24px}.chart-period-return span{font-size:12px;color:#64748b}
 .chart-earn-legend{display:inline-flex;align-items:center;gap:6px;margin-left:auto;color:#d64545!important;font-weight:700}
@@ -1024,6 +1024,15 @@ html.dark .tool-preview-head{color:#9ab0a3}
 .earnings-day.is-today header{background:#e9f4ef;border-bottom-color:#9adcbd;box-shadow:inset 3px 0 0 #2f9a68}
 .earnings-day-jump{display:none}
 .earnings-day header{position:sticky;top:0;background:#fff;z-index:1}
+.earnings-detail-header{padding-right:48px}
+.earnings-detail-company{display:flex;align-items:center;gap:12px;min-width:0;color:inherit;text-decoration:none;border-radius:10px}
+.earnings-detail-company:hover .company-icon{border-color:#365bd8}
+.earnings-detail-company:focus-visible{outline:3px solid #8fa9ff;outline-offset:3px}
+.earnings-detail-company .company-icon{width:40px;height:40px;flex:0 0 40px}
+.earnings-detail-company span{display:grid;gap:2px;min-width:0}
+.earnings-detail-company [data-slot=sheet-title]{margin:0;font-size:20px;line-height:1.2}
+.earnings-detail-company [data-slot=sheet-description]{margin:0;overflow:hidden;text-overflow:ellipsis}
+.earnings-detail-action{width:100%;min-height:44px;box-sizing:border-box}
 .earnings-detail{display:grid;gap:16px;padding:0 16px 20px;font-size:14px}
 .earnings-detail dl{display:grid;gap:8px;margin:0}
 .earnings-detail dt{font-size:12px;color:#6b7a91}

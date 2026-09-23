@@ -1,5 +1,5 @@
 'use client';
-import {useT} from '@/components/product/language';
+import {useLang,useT} from '@/components/product/language';
 import {T} from '@/components/product/language';
 import {useCallback,useEffect,useMemo,useRef,useState} from 'react';
 import {useRouter,useSearchParams} from 'next/navigation';
@@ -29,7 +29,12 @@ type SortKey='symbol'|'date'|'session'|'status'|'estimate'|'actual'|'surprise'|'
 function shiftWeek(monday:string,delta:number){
   return addDays(monday,delta*7);
 }
-const dayFormat=(iso:string,options:Intl.DateTimeFormatOptions)=>new Date(iso+'T12:00:00Z').toLocaleDateString(undefined,{...options,timeZone:'UTC'});
+const localeOf=(lang:string)=>lang==='tr'?'tr-TR':lang==='es'?'es-ES':'en-US';
+const dayFormat=(iso:string,options:Intl.DateTimeFormatOptions,locale='en-US')=>new Date(iso+'T12:00:00Z').toLocaleDateString(locale,{...options,timeZone:'UTC'});
+const stampFormat=(iso:string,locale='en-US')=>{
+  const date=new Date(iso);
+  return Number.isFinite(date.getTime())?date.toLocaleString(locale,{timeZone:'America/New_York',month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}):'';
+};
 const UNAVAILABLE='The earnings calendar is temporarily unavailable.';
 const VIEW_KEY='earnings:view';
 const weekStore=new Map<string,Board>();
@@ -54,12 +59,14 @@ function readView(params:URLSearchParams):View{
 
 export function EarningsCalendar(){
   const t=useT();
+  const lang=useLang();
+  const locale=localeOf(lang);
   const router=useRouter();
   const params=useSearchParams();
   const week=params.get('week')||'';
-  const [data,setData]=useState<Board|null>(()=>cachedWeek(week)||null);
+  const [data,setData]=useState<Board|null>(null);
   const [error,setError]=useState('');
-  const [loading,setLoading]=useState(!cachedWeek(week));
+  const [loading,setLoading]=useState(true);
   const [attempt,setAttempt]=useState(0);
   const [query,setQuery]=useState(params.get('q')||'');
   const [watchSymbols,setWatchSymbols]=useState<Set<string>>(new Set());
@@ -311,7 +318,7 @@ export function EarningsCalendar(){
       <p className="intro"><T text="Track upcoming announcements and compare reported results with market expectations."/></p>
       <p className="earnings-meta">
         {t('Source: Nasdaq')} · {t('US-listed companies above $1B')} · {t('New York time')} · {t('Past weeks go back two quarters.')}
-        {data?` · ${t('Last successful update')} ${new Date(data.fetchedAt).toLocaleString()}.`:''}
+        {data?` · ${t('Last successful update')} ${stampFormat(data.fetchedAt,locale)}.`:''}
         {failedDays?` ${t('Some days in this week could not be refreshed.')}`:''}
       </p>
     </div>
@@ -381,7 +388,7 @@ export function EarningsCalendar(){
     {view==='calendar'&&!!days.length&&!loading&&!emptyCoverage&&!emptyFilters&&!emptyWatch&&<nav className="earnings-day-jump" aria-label={t('Jump to day')}>
       {days.map(day=>{
         const companies=filteredByDay.get(day.date)||[];
-        return <a key={day.date} href={'#earnings-'+day.date}>{dayFormat(day.date,{weekday:'short'})} {dayFormat(day.date,{month:'short',day:'numeric'})} · {companies.length}</a>;
+        return <a key={day.date} href={'#earnings-'+day.date}>{dayFormat(day.date,{weekday:'short'},locale)} {dayFormat(day.date,{month:'short',day:'numeric'},locale)} · {companies.length}</a>;
       })}
     </nav>}
 
@@ -411,7 +418,7 @@ export function EarningsCalendar(){
                     {watchSymbols.has(row.symbol)&&<Star size={12} aria-label={t('On a watchlist')}/>}
                   </button>
                 </th>
-                <td>{dayFormat(row.date,{weekday:'short',month:'short',day:'numeric'})}</td>
+                <td>{dayFormat(row.date,{weekday:'short',month:'short',day:'numeric'},locale)}</td>
                 <td>{timing(row.when)}</td>
                 <td>{row.reported?t('Reported'):t('Upcoming')}</td>
                 <td className="num">{row.epsForecast?formatEps(row.epsForecast):<span aria-label={t('Not available')}>—</span>}</td>
@@ -430,8 +437,8 @@ export function EarningsCalendar(){
           const companies=filteredByDay.get(day.date)||[];
           return <section id={'earnings-'+day.date} key={day.date} className={'earnings-day'+(isToday?' is-today':'')+(day.date<today?' is-past':'')}>
             <header>
-              <strong>{dayFormat(day.date,{weekday:'short'})}</strong>
-              <span>{dayFormat(day.date,{month:'short',day:'numeric'})}</span>
+              <strong>{dayFormat(day.date,{weekday:'short'},locale)}</strong>
+              <span>{dayFormat(day.date,{month:'short',day:'numeric'},locale)}</span>
               {isToday&&<em className="earnings-today-tag">{t('Today')}</em>}
               <small>{companies.length}</small>
             </header>
@@ -461,14 +468,20 @@ export function EarningsCalendar(){
     <Sheet open={!!selected} onOpenChange={open=>{if(!open)closePanel();}}>
       <SheetContent className="earnings-detail-sheet sm:max-w-[480px]" side="right">
         {selected&&<>
-          <SheetHeader>
-            <SheetTitle>{selected.symbol}</SheetTitle>
-            <SheetDescription>{selected.name}</SheetDescription>
+          <SheetHeader className="earnings-detail-header">
+            <a className="earnings-detail-company" href={'/stocks/'+encodeURIComponent(selected.symbol)}>
+              <CompanyIcon symbol={selected.symbol}/>
+              <span>
+                <SheetTitle>{selected.symbol}</SheetTitle>
+                <SheetDescription>{selected.name}</SheetDescription>
+              </span>
+            </a>
           </SheetHeader>
           <div className="earnings-detail">
-            <p>{watchSymbols.has(selected.symbol)?t('On a watchlist'):t('Not on a watchlist')} · <a href="/">{t('Open watchlists')}</a> · <a href={'/stocks/'+encodeURIComponent(selected.symbol)}>{t('Open company page')}</a></p>
+            <a className="solid-link earnings-detail-action" href={'/stocks/'+encodeURIComponent(selected.symbol)}>{t('Stock details')}</a>
+            <p>{watchSymbols.has(selected.symbol)?t('On a watchlist'):t('Not on a watchlist')} · <a href="/">{t('Open watchlists')}</a></p>
             <dl>
-              <div><dt>{t('Announcement date')}</dt><dd>{dayFormat(selected.date,{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</dd></div>
+              <div><dt>{t('Announcement date')}</dt><dd>{dayFormat(selected.date,{weekday:'long',month:'long',day:'numeric',year:'numeric'},locale)}</dd></div>
               <div><dt>{t('Announcement time')}</dt><dd>{timing(selected.when)} · {t('New York time')}</dd></div>
               <div><dt>{t('Status')}</dt><dd>{selected.reported?t('Reported'):t('Upcoming')}</dd></div>
               <div><dt>{t('Market cap')}</dt><dd>{formatCap(selected.marketCap||0)||'—'}</dd></div>
@@ -485,7 +498,7 @@ export function EarningsCalendar(){
               </dl>
               <p className="earnings-detail-note">{t('Revenue, fiscal period, and company guidance are not in this Nasdaq calendar feed.')}</p>
             </section>
-            <p className="earnings-detail-note">{t('Source: Nasdaq')} · {data?`${t('Last successful update')} ${new Date(data.fetchedAt).toLocaleString()}`:''}</p>
+            <p className="earnings-detail-note">{t('Source: Nasdaq')} · {data?`${t('Last successful update')} ${stampFormat(data.fetchedAt,locale)}`:''}</p>
           </div>
         </>}
       </SheetContent>
