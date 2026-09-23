@@ -56,14 +56,17 @@ test('busy days keep every large name instead of cutting the list',()=>{
   assert.equal(rows.length,15);
 });
 
-test('small names are dropped so the tape stays large-cap',()=>{
+test('names below $1B are dropped; the rest stay sorted by market cap',()=>{
   const rows=normalizeDayRows([
     {symbol:'TINY',name:'Tiny',marketCap:'$500,000,000',time:'time-amc'},
+    {symbol:'MID',name:'Mid',marketCap:'$1.2B',time:'time-not-supplied'},
     {symbol:'MSFT',name:'Microsoft',marketCap:'$3,000,000,000,000',time:'time-bmo'},
-    {symbol:'MID',name:'Mid',marketCap:'$2,500,000,000',time:'time-not-supplied'},
+    {symbol:'EDGE',name:'Edge',marketCap:'$1,000,000,000',time:'time-pre-market'},
   ]);
-  assert.deepEqual(rows.map(row=>row.symbol),['MSFT','MID']);
+  assert.deepEqual(rows.map(row=>row.symbol),['MSFT','MID','EDGE']);
   assert.equal(rows[1].when,'unknown');
+  assert.equal(rows[1].marketCap,1.2e9);
+  assert.equal(rows[2].when,'bmo');
 });
 
 test('one week is loaded, in weekday order, with a dated range',async()=>{

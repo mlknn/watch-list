@@ -6,7 +6,7 @@ Three tools at [stockwatchlist.app](https://stockwatchlist.app): **watchlists**,
 
 - [Watchlists](https://stockwatchlist.app/watchlists) — freeze the add-day price (and optional cost). Lists lock to USD, EUR, CAD, or TRY.
 - [Markets](https://stockwatchlist.app/dashboard) — US, Europe, Canada, global cash markets, and crypto. Indexes, ETFs, gainers and losers.
-- [Earnings](https://stockwatchlist.app/earnings) — US-listed names above $2B, one column per weekday. Source: Nasdaq.
+- [Earnings](https://stockwatchlist.app/earnings) — US-listed names above $1B, one column per weekday. Source: Nasdaq.
 - [Compare](https://stockwatchlist.app/compare) — vs Yahoo Finance, Google Finance, TradingView
 - [Open source notes](https://stockwatchlist.app/open-source)
 - Saved lists can issue a read-only `/share/…` link (capability token; do not commit live tokens)

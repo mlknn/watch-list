@@ -7,7 +7,7 @@ import {ChevronLeft,ChevronRight,LoaderCircle} from 'lucide-react';
 import {CompanyIcon} from './company-icon';
 import {Button} from '@/components/ui/button';
 
-type Company={symbol:string;name:string;when:string;reported:boolean;eps:string;epsForecast:string};
+type Company={symbol:string;name:string;when:string;reported:boolean;eps:string;epsForecast:string;marketCap?:number};
 type Day={date:string;status:string;companies:Company[]};
 type Board={weekStart:string;weekEnd:string;days:Day[];minWeek:string;maxWeek:string;todayMonday:string;source:string;timezone:string;fetchedAt:string};
 
@@ -77,7 +77,8 @@ export function EarningsCalendar(){
   const timing=(row:Company)=>row.when==='bmo'?t('Before market open')
     :row.when==='amc'?t('After market close')
     :row.when==='during'?t('During market hours')
-    :t('Time not provided');
+    :'';
+  const byCap=(rows:Company[])=>[...rows].sort((a,b)=>(b.marketCap||0)-(a.marketCap||0));
   const days=data?.days||[];
   const prev=data?shiftWeek(data.weekStart,-1):'';
   const next=data?shiftWeek(data.weekStart,1):'';
@@ -123,23 +124,26 @@ export function EarningsCalendar(){
             </header>
             {day.status!=='ok'?<p className="earnings-day-note is-error">{t('Could not load this day.')}</p>
               :day.companies.length?<ul className="earnings-day-list">
-                {day.companies.map(row=><li key={row.symbol}>
-                  <a href={'/stocks/'+encodeURIComponent(row.symbol)} className="earnings-chip">
-                    <CompanyIcon symbol={row.symbol}/>
-                    <span className="earnings-chip-text">
-                      <strong>{row.symbol}{row.reported&&<i className="earnings-reported">{t('Reported')}</i>}</strong>
-                      <small title={row.name}>{row.name}</small>
-                      <em>{row.reported&&row.eps?`${t('EPS')} ${row.eps}${row.epsForecast?` · ${t('est.')} ${row.epsForecast}`:''}`:timing(row)}</em>
-                    </span>
-                  </a>
-                </li>)}
+                {byCap(day.companies).map(row=>{
+                  const slot=row.reported&&row.eps?`${t('EPS')} ${row.eps}${row.epsForecast?` · ${t('est.')} ${row.epsForecast}`:''}`:timing(row);
+                  return <li key={row.symbol}>
+                    <a href={'/stocks/'+encodeURIComponent(row.symbol)} className="earnings-chip">
+                      <CompanyIcon symbol={row.symbol}/>
+                      <span className="earnings-chip-text">
+                        <strong>{row.symbol}{row.reported&&<i className="earnings-reported">{t('Reported')}</i>}</strong>
+                        <small title={row.name}>{row.name}</small>
+                        {slot?<em>{slot}</em>:null}
+                      </span>
+                    </a>
+                  </li>;
+                })}
               </ul>:<p className="earnings-day-note">{t('No earnings scheduled')}</p>}
           </section>;
         })}
       </div>
     }
     <p className="market-footnote">
-      <T text="Source: Nasdaq earnings calendar · Report times are New York time · US-listed companies above $2B."/>
+      <T text="Source: Nasdaq earnings calendar · Report times are New York time · US-listed companies above $1B."/>
       {data?` ${t('Updated')} ${new Date(data.fetchedAt).toLocaleString()}.`:''} <T text="Past weeks go back two quarters."/>
     </p>
   </main>;

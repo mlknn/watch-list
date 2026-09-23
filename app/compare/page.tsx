@@ -33,7 +33,7 @@ const faqJsonLd = {
       name: 'Does StockWatchlist have an earnings calendar?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes. https://stockwatchlist.app/earnings is a public US earnings calendar for listed companies above $2B. One column per weekday, before the open or after the close. No account required. Source: Nasdaq.',
+        text: 'Yes. https://stockwatchlist.app/earnings is a public US earnings calendar for listed companies above $1B. One column per weekday, before the open or after the close. No account required. Source: Nasdaq.',
       },
     },
     {
@@ -41,7 +41,7 @@ const faqJsonLd = {
       name: 'Which markets does StockWatchlist cover?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Watchlists lock to USD, EUR, CAD, or TRY. The Markets page covers the US, Europe, Canada, global cash markets (Japan, China, India, Korea, and more), and crypto. The earnings calendar is US-listed companies above $2B.',
+        text: 'Watchlists lock to USD, EUR, CAD, or TRY. The Markets page covers the US, Europe, Canada, global cash markets (Japan, China, India, Korea, and more), and crypto. The earnings calendar is US-listed companies above $1B.',
       },
     },
   ],
@@ -107,7 +107,7 @@ export default function Compare() {
               </tr>
               <tr>
                 <th scope="row">Earnings calendar</th>
-                <td><a href="/earnings">US-listed, above $2B, weekday columns</a></td>
+                <td><a href="/earnings">US-listed, above $1B, weekday columns</a></td>
                 <td>Yes, with news</td>
                 <td>Limited</td>
                 <td>Economic calendar</td>

@@ -16,11 +16,16 @@ export function toYahooSymbol(value){
 }
 
 export function parseMarketCap(value){
-  const n=Number(String(value||'').replace(/[^0-9.]/g,''));
-  return Number.isFinite(n)?n:0;
+  const raw=String(value||'').trim().toUpperCase().replace(/[$,\s]/g,'');
+  const match=raw.match(/^([0-9]*\.?[0-9]+)([KMBT])?$/);
+  if(!match)return 0;
+  const n=Number(match[1]);
+  if(!Number.isFinite(n))return 0;
+  const mult={K:1e3,M:1e6,B:1e9,T:1e12}[match[2]]||1;
+  return n*mult;
 }
 
-const MIN_MARKET_CAP=2_000_000_000;
+export const MIN_MARKET_CAP=1_000_000_000;
 
 /** Future report dates are fetched the day before and held at the edge; today stays shorter so reported flags can move. */
 export function nasdaqCacheTtl(date,today){
