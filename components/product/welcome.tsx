@@ -42,13 +42,20 @@ export function Welcome(){
   return <><PublicNav/><main className={'welcome'+(returning?' is-returning':'')}>
     <section className="home-hero">
       <div className="hero-copy">
-        <p className="eyebrow">{t('WATCHLISTS · MARKETS · EARNINGS')}</p>
+        <p className="eyebrow">
+          <a href="/watchlists">{t('Watchlists')}</a>
+          <span aria-hidden="true">·</span>
+          <a href="/dashboard">{t('Markets')}</a>
+          <span aria-hidden="true">·</span>
+          <a href="/earnings">{t('Earnings')}</a>
+        </p>
         {returning?<>
           <h1><T text="Your watchlist is ready."/></h1>
           <p><T text="Continue from the prices you already recorded, or add another company."/></p>
           <div className="hero-actions">
             <a className="solid-link" href="/watchlists"><T text="Continue to your watchlists"/></a>
             <a className="outline-link" href="/dashboard"><T text="Explore markets"/></a>
+            <a className="outline-link" href="/earnings"><T text="View earnings"/></a>
           </div>
         </>:<>
           <h1><T text="Track your stock ideas from the day you add them."/></h1>
@@ -56,6 +63,7 @@ export function Welcome(){
           <div className="hero-actions">
             <button type="button" className="primary-button" onClick={startWatchlist}><T text="Start your watchlist"/></button>
             <a className="outline-link" href="/dashboard"><T text="Explore markets"/></a>
+            <a className="outline-link" href="/earnings"><T text="View earnings"/></a>
           </div>
           <p className="hero-note"><T text="No account needed to start. Your guest watchlist stays on this device."/></p>
         </>}
