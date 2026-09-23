@@ -5,7 +5,14 @@ export const metadata: Metadata = {
   title: 'StockWatchlist vs Yahoo Finance, Google Finance, and TradingView',
   description: 'Watchlists that freeze the add-day price, plus a markets tape and a US earnings calendar. Compared with Yahoo Finance, Google Finance, and TradingView. Not a broker.',
   alternates: {canonical: 'https://stockwatchlist.app/compare'},
-  openGraph: {url: 'https://stockwatchlist.app/compare'},
+  openGraph: {
+    url: 'https://stockwatchlist.app/compare',
+    images: [{url: '/compare/opengraph-image', width: 1200, height: 630, alt: 'StockWatchlist compared with Yahoo Finance, Google Finance, and TradingView'}],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/compare/opengraph-image'],
+  },
 };
 
 const faqJsonLd = {
