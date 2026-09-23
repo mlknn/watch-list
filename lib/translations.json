@@ -2774,5 +2774,165 @@
   "None of your watchlists have companies in this week.": [
     "Bu hafta listelerindeki şirketlerden biri yok.",
     "Ninguna empresa de tus listas aparece esta semana."
+  ],
+  "Example watchlist": [
+    "Örnek liste",
+    "Lista de ejemplo"
+  ],
+  "Since": [
+    "Başlangıç",
+    "Desde"
+  ],
+  "WATCHLISTS · MARKETS · EARNINGS": [
+    "LİSTELER · PİYASALAR · BİLANÇOLAR",
+    "LISTAS · MERCADOS · RESULTADOS"
+  ],
+  "Track your stock ideas from the day you add them.": [
+    "Hisse fikirlerini eklediğin günden itibaren izle.",
+    "Sigue tus ideas desde el día en que las añades."
+  ],
+  "Save the stocks you want to follow, see how their prices change from your starting point, and keep markets and earnings within reach.": [
+    "İzlemek istediğin hisseleri kaydet, başlangıç fiyatından değişimi gör, piyasaları ve bilançoları yanında tut.",
+    "Guarda las acciones que quieres seguir, mira el cambio desde tu precio inicial y ten mercados y resultados a mano."
+  ],
+  "Start your watchlist": [
+    "Listene başla",
+    "Empieza tu lista"
+  ],
+  "No account needed to start. Your guest watchlist stays on this device.": [
+    "Başlamak için hesap gerekmez. Misafir listen bu cihazda kalır.",
+    "No hace falta cuenta para empezar. La lista de invitado se queda en este dispositivo."
+  ],
+  "Your watchlist is ready.": [
+    "Listen hazır.",
+    "Tu lista está lista."
+  ],
+  "Continue from the prices you already recorded, or add another company.": [
+    "Kaydettiğin fiyatlardan devam et veya başka bir şirket ekle.",
+    "Sigue desde los precios que ya guardaste o añade otra empresa."
+  ],
+  "Continue to your watchlists": [
+    "Listelerine devam et",
+    "Sigue a tus listas"
+  ],
+  "Your first stock idea starts here.": [
+    "İlk hisse fikrin burada başlar.",
+    "Tu primera idea empieza aquí."
+  ],
+  "Search for a company or ticker to start tracking it.": [
+    "İzlemek için bir şirket veya sembol ara.",
+    "Busca una empresa o un símbolo para empezar a seguirla."
+  ],
+  "Price change since added uses the recorded starting price. Position performance uses optional shares and cost.": [
+    "Eklenmesinden beri değişim, kaydedilen başlangıç fiyatını kullanır. Pozisyon getirisi isteğe bağlı adet ve maliyeti kullanır.",
+    "El cambio desde que la añadiste usa el precio inicial. El rendimiento de la posición usa acciones y coste opcionales."
+  ],
+  "Price change from the recorded starting price.": [
+    "Kaydedilen başlangıç fiyatından değişim.",
+    "Cambio desde el precio inicial registrado."
+  ],
+  "An example, not a result you should expect.": [
+    "Örnek; beklenen bir sonuç değil.",
+    "Un ejemplo, no un resultado esperado."
+  ],
+  "We couldn’t load the example watchlist.": [
+    "Örnek liste yüklenemedi.",
+    "No pudimos cargar la lista de ejemplo."
+  ],
+  "Above starting price": [
+    "Başlangıç fiyatının üzerinde",
+    "Por encima del precio inicial"
+  ],
+  "Below starting price": [
+    "Başlangıç fiyatının altında",
+    "Por debajo del precio inicial"
+  ],
+  "Markets at a glance": [
+    "Piyasalara bakış",
+    "Mercados de un vistazo"
+  ],
+  "US ETFs": [
+    "ABD ETF’leri",
+    "ETF de EE. UU."
+  ],
+  "Daily change": [
+    "Günlük değişim",
+    "Cambio diario"
+  ],
+  "Up on the day": [
+    "Günlük artış",
+    "Alza del día"
+  ],
+  "Down on the day": [
+    "Günlük düşüş",
+    "Baja del día"
+  ],
+  "Markets and earnings": [
+    "Piyasalar ve bilançolar",
+    "Mercados y resultados"
+  ],
+  "View earnings calendar": [
+    "Bilanço takvimini aç",
+    "Ver el calendario de resultados"
+  ],
+  "Upcoming earnings": [
+    "Yaklaşan bilançolar",
+    "Próximos resultados"
+  ],
+  "Market data is temporarily unavailable.": [
+    "Piyasa verisi şu an yok.",
+    "Los datos de mercado no están disponibles."
+  ],
+  "No upcoming announcements in the available coverage.": [
+    "Kapsamdaki yaklaşan bir açıklama yok.",
+    "No hay anuncios próximos en la cobertura."
+  ],
+  "Earnings data is temporarily unavailable.": [
+    "Bilanço verisi şu an yok.",
+    "Los datos de resultados no están disponibles."
+  ],
+  "How it works": [
+    "Nasıl çalışır",
+    "Cómo funciona"
+  ],
+  "Add a company": [
+    "Şirket ekle",
+    "Añade una empresa"
+  ],
+  "Search for a stock you want to follow.": [
+    "İzlemek istediğin hisseyi ara.",
+    "Busca una acción que quieras seguir."
+  ],
+  "Keep your starting point": [
+    "Başlangıç noktanı koru",
+    "Guarda tu punto de partida"
+  ],
+  "Your watchlist records a reference price when you add it.": [
+    "Liste, eklediğin anda bir referans fiyat kaydeder.",
+    "La lista guarda un precio de referencia al añadirla."
+  ],
+  "Follow what changes": [
+    "Değişeni izle",
+    "Sigue lo que cambia"
+  ],
+  "Review price changes and explore markets and upcoming earnings.": [
+    "Fiyat değişimini incele, piyasaları ve yaklaşan bilançoları aç.",
+    "Revisa los cambios de precio y explora mercados y próximos resultados."
+  ],
+  "Explore the example watchlist.": [
+    "Örnek listeyi incele.",
+    "Explora la lista de ejemplo."
+  ],
+  "Stay on this device, or keep lists across devices.": [
+    "Bu cihazda kal veya listelerini cihazlar arasında tut.",
+    "Quédate en este dispositivo o guarda las listas en todos."
+  ],
+  "A guest watchlist is stored in this browser. A free account keeps up to five lists of 20 stocks each, on any device.": [
+    "Misafir liste bu tarayıcıda saklanır. Ücretsiz hesap, her biri 20 hisse olan beş listeyi her cihazda tutar.",
+    "La lista de invitado se guarda en este navegador. Una cuenta gratuita guarda hasta cinco listas de 20 acciones en cualquier dispositivo."
+  ],
+  "Your lists are saved to your account.": [
+    "Listelerin hesabına kaydedildi.",
+    "Tus listas están guardadas en tu cuenta."
   ]
 }

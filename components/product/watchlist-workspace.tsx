@@ -110,15 +110,19 @@ export function WatchlistWorkspace({compact=false}:{compact?:boolean}){const t=u
   const sharePreview=active?shareCard(active):null;
   const shareMail=`mailto:?subject=${encodeURIComponent(sharePreview?.title||'Take a look at my watchlist')}&body=${encodeURIComponent(`${sharePreview?.description||'Here’s what I’m watching:'}\n\n${shareUrl}`)}`;
   const member=!!state&&!state.guest;
-  return <>{compact?<section className="home-watchlist" aria-label={t("Your watchlist")}>
-  <div className="home-watchlist-heading"><div><h2>{active?.stocks.length?t("Your watchlist"):t("Start with one stock.")}</h2><p>{t("Add a company and follow its price from today.")}</p></div><a className="tool-link" href="/watchlists"><T text="Open full watchlist"/></a></div>
+  useEffect(()=>{
+    if(!state)return;
+    window.dispatchEvent(new CustomEvent('watchlist:ready',{detail:{hasStocks:state.watchlists.some(list=>list.stocks.length>0),guest:!!state.guest}}));
+  },[state]);
+  return <>{compact?<section id="your-watchlist" className="home-watchlist" aria-label={t("Your watchlist")}>
+  <div className="home-watchlist-heading"><div><h2>{active?.stocks.length?active.name||t("Your watchlist"):t("Your first stock idea starts here.")}</h2><p>{active?.stocks.length?t("Price change since added uses the recorded starting price. Position performance uses optional shares and cost."):t("Search for a company or ticker to start tracking it.")}</p></div><a className="tool-link" href="/watchlists"><T text="Open full watchlist"/></a></div>
   {error&&!addQuote&&<p role="alert" className="error-banner">{error}<Button variant="ghost" onClick={()=>void load()}>{t("Retry")}</Button></p>}
   <span role="status" className="sr-only">{notice}</span>
   {state&&active?<>
-    {canEdit&&<form className="home-watchlist-search" onSubmit={addStock}><StockSearch value={ticker} onChange={setTicker} onPick={symbol=>{void openAddModal(symbol);}} inputRef={inputRef} currency={active.stocks[0]?.currency}/><Button type="submit" className="primary-button" disabled={!!busy||!ticker.trim()||addLimited}>{busy?<LoaderCircle className="spin"/>:<Plus/>}<T text="Add stock"/></Button></form>}
+    {canEdit&&<form className="home-watchlist-search" onSubmit={addStock}><StockSearch value={ticker} onChange={setTicker} onPick={symbol=>{void openAddModal(symbol);}} inputRef={inputRef} inputId="watchlist-search" placeholder={t("Search company or ticker")} currency={active.stocks[0]?.currency}/><Button type="submit" className="primary-button" disabled={!!busy||!ticker.trim()||addLimited}>{busy?<LoaderCircle className="spin"/>:<Plus/>}{busy==='quote'?t("Loading…"):busy==='addStock'?t("Adding…"):t("Add stock")}</Button></form>}
     {state.guest&&!!active.stocks.length&&<StockPageHint placement="search"/>}
     {addLimited&&<p className="quote-warning">{t("Stock limit reached.")}</p>}
-    {active.stocks.length?<CompactStocks stocks={active.stocks.slice(0,5)} hint={!!state.guest}/>:<p className="home-watchlist-empty"><T text="Search for your first stock above. Your watchlist will appear here."/></p>}
+    {active.stocks.length?<CompactStocks stocks={active.stocks.slice(0,5)} hint={!!state.guest}/>:<p className="home-watchlist-empty"><T text="Search for a company or ticker to start tracking it."/></p>}
     <div className="home-watchlist-footer"><span>{state.guest?t("Saved on this device"):active.name} · {active.stocks.length} / {state.plan.maxStocks} {t("Stocks")}</span><span className="home-watchlist-footer-links">{active.stocks.length>5&&<a href="/watchlists"><T text="View all"/></a>}{state.guest?<button type="button" className="tool-link" onClick={()=>setSaveOpen(true)}><T text="Save with a free account"/></button>:<a href="/watchlists"><T text="Open full watchlist"/></a>}</span></div>
   </>:<p role="status">{t("Opening your watchlists…")}</p>}
 </section>:<><header className="topbar"><div className="public-nav-main"><Brand/><ProductNav onNavigate={warnLeave}/></div><div className="account-nav"><ThemeToggle/>{state?.guest?<><a href="/login"><T text="Log in"/></a><button type="button" className="solid-link" onClick={()=>setSaveOpen(true)}><T text="Save portfolio"/></button></>:<><a href="/account"><T text="Account"/></a>{state?.user.analytics&&<a href="/insights">Analytics</a>}<span className="save-state">{busy?<LoaderCircle size={15} className="spin"/>:<Check size={15}/>} {busy?t("Updating…"):state?t("Saved to your account"):t("Connecting…")}</span></>}</div></header>

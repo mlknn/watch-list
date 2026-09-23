@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {averageImpact,chartEventMarks,chartEventTimes,eventWindows} from '../lib/earnings-impact.mjs';
-import {earningsWeek,mondayOnOrBefore,normalizeDayRows,reportTiming,toYahooSymbol,weekDays,clampMonday,earningsWindow,addDays,weeksAhead,prefetchAhead,nasdaqCacheTtl,homePreviewRows,earningsHomePreview} from '../server/earnings-calendar.mjs';
+import {earningsWeek,mondayOnOrBefore,normalizeDayRows,reportTiming,toYahooSymbol,weekDays,clampMonday,earningsWindow,addDays,weeksAhead,prefetchAhead,nasdaqCacheTtl,homePreviewRows,earningsHomePreview,previewScopeLabel} from '../server/earnings-calendar.mjs';
 
 test('class shares map to Yahoo tickers',()=>{
   assert.equal(toYahooSymbol('BRK.B'),'BRK-B');
@@ -179,4 +179,11 @@ test('homepage preview skips already-reported names and uses next week when this
   assert.equal(data.label,'Reporting next week');
   assert.equal(data.rows[0].symbol,'NVDA');
   assert.ok(data.rows.some(row=>row.symbol==='AMD'&&row.date==='2026-09-22'));
+});
+
+test('preview label follows every shown date, not only the first row',()=>{
+  assert.equal(previewScopeLabel([{date:'2026-09-23'}],'2026-09-23','2026-09-21'),'Reporting today');
+  assert.equal(previewScopeLabel([{date:'2026-09-23'},{date:'2026-09-24'}],'2026-09-23','2026-09-21'),'Reporting this week');
+  assert.equal(previewScopeLabel([{date:'2026-09-28'}],'2026-09-23','2026-09-21'),'Reporting next week');
+  assert.equal(previewScopeLabel([{date:'2026-09-23'},{date:'2026-09-28'}],'2026-09-23','2026-09-21'),'Upcoming earnings');
 });

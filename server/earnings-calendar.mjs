@@ -258,6 +258,7 @@ export function homePreviewRows(days,today,weekStart,{limit=5}={}){
       symbol:row.symbol,
       date:day.date,
       marketCap:Number(row.marketCap)||0,
+      when:row.when||'',
     })));
   const friday=weekStart?addDays(weekStart,4):'';
   const mega=upcoming
@@ -268,7 +269,7 @@ export function homePreviewRows(days,today,weekStart,{limit=5}={}){
   function add(row){
     if(!row||seen.has(row.symbol)||picked.length>=limit)return;
     seen.add(row.symbol);
-    picked.push({symbol:row.symbol,date:row.date});
+    picked.push({symbol:row.symbol,date:row.date,when:row.when||''});
   }
   for(const row of mega)add(row);
   const byDay=new Map();
@@ -283,13 +284,23 @@ export function homePreviewRows(days,today,weekStart,{limit=5}={}){
   return picked;
 }
 
+/** Label the homepage teaser from the dates that are actually shown. */
+export function previewScopeLabel(rows,today,weekStart){
+  const dates=(rows||[]).map(row=>row.date).filter(Boolean);
+  if(!dates.length)return 'Upcoming earnings';
+  const friday=weekStart?addDays(weekStart,4):'';
+  if(dates.every(date=>date===today))return 'Reporting today';
+  if(friday&&dates.every(date=>date>=weekStart&&date<=friday))return 'Reporting this week';
+  if(friday&&dates.every(date=>date>friday))return 'Reporting next week';
+  return 'Upcoming earnings';
+}
+
 export async function earningsHomePreview({loadDay=nasdaqDay,now=new Date(),limit=5}={}){
   const today=ymdInZone(now);
   const monday=mondayOnOrBefore(today);
   const nextMonday=addDays(monday,7);
   const thisWeek=await readWeek(monday,loadDay,now);
   let nextWeek=loadDay===nasdaqDay?peekCachedWeek(nextMonday):null;
-  const friday=thisWeek.weekEnd||addDays(monday,4);
   const laterThisWeek=(thisWeek.days||[]).some(day=>day.status==='ok'&&day.date>today&&(day.companies||[]).some(row=>!row.reported));
   const firstPass=homePreviewRows(thisWeek.days||[],today,monday,{limit});
   if(!nextWeek&&(firstPass.length<limit||!laterThisWeek)){
@@ -298,8 +309,7 @@ export async function earningsHomePreview({loadDay=nasdaqDay,now=new Date(),limi
     void refreshWeek(nextMonday,loadDay,now).catch(()=>{});
   }
   const rows=homePreviewRows([...(thisWeek.days||[]),...(nextWeek?.days||[])],today,monday,{limit});
-  const first=rows[0]?.date||'';
-  const label=first===today?'Reporting today':first&&first<=friday?'Reporting this week':'Reporting next week';
+  const label=previewScopeLabel(rows,today,monday);
   const delay=setTimeout(()=>{void prefetchAhead(monday,{now}).catch(()=>{});},400);
   delay.unref?.();
   return {label,rows,weekStart:monday};

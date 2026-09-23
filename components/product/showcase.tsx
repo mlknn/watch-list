@@ -90,7 +90,7 @@ function SampleRow({stock}:{stock:Row}){
 
 /** One live fetch for the home page, shared by the watchlist preview and the example below it. */
 export function useShowcase(){
- const [data,setData]=useState<ShowcaseData|null>(null),[error,setError]=useState('');
+ const [data,setData]=useState<ShowcaseData|null>(null),[error,setError]=useState(''),[attempt,setAttempt]=useState(0);
  useEffect(()=>{
   let alive=true,running=false;
   async function load(){
@@ -100,14 +100,43 @@ export function useShowcase(){
     const result=await r.json() as ShowcaseData&{error?:string};
     if(!r.ok)throw Error(result.error);
     if(alive){setData(result);setError('');}
-   }catch{if(alive)setError('Market data is temporarily unavailable. Please check back shortly.');}
+   }catch{if(alive)setError('We couldn’t load the example watchlist.');}
    finally{running=false;}
   }
   void load();
   const timer=setInterval(()=>{if(!document.hidden)void load();},15000);
   return()=>{alive=false;clearInterval(timer);};
- },[]);
- return {data,error};
+ },[attempt]);
+ return {data,error,retry:()=>setAttempt(n=>n+1)};
+}
+
+const pct=(value:number|null|undefined)=>value===null||value===undefined?'—':`${value>=0?'+':''}${value.toFixed(2)}%`;
+
+export function ExampleWatchlistPreview({data,error,onRetry}:{data:ShowcaseData|null;error:string;onRetry?:()=>void}){
+ const t=useT();
+ const picks=data?.stocks.slice(0,4)||[];
+ const started=data?.performance.startDate?new Date(data.performance.startDate+'T12:00:00Z'):new Date('2021-09-03T12:00:00Z');
+ const startedLabel=started.toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'});
+ return <aside className="example-preview" aria-label={t('Example watchlist')}>
+  <header>
+   <strong><T text="Example watchlist"/></strong>
+   <span>{t('Since')} {startedLabel}</span>
+  </header>
+  {picks.length?<table>
+   <caption className="sr-only">{t('Example watchlist')}</caption>
+   <thead><tr><th>{t('Company')}</th><th>{t('Price')}</th><th>{t('Since added')}</th></tr></thead>
+   <tbody>{picks.map(stock=>{
+    const up=stock.changePercent>=0;
+    return <tr key={stock.symbol}>
+     <th scope="row"><CompanyIcon symbol={stock.symbol}/><span><strong>{stock.symbol}</strong><small>{stock.companyName}</small></span></th>
+     <td>{price(stock.currentPrice,stock.currency)}</td>
+     <td className={up?'up':'down'}>{pct(stock.changePercent)} <span className="sr-only">{up?t('Above starting price'):t('Below starting price')}</span></td>
+    </tr>;
+   })}</tbody>
+  </table>:error?<p className="example-preview-status" role="alert">{t("We couldn’t load the example watchlist.")}{onRetry?<button type="button" className="home-inline-retry" onClick={onRetry}>{t('Retry')}</button>:null}</p>
+  :<div className="example-preview-skel" role="status" aria-label={t('Loading prices…')}><i/><i/><i/><i/></div>}
+  <p>{t('Price change from the recorded starting price.')} {t('An example, not a result you should expect.')}</p>
+ </aside>;
 }
 
 export function SamplePortfolio({data,error}:{data:ShowcaseData|null;error:string}){
