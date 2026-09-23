@@ -10,7 +10,8 @@ import {Input} from '@/components/ui/input';
 import {Sheet,SheetContent,SheetDescription,SheetHeader,SheetTitle} from '@/components/ui/sheet';
 import {apiJson,signedIn} from '@/lib/auth-client';
 import {readGuestState} from '@/lib/guest-watchlist.mjs';
-import {addDays,todayInMarket} from '@/lib/next-earnings.mjs';
+import {addDays,mondayOnOrBefore,todayInMarket} from '@/lib/next-earnings.mjs';
+import {weeksToPrefetch} from '@/lib/earnings-week-prefetch.mjs';
 import type {AccountState} from '@/lib/watchlist';
 import {earningsCsv,epsSurprise,filterEarningsRows,formatCap,formatEps,formatSurprise,sortEarningsRows,summaryCounts,weekRangeLabel} from '@/lib/earnings-compare.mjs';
 import {stockHref} from '@/lib/safe-return.mjs';
@@ -37,17 +38,36 @@ const stampFormat=(iso:string,locale='en-US')=>{
 const UNAVAILABLE='The earnings calendar is temporarily unavailable.';
 const VIEW_KEY='earnings:view';
 const weekStore=new Map<string,Board>();
+const weekPending=new Map<string,Promise<Board>>();
 
-async function pullWeek(monday:string){
-  const query=monday?'?week='+encodeURIComponent(monday):'';
-  const r=await fetch('/api/earnings-calendar'+query);
-  const result=await r.json() as Board&{error?:string};
-  if(!r.ok)throw Error(result.error||UNAVAILABLE);
+function rememberWeek(monday:string,result:Board){
   weekStore.set(result.weekStart,result);
   if(!monday)weekStore.set('',result);
-  return result;
+}
+
+function pullWeek(monday:string){
+  const key=monday||mondayOnOrBefore(todayInMarket())||'';
+  const existing=weekPending.get(key)||(!monday?weekPending.get(''):undefined);
+  if(existing)return existing;
+  const query=monday?'?week='+encodeURIComponent(monday):'';
+  const task=fetch('/api/earnings-calendar'+query).then(async r=>{
+    const result=await r.json() as Board&{error?:string};
+    if(!r.ok)throw Error(result.error||UNAVAILABLE);
+    rememberWeek(monday,result);
+    return result;
+  }).finally(()=>{weekPending.delete(key);if(!monday)weekPending.delete('');});
+  weekPending.set(key,task);
+  if(!monday)weekPending.set('',task);
+  return task;
 }
 function cachedWeek(monday:string){return weekStore.get(monday)||(!monday?weekStore.get(''):undefined);}
+function warmAround(monday:string,bounds?:{minWeek?:string;maxWeek?:string}){
+  if(!monday)return;
+  for(const next of weeksToPrefetch(monday,bounds)){
+    if(weekStore.has(next)||weekPending.has(next))continue;
+    void pullWeek(next).catch(()=>{/* Visible week stays on screen if a neighbor misses. */});
+  }
+}
 
 function readView(params:URLSearchParams):View{
   const url=params.get('view');
@@ -118,30 +138,20 @@ export function EarningsCalendar(){
 
   useEffect(()=>{
     let alive=true;
-    const hit=cachedWeek(week);
-    if(hit){setData(hit);setLoading(false);setError('');setStaleNotice('');}
-    else{setLoading(true);setError('');setStaleNotice('');}
-    void pullWeek(week).then(result=>{if(!alive)return;setData(result);setLoading(false);setStaleNotice('');}).catch(e=>{if(!alive)return;if(hit){setStaleNotice(e.message||UNAVAILABLE);setLoading(false);return;}setError(e.message||UNAVAILABLE);setLoading(false);});
+    const monday=week||mondayOnOrBefore(today);
+    const hit=cachedWeek(week)||cachedWeek(monday);
+    if(hit){setData(hit);setLoading(false);setError('');setStaleNotice('');warmAround(monday,{minWeek:hit.minWeek,maxWeek:hit.maxWeek});}
+    else{setLoading(true);setError('');setStaleNotice('');warmAround(monday);}
+    if(hit&&!attempt)return()=>{alive=false;};
+    void pullWeek(week).then(result=>{
+      if(!alive)return;
+      setData(result);
+      setLoading(false);
+      setStaleNotice('');
+      warmAround(result.weekStart,{minWeek:result.minWeek,maxWeek:result.maxWeek});
+    }).catch(e=>{if(!alive)return;if(hit){setStaleNotice(e.message||UNAVAILABLE);setLoading(false);return;}setError(e.message||UNAVAILABLE);setLoading(false);});
     return()=>{alive=false;};
-  },[week,attempt]);
-
-  useEffect(()=>{
-    if(!data)return;
-    const ahead=data.weekStart===data.todayMonday?4:data.weekStart>data.todayMonday?3:2;
-    let cancelled=false;
-    const run=async()=>{
-      for(let i=1;i<=ahead;i++){
-        await new Promise(resolve=>window.setTimeout(resolve,280));
-        if(cancelled)return;
-        const monday=shiftWeek(data.weekStart,i);
-        if(monday>data.maxWeek)return;
-        if(weekStore.has(monday))continue;
-        try{await pullWeek(monday);}catch{/* Keep the open week as-is if a later week misses. */}
-      }
-    };
-    void run();
-    return()=>{cancelled=true;};
-  },[data?.weekStart,data?.todayMonday,data?.maxWeek]);
+  },[week,attempt,today]);
 
   const writeUrl=(patch:Record<string,string|null>,mode:'push'|'replace'='push')=>{
     const next=new URLSearchParams(params.toString());
@@ -158,6 +168,8 @@ export function EarningsCalendar(){
 
   const go=useCallback((next:string)=>{
     if(!data||next<data.minWeek||next>data.maxWeek)return;
+    if(!cachedWeek(next))void pullWeek(next).catch(()=>{});
+    warmAround(next,{minWeek:data.minWeek,maxWeek:data.maxWeek});
     replace({week:next===data.todayMonday?null:next});
   },[data,params]);
 

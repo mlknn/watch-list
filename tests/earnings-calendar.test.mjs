@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {averageImpact,chartEventMarks,chartEventTimes,eventWindows} from '../lib/earnings-impact.mjs';
 import {earningsWeek,mondayOnOrBefore,normalizeDayRows,reportTiming,toYahooSymbol,weekDays,clampMonday,earningsWindow,addDays,weeksAhead,prefetchAhead,nasdaqCacheTtl,homePreviewRows,earningsHomePreview,previewScopeLabel} from '../server/earnings-calendar.mjs';
+import {weeksToPrefetch} from '../lib/earnings-week-prefetch.mjs';
 
 test('class shares map to Yahoo tickers',()=>{
   assert.equal(toYahooSymbol('BRK.B'),'BRK-B');
@@ -114,6 +115,14 @@ test('this week prefetches the next four Mondays, never itself',()=>{
   const now=new Date('2026-09-18T16:00:00Z');
   const {maxWeek,todayMonday}=earningsWindow(now);
   assert.deepEqual(weeksAhead(todayMonday,4,maxWeek),['2026-09-21','2026-09-28','2026-10-05','2026-10-12']);
+});
+
+test('a member on a week warms the next three Mondays and the previous one',()=>{
+  assert.deepEqual(weeksToPrefetch('2026-09-14'),['2026-09-21','2026-09-28','2026-10-05','2026-09-07']);
+});
+
+test('clicking next week warms the three Mondays after that week',()=>{
+  assert.deepEqual(weeksToPrefetch('2026-09-21'),['2026-09-28','2026-10-05','2026-10-12','2026-09-14']);
 });
 
 test('warming later weeks waits for this week and never fetches it again',async()=>{
