@@ -2502,5 +2502,57 @@
   "More headlines on Yahoo Finance ↗": [
     "Yahoo Finance’ta daha fazla haber ↗",
     "Más titulares en Yahoo Finance ↗"
+  ],
+  "Organize your ideas": [
+    "Fikirlerini düzenle",
+    "Organiza tus ideas"
+  ],
+  "Track global markets": [
+    "Küresel piyasaları takip et",
+    "Sigue los mercados globales"
+  ],
+  "See who is reporting": [
+    "Kim açıklıyor, gör",
+    "Mira quién publica"
+  ],
+  "MY WATCHLISTS": [
+    "LİSTELERİM",
+    "MIS LISTAS"
+  ],
+  "ALLOCATION": [
+    "DAĞILIM",
+    "REPARTO"
+  ],
+  "Allocation": [
+    "Dağılım",
+    "Reparto"
+  ],
+  "Names": [
+    "İsimler",
+    "Nombres"
+  ],
+  "Add a stock to see how this list is split.": [
+    "Listenin nasıl bölündüğünü görmek için bir hisse ekle.",
+    "Añade un valor para ver cómo se reparte esta lista."
+  ],
+  "Sized by current holding value.": [
+    "Güncel pozisyon değerine göre.",
+    "Según el valor actual de las posiciones."
+  ],
+  "Equal weight until you add shares.": [
+    "Adet ekleyene kadar eşit ağırlık.",
+    "Mismo peso hasta que añadas acciones."
+  ],
+  "Symbol": [
+    "Sembol",
+    "Símbolo"
+  ],
+  "Watchlist summary": [
+    "Liste özeti",
+    "Resumen de la lista"
+  ],
+  "Add shares to see value": [
+    "Değeri görmek için adet ekle",
+    "Añade acciones para ver el valor"
   ]
 }

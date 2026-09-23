@@ -57,9 +57,11 @@ export function HomeTools({showcase}:{showcase:ShowcaseData|null}){
       <h2><T text="Watchlists"/></h2>
       <p><T text="Follow your stock ideas from the day you add them, with optional share counts and costs."/></p>
       <PreviewFrame label={t('Example watchlist · since 2021')} ready={picks.length>0} empty={t('Loading prices…')}>
+        <li className="tool-preview-head"><span>{t('Symbol')}</span><span>{t('Price')}</span><span>{t('Since added')}</span></li>
         {picks.map(stock=><li key={stock.symbol}>
           <CompanyIcon symbol={stock.symbol}/>
-          <span className="tool-preview-name">{stock.symbol}</span>
+          <span className="tool-preview-copy"><span className="tool-preview-name">{stock.symbol}</span><span className="tool-preview-sub">{stock.companyName}</span></span>
+          <span className="tool-preview-sub">{price(stock.currentPrice,stock.currency)}</span>
           <span className={'tool-preview-value '+tone(stock.changePercent)}>{pct(stock.changePercent)}</span>
         </li>)}
       </PreviewFrame>
