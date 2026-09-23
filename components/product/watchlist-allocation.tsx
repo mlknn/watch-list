@@ -2,7 +2,7 @@
 import {T,useT} from '@/components/product/language';
 import {Cell,Pie,PieChart} from 'recharts';
 import {watchlistAllocation} from '@/lib/watchlist-allocation.mjs';
-import {price,type Watchlist} from '@/lib/watchlist';
+import {type Watchlist} from '@/lib/watchlist';
 
 const COLORS=['#2563eb','#0ea5e9','#14b8a6','#6366f1','#38bdf8','#64748b'];
 
@@ -21,10 +21,6 @@ export function WatchlistAllocation({list,compact=false}:{list:Watchlist;compact
             {data.slices.map((slice,index)=><Cell key={slice.symbol} fill={COLORS[index%COLORS.length]}/>)}
           </Pie>
         </PieChart>
-        <div className="watchlist-alloc-center">
-          <strong>{data.sizedByValue?price(data.total,data.currency):String(data.slices.length)}</strong>
-          <span>{data.sizedByValue?t('Current value'):t('Names')}</span>
-        </div>
       </div>
       <ol className="watchlist-alloc-list">
         {top.map((slice,index)=><li key={slice.symbol}>
