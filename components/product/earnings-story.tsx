@@ -38,7 +38,7 @@ export function EarningsStory({symbol,nextDate}:{symbol:string;nextDate?:string}
   const [error,setError]=useState('');
   const [loading,setLoading]=useState(true);
   const [windows,setWindows]=useState<ReturnType<typeof eventWindows>>([]);
-  const [calendarDate,setCalendarDate]=useState('');
+  const [calendarHit,setCalendarHit]=useState<{symbol:string;date:string;when:string;epsForecast:string}|null>(null);
   useEffect(()=>{
     let alive=true;
     const today=todayInMarket();
@@ -47,14 +47,14 @@ export function EarningsStory({symbol,nextDate}:{symbol:string;nextDate?:string}
       const nextMonday=current.weekStart?addDays(current.weekStart,7):'';
       const upcoming=nextMonday?await fetch('/api/earnings-calendar?week='+encodeURIComponent(nextMonday)).then(res=>res.json() as Promise<EarningsWeek>).catch(()=>({days:[]})):{days:[]};
       if(!alive)return;
-      const hit=[...(current.days||[]),...(upcoming.days||[])].filter(day=>day.status==='ok').flatMap(day=>(day.companies||[]).map(row=>({...row,date:day.date}))).find(row=>row.symbol===symbol&&!row.reported&&row.date>=today);
-      setCalendarDate(hit?.date||'');
-    }).catch(()=>{if(alive)setCalendarDate('');});
+      const hit=[...(current.days||[]),...(upcoming.days||[])].filter(day=>day.status==='ok').flatMap(day=>(day.companies||[]).map(row=>({...row,date:day.date}))).find(row=>row.symbol===symbol&&!row.reported&&row.date>=today) as {date:string;when?:string;epsForecast?:string}|undefined;
+      setCalendarHit(hit?{symbol,date:hit.date,when:hit.when||'',epsForecast:hit.epsForecast||''}:null);
+    }).catch(()=>{if(alive)setCalendarHit(null);});
     return()=>{alive=false;};
   },[symbol]);
   useEffect(()=>{
     let alive=true;
-    setLoading(true);setError('');
+    setLoading(true);setError('');setReports(null);
     void Promise.all([
       apiFetch('/api/stocks/'+encodeURIComponent(symbol)+'/earnings',{},false).then(async r=>{const result=await r.json() as Reports&{error?:string};if(!r.ok)throw Error(result.error||'Unable to load earnings.');return result;}),
       marketChart(symbol,'5y').catch(()=>null),
@@ -71,14 +71,28 @@ export function EarningsStory({symbol,nextDate}:{symbol:string;nextDate?:string}
     const income=q.netIncome||0;
     return {...q,label:new Date(q.periodEnd+'T12:00:00Z').toLocaleDateString(undefined,{month:'short',year:'2-digit',timeZone:'UTC'}),revAbs:Math.abs(rev),incomeAbs:Math.abs(income),incomeNeg:income<0};
   }),[reports]);
-  const reportDate=calendarDate||isoDay(nextDate);
+  const shownHit=calendarHit?.symbol===symbol?calendarHit:null;
+  const reportDate=shownHit?.date||isoDay(nextDate);
   const nextNotice=<NextReportNotice iso={reportDate}/>;
-  if(loading)return <section className="earnings-story" role="status">{nextNotice}<span className="story-loading"><LoaderCircle className="spin"/>{t('Loading quarterly results…')}</span></section>;
-  if(error)return <section className="earnings-story" role="alert">{nextNotice}<p>{error}</p></section>;
-  if(!reports?.quarters.length)return <section className="earnings-story">{nextNotice}<p>{t('No quarterly reports are available for this symbol yet.')}</p></section>;
+  const whenLabel=shownHit?.when==='bmo'?t('Before open'):shownHit?.when==='amc'?t('After close'):shownHit?.when==='during'?t('During market hours'):shownHit?.when==='unknown'?t('Time not supplied'):'';
+  const previous=reports?.quarters?.at(-1);
+  const nextCard=reportDate?<section className="story-card stock-next-earn" aria-label={t('Next earnings')}>
+    <p className="eyebrow"><T text="Next earnings"/></p>
+    <h2>{new Date(reportDate+'T12:00:00Z').toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'})}</h2>
+    {whenLabel&&<p>{whenLabel}</p>}
+    <dl>
+      {shownHit?.epsForecast?<div><dt>{t('EPS estimate')}</dt><dd>{shownHit.epsForecast}</dd></div>:null}
+      {previous?.eps!=null?<div><dt>{t('Previous EPS')}</dt><dd>{previous.eps.toFixed(2)}</dd></div>:null}
+    </dl>
+    <a href="#earnings-history">{t('View earnings history')} →</a>
+  </section>:null;
+  if(loading)return <div className="earnings-story">{nextCard}<section className="story-card" aria-live="polite">{nextNotice}<span className="story-loading"><LoaderCircle className="spin"/>{t('Loading quarterly results…')}</span></section></div>;
+  if(error)return <div className="earnings-story">{nextCard}<section className="story-card" role="alert">{nextNotice}<p>{t('Earnings history is temporarily unavailable.')}</p></section></div>;
+  if(!reports?.quarters.length)return <div className="earnings-story">{nextCard}<section className="story-card">{nextNotice}<p>{t('No quarterly reports are available for this symbol yet.')}</p></section></div>;
   const maxRev=Math.max(...mix.map(q=>q.revAbs),1);
   return <div className="earnings-story">
-    <section className="story-card">
+    {nextCard}
+    <section className="story-card" id="earnings-history">
       <p className="eyebrow"><T text="EARNINGS STORY"/></p>
       {nextNotice}
       <h2><T text="Price around past earnings announcements"/></h2>

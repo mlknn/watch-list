@@ -1189,6 +1189,80 @@ html.dark .example-preview .down,html.dark .home-panel .down{color:#ff9aa4}
 html.dark .position-mode-btn{background:#141f1a;border-color:#2a4438}
 html.dark .position-mode-btn.is-on{background:#12301f;border-color:#3dff8f}
 html.dark .privacy-toc{border-color:#2a4438}
+.stock-page{max-width:1120px;margin:0 auto;padding:20px 20px 88px;min-width:0;overflow-x:clip}
+.stock-page .stock-back-row{display:flex;gap:16px;margin-bottom:14px}
+.stock-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 24px;align-items:start;padding:8px 0 18px}
+.stock-hero-id{display:flex;gap:14px;align-items:center;min-width:0}
+.stock-hero-id .company-icon{width:48px;height:48px;flex:0 0 48px}
+.stock-hero h1{margin:0;font-size:clamp(26px,3vw,36px);letter-spacing:-.8px;line-height:1.15;overflow-wrap:anywhere}
+.stock-hero-id p,.stock-hero-price p{margin:4px 0 0;color:#5c6b82;font-size:14px}
+.stock-hero-price{grid-column:1;display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px}
+.stock-hero-price strong{font-size:clamp(36px,5vw,52px);letter-spacing:-1.6px;line-height:1}
+.stock-hero-price .up{color:#14845b;font-weight:700;font-variant-numeric:tabular-nums}
+.stock-hero-price .down{color:#b44450;font-weight:700;font-variant-numeric:tabular-nums}
+.stock-hero-price .flat{color:#5c6b82;font-weight:650}
+.stock-hero-price p{flex-basis:100%}
+.stock-after{display:flex;align-items:center;gap:6px}
+.stock-hero-actions{grid-column:2;grid-row:1 / span 2;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;align-content:start}
+.stock-hero-actions .primary-button{min-height:46px}
+.stock-hero-actions .outline-button,.stock-full-chart{min-height:44px}
+.stock-quick{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin:4px 0 18px}
+.stock-quick>div{min-width:0;padding:12px 12px 10px;border:1px solid #e1e8f3;border-radius:12px;background:#fff}
+.stock-quick dt{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#6b7a91;margin-bottom:6px}
+.stock-quick dd{margin:0;font-size:15px;font-weight:650;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.stock-chart-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}
+.stock-chart-head h2{margin:0;font-size:18px}
+.stock-chart-head p{margin:4px 0 0;font-weight:700;font-variant-numeric:tabular-nums}
+.stock-page .chart-toolbar{min-width:0}
+.stock-page .chart-ranges{max-width:100%;overflow-x:auto;flex-wrap:nowrap}
+.stock-page .chart-ranges [data-slot=tabs-trigger][data-active]{background:#1f6b4a;color:#fff;font-weight:700}
+.stock-page .detail-price-chart,.stock-page .candle-svg{height:320px;width:100%;max-width:100%}
+.stock-chart-tip{display:grid;gap:2px;padding:8px 10px;border-radius:9px;font-size:13px;font-variant-numeric:tabular-nums}
+.stock-lower{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(260px,.9fr);gap:16px;align-items:start;margin-top:16px}
+.stock-facts dl,.stock-facts-list{display:grid;gap:0;margin:8px 0 0}
+.stock-facts dl>div,.stock-facts-list>div,.stock-page .company-facts>div{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid #eef2f8}
+.stock-page .company-facts{display:grid;grid-template-columns:1fr;margin:8px 0 0}
+.stock-facts dt,.stock-facts-list dt{color:#6b7a91;font-size:13px}
+.stock-facts dd,.stock-facts-list dd{margin:0;font-weight:650;font-variant-numeric:tabular-nums;text-align:right}
+.stock-facts h2,.stock-lower-side h2,.stock-range h2{margin:0;font-size:18px}
+.stock-about{font-size:14px;line-height:1.6;color:#334155;margin:10px 0}
+.stock-quiet{font-size:13px;color:#6b7a91;line-height:1.5}
+.stock-range-track{position:relative;height:8px;margin:16px 0 8px;border-radius:99px;background:#e7edf5}
+.stock-range-track i{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:#1f3b73;border:2px solid #fff;transform:translate(-50%,-50%);box-shadow:0 0 0 1px #1f3b73}
+.stock-range p{display:flex;justify-content:space-between;gap:12px;margin:0;font-size:12px;color:#5c6b82;font-variant-numeric:tabular-nums}
+.stock-next-earn h2{font-size:28px;letter-spacing:-.6px}
+.stock-next-earn dl{display:flex;gap:22px;margin:12px 0}
+.stock-next-earn dt{font-size:12px;color:#6b7a91}
+.stock-next-earn dd{margin:2px 0 0;font-size:18px;font-weight:650}
+.stock-next-earn a{font-weight:650}
+.stock-skel{height:64px;border-radius:12px;background:linear-gradient(90deg,#eef2f8,#f7f9fc,#eef2f8);background-size:200% 100%}
+.stock-skel-price{display:inline-block;width:180px;height:48px}
+.stock-skel-copy{height:72px}
+.stock-sticky-cta{position:fixed;left:12px;right:12px;bottom:12px;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid #e1e8f3;border-radius:14px;background:#fff;box-shadow:0 10px 30px rgba(20,32,48,.12)}
+.stock-sticky-cta span{font-weight:700;font-variant-numeric:tabular-nums}
+.stock-sticky-cta .primary-button{min-height:44px}
+html.dark .stock-quick>div,html.dark .stock-sticky-cta{background:#141f1a;border-color:#2a4438}
+html.dark .stock-hero-id p,html.dark .stock-hero-price p,html.dark .stock-quiet,html.dark .stock-range p,html.dark .stock-facts dt{color:#b8ccc0}
+html.dark .stock-facts dl>div,html.dark .stock-facts-list>div,html.dark .stock-page .company-facts>div{border-color:#2a4438}
+html.dark .stock-range-track{background:#24382f}
+html.dark .stock-page .chart-ranges [data-slot=tabs-trigger][data-active]{background:#14643f;color:#fff}
+@media(max-width:900px){
+  .stock-lower{grid-template-columns:1fr}
+  .stock-quick{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:700px){
+  .stock-page{padding:12px 12px 96px}
+  .stock-hero{grid-template-columns:1fr}
+  .stock-hero-actions{grid-column:1;grid-row:auto;justify-content:stretch}
+  .stock-hero-actions .primary-button{flex:1 1 100%}
+  .stock-hero-actions .outline-button{flex:1 1 calc(50% - 8px)}
+  .stock-full-chart{flex:1 1 100%}
+  .stock-quick{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stock-page .detail-price-chart,.stock-page .candle-svg{height:260px}
+  .stock-page .chart-ranges [data-slot=tabs-trigger]{min-height:44px;padding:8px 12px;font-size:13px}
+  .stock-hero h1{font-size:26px}
+  .stock-hero-price strong{font-size:40px}
+}
 @media(prefers-reduced-motion:reduce){
   .market-ticker-track{animation:none!important}
 }
