@@ -17,6 +17,7 @@ import {exchangeSession,sectorAverage,tapeBreadth,tapeMovers} from '@/lib/market
 import {getMarket,groupsFor,isCryptoCoin,listMarkets} from '@/lib/markets.mjs';
 import {resolveStockInput} from '@/lib/stock-search.mjs';
 import {apiJson} from '@/lib/auth-client';
+import {CryptoMarkets} from '@/components/product/crypto-markets';
 
 type Row={symbol:string;name?:string;short?:string;chart:MarketChart|null;error:string|null};
 type Group={id:string;title:string;blurb:string;stocks:Row[];kind?:string};
@@ -372,7 +373,7 @@ function GroupTable({group,ready,sort,onSort,onCoin}:{group:Group;ready:boolean;
   </section>;
 }
 
-export function MarketBoard(){
+function EquityBoard(){
   const t=useT();
   const router=useRouter();
   const params=useSearchParams();
@@ -514,4 +515,10 @@ export function MarketBoard(){
       </DialogContent>
     </Dialog>
   </main></Favorites.Provider>;
+}
+
+export function MarketBoard(){
+  const params=useSearchParams();
+  if(getMarket(params.get('market')).kind==='crypto') return <CryptoMarkets/>;
+  return <EquityBoard/>;
 }
