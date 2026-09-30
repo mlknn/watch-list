@@ -1357,3 +1357,43 @@ html.dark .crypto-markets .chart-ranges [data-slot=tabs-trigger][data-active]{ba
   .earnings-summary-strip dd{font-size:18px}
   .compare-table{min-width:640px}
 }
+
+/* Guided guest setup and personal earnings agenda. */
+.watchlist-setup,.watchlist-earnings{min-width:0;margin:18px 0;padding:18px;border:1px solid #dce5f1;border-radius:14px;background:#f8faff}
+.watchlist-setup header,.watchlist-earnings header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.watchlist-setup h3,.watchlist-earnings h3{display:flex;align-items:center;gap:8px;margin:0;font-size:17px}
+.watchlist-setup p,.watchlist-earnings p{margin:6px 0;font-size:13px;color:#596b82;line-height:1.5}
+.watchlist-setup header>span{font-size:13px;font-weight:700;color:#365bd8}
+.watchlist-setup ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;list-style:none;padding:0;margin:16px 0 0}
+.watchlist-setup li{min-width:0}
+.watchlist-setup li button{display:flex;align-items:flex-start;gap:10px;width:100%;height:100%;padding:14px;text-align:left;border:1px solid #dce5f1;border-radius:10px;background:#fff;color:inherit;cursor:pointer}
+.watchlist-setup li button:hover{border-color:#365bd8}
+.watchlist-setup li button:focus-visible{outline:2px solid #365bd8;outline-offset:3px}
+.watchlist-setup li button:disabled{opacity:.6;cursor:wait}
+.watchlist-setup li svg{flex-shrink:0;width:18px;height:18px;color:#365bd8}
+.watchlist-setup li.is-complete svg{color:#14754c}
+.watchlist-setup li span{min-width:0;overflow-wrap:anywhere}
+.watchlist-setup strong{display:block;font-size:13px;line-height:1.5}
+.watchlist-setup small{display:block;margin-top:4px;font-size:12px;line-height:1.5;color:#596b82}
+.watchlist-earnings header>a{font-size:13px;min-height:32px;display:flex;align-items:center}
+.watchlist-earnings ul{list-style:none;padding:0;margin:12px 0}
+.watchlist-earnings li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid #dce5f1}
+.watchlist-earnings li>a{min-width:0;text-decoration:none;color:inherit}
+.watchlist-earnings li strong,.watchlist-earnings li span{display:block;overflow-wrap:anywhere}
+.watchlist-earnings li span{font-size:12px;color:#596b82;margin-top:3px}
+.watchlist-earnings time{font-size:13px;font-variant-numeric:tabular-nums}
+.watchlist-earnings button{min-height:44px;white-space:normal}
+.earnings-retry{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:13px}
+.earnings-download-notice:empty{display:none}
+.save-list-preview{padding:14px;border:1px solid #dce5f1;border-radius:12px;background:#f8faff;overflow-wrap:anywhere}
+.save-list-preview p{font-size:13px;line-height:1.5;margin:6px 0}
+.save-list-preview ul{list-style:none;padding:0;margin:10px 0;display:flex;gap:6px;flex-wrap:wrap}
+.save-list-preview li{padding:4px 8px;border-radius:6px;background:#e7edfb;font-size:12px;font-weight:650}
+html.dark .watchlist-setup,html.dark .watchlist-earnings,html.dark .save-list-preview{background:#101a16;border-color:#2a4438}
+html.dark .watchlist-setup li button{background:#141f1a;border-color:#2a4438}
+html.dark .watchlist-earnings li{border-color:#2a4438}
+html.dark .watchlist-setup p,html.dark .watchlist-setup small,html.dark .watchlist-earnings p,html.dark .watchlist-earnings li span{color:#b8ccc0}
+html.dark .watchlist-setup li svg,html.dark .watchlist-setup header>span{color:#8eb6ff}
+html.dark .watchlist-setup li.is-complete svg{color:#3dff8f}
+html.dark .save-list-preview li{background:#24382f}
+@media(max-width:760px){.watchlist-setup ol{grid-template-columns:minmax(0,1fr)}.watchlist-setup,.watchlist-earnings{padding:14px}.watchlist-earnings li{grid-template-columns:minmax(0,1fr) auto;gap:10px}.watchlist-earnings li button{grid-column:1/-1;justify-self:start}.watchlist-earnings time{font-size:12px}}
