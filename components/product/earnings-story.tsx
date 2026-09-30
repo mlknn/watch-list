@@ -42,13 +42,19 @@ export function EarningsStory({symbol,nextDate}:{symbol:string;nextDate?:string}
   useEffect(()=>{
     let alive=true;
     const today=todayInMarket();
+    const pick=(week:EarningsWeek)=>(week.days||[]).filter(day=>day.status==='ok').flatMap(day=>(day.companies||[]).map(row=>({...row,date:day.date}))).find(row=>row.symbol===symbol&&!row.reported&&row.date>=today) as {date:string;when?:string;epsForecast?:string}|undefined;
+    const remember=(hit:{date:string;when?:string;epsForecast?:string}|undefined)=>{
+      if(!alive)return;
+      setCalendarHit(hit?{symbol,date:hit.date,when:hit.when||'',epsForecast:hit.epsForecast||''}:null);
+    };
     void fetch('/api/earnings-calendar').then(async r=>{
       const current=await r.json() as EarningsWeek;
+      const currentHit=pick(current);
+      if(currentHit){remember(currentHit);return;}
       const nextMonday=current.weekStart?addDays(current.weekStart,7):'';
-      const upcoming=nextMonday?await fetch('/api/earnings-calendar?week='+encodeURIComponent(nextMonday)).then(res=>res.json() as Promise<EarningsWeek>).catch(()=>({days:[]})):{days:[]};
-      if(!alive)return;
-      const hit=[...(current.days||[]),...(upcoming.days||[])].filter(day=>day.status==='ok').flatMap(day=>(day.companies||[]).map(row=>({...row,date:day.date}))).find(row=>row.symbol===symbol&&!row.reported&&row.date>=today) as {date:string;when?:string;epsForecast?:string}|undefined;
-      setCalendarHit(hit?{symbol,date:hit.date,when:hit.when||'',epsForecast:hit.epsForecast||''}:null);
+      if(!nextMonday){remember(undefined);return;}
+      const upcoming=await fetch('/api/earnings-calendar?week='+encodeURIComponent(nextMonday)).then(res=>res.json() as Promise<EarningsWeek>).catch(()=>({days:[]} as EarningsWeek));
+      remember(pick(upcoming));
     }).catch(()=>{if(alive)setCalendarHit(null);});
     return()=>{alive=false;};
   },[symbol]);
