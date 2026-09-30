@@ -94,6 +94,11 @@ export function StockEquity({symbol,data,fund,chart,range,chartStyle,busy,error,
     }
     try{await navigator.clipboard.writeText(url);setCopied(t('Link copied.'));}catch{setCopied('');}
   }
+  const rangeCard=marker!=null&&quote?.fiftyTwoWeekLow!=null&&quote.fiftyTwoWeekHigh!=null?<section className="story-card stock-range" aria-label={t('52-week range')}>
+    <h2>{t('52-week range')}</h2>
+    <div className="stock-range-track"><i style={{left:`${Math.min(100,Math.max(0,marker*100))}%`}}/></div>
+    <p><span>{t('52-week low')} {formatQuote(quote.fiftyTwoWeekLow)}</span><span>{t('52-week high')} {formatQuote(quote.fiftyTwoWeekHigh)}</span></p>
+  </section>:null;
   const rangeControls=<Tabs value={range} onValueChange={v=>onRange(String(v))}><TabsList className="chart-ranges" aria-label={t('Chart time range')}>{ranges.map(([value,label])=><TabsTrigger key={value} value={value}>{label}</TabsTrigger>)}</TabsList></Tabs>;
   const styleControls=<Tabs value={chartStyle} onValueChange={v=>onStyle(v as ChartStyle)}><TabsList className="chart-ranges chart-style-toggle" aria-label={t('Chart type')}><TabsTrigger value="line">{t('Line')}</TabsTrigger><TabsTrigger value="candle">{t('Candle')}</TabsTrigger></TabsList></Tabs>;
   return <main className="stock-page">
@@ -123,7 +128,10 @@ export function StockEquity({symbol,data,fund,chart,range,chartStyle,busy,error,
     <section className="stock-quick" aria-label={t('Key statistics')}>
       {fund===null&&!quote?Array.from({length:6},(_,i)=><div key={i} className="stock-skel"/>):quick.map((item:Fact)=><div key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}
     </section>
-    <DailyMove symbol={symbol} chart={data} earningsDate={fund?.earningsDate}/>
+    <div className="stock-move-row">
+      <DailyMove symbol={symbol} chart={data} earningsDate={fund?.earningsDate}/>
+      {rangeCard}
+    </div>
     <section className="main-chart-panel story-card stock-chart">
       <div className="stock-chart-head">
         <div><h2>{t('Price history')}</h2>{period?.changePercent!=null&&<p className={period.changePercent>0?'up':period.changePercent<0?'down':'flat'}>{rangeLabel(range)} {period.changePercent>0?'▲ +':period.changePercent<0?'▼ ':' '}{Math.abs(period.changePercent).toFixed(2)}%</p>}</div>
@@ -137,11 +145,6 @@ export function StockEquity({symbol,data,fund,chart,range,chartStyle,busy,error,
       <div className="stock-lower-main">
         {fund&&!fund.available&&<p className="stock-quiet">{fund.error||t('Some company statistics are unavailable from the provider.')}</p>}
         {groups.map(group=><section key={group.title} className="story-card stock-facts"><h2>{group.title}</h2><dl>{group.items.map((item:Fact)=><div key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl></section>)}
-        {marker!=null&&quote?.fiftyTwoWeekLow!=null&&quote.fiftyTwoWeekHigh!=null&&<section className="story-card stock-range" aria-label={t('52-week range')}>
-          <h2>{t('52-week range')}</h2>
-          <div className="stock-range-track"><i style={{left:`${marker*100}%`}}/></div>
-          <p><span>{t('52-week low')} {formatQuote(quote.fiftyTwoWeekLow)}</span><span>{t('52-week high')} {formatQuote(quote.fiftyTwoWeekHigh)}</span></p>
-        </section>}
       </div>
       <aside className="stock-lower-side">
         <section className="story-card">

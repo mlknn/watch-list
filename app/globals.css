@@ -500,6 +500,11 @@ html.dark .favorite-star{color:#d7e6dc;opacity:.95}
 .stock-happening{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,320px);gap:18px;align-items:start;position:relative}
 .stock-happening.is-collapsed{grid-template-columns:minmax(0,1fr)}
 .stock-happening-main{min-width:0;display:grid;gap:16px}
+.stock-move-row{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:stretch;margin:0 0 16px;min-width:0}
+.stock-move-row:empty{display:none;margin:0}
+.stock-move-row:has(.daily-move):has(.stock-range){grid-template-columns:minmax(0,1.45fr) minmax(220px,.85fr)}
+.stock-move-row .daily-move{margin:0;max-width:none;min-width:0}
+.stock-move-row .stock-range{margin:0;min-width:0;display:flex;flex-direction:column;justify-content:center}
 .daily-move{margin:0 0 16px;padding:16px 18px;border:1px solid #e1e8f3;border-radius:16px;background:#fff;max-width:760px}
 .daily-move .eyebrow{margin-bottom:8px}
 .daily-move>p{margin:0 0 6px;font-size:15px;line-height:1.55;color:#2c3a4d}
@@ -1230,6 +1235,7 @@ html.dark .privacy-toc{border-color:#2a4438}
 .stock-range-track{position:relative;height:8px;margin:16px 0 8px;border-radius:99px;background:#e7edf5}
 .stock-range-track i{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:#1f3b73;border:2px solid #fff;transform:translate(-50%,-50%);box-shadow:0 0 0 1px #1f3b73}
 .stock-range p{display:flex;justify-content:space-between;gap:12px;margin:0;font-size:12px;color:#5c6b82;font-variant-numeric:tabular-nums}
+.stock-range p span{min-width:0;overflow-wrap:anywhere}
 .stock-next-earn h2{font-size:28px;letter-spacing:-.6px}
 .stock-next-earn dl{display:flex;gap:22px;margin:12px 0}
 .stock-next-earn dt{font-size:12px;color:#6b7a91}
@@ -1246,6 +1252,9 @@ html.dark .stock-hero-id p,html.dark .stock-hero-price p,html.dark .stock-quiet,
 html.dark .stock-facts dl>div,html.dark .stock-facts-list>div,html.dark .stock-page .company-facts>div{border-color:#2a4438}
 html.dark .stock-range-track{background:#24382f}
 html.dark .stock-page .chart-ranges [data-slot=tabs-trigger][data-active]{background:#14643f;color:#fff}
+@media(max-width:760px){
+  .stock-move-row:has(.daily-move):has(.stock-range){grid-template-columns:minmax(0,1fr)}
+}
 @media(max-width:900px){
   .stock-lower{grid-template-columns:1fr}
   .stock-quick{grid-template-columns:repeat(3,minmax(0,1fr))}
