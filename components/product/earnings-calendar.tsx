@@ -22,7 +22,7 @@ type Board={weekStart:string;weekEnd:string;days:Day[];minWeek:string;maxWeek:st
 type Row=Company&{date:string;dayStatus:string};
 type Session='bmo'|'amc'|'during'|'unknown';
 type Status='upcoming'|'reported';
-type Cap='1-10'|'10-50'|'50-200'|'200+';
+type Cap='under-1'|'unknown'|'1-10'|'10-50'|'50-200'|'200+';
 type View='calendar'|'table';
 type SortKey='symbol'|'date'|'session'|'status'|'estimate'|'actual'|'surprisePct'|'surpriseAbs'|'cap';
 
@@ -291,6 +291,8 @@ export function EarningsCalendar(){
       <span>{t('Market cap')}</span>
       <select value={cap} onChange={e=>replace({cap:e.target.value||null})}>
         <option value="">{t('All market caps')}</option>
+        <option value="under-1">{t('Under $1B')}</option>
+        <option value="unknown">{t('Market cap unavailable')}</option>
         <option value="1-10">$1–10B</option>
         <option value="10-50">$10–50B</option>
         <option value="50-200">$50–200B</option>
@@ -310,7 +312,7 @@ export function EarningsCalendar(){
         <summary>{t('Coverage and source')}</summary>
         <p className="intro"><T text="Track upcoming announcements and compare reported results with market expectations."/></p>
         <p className="earnings-meta">
-          {t('Source: Nasdaq')} · {t('US-listed companies above $1B')} · {t('New York time')} · {t('Past weeks go back two quarters.')}
+          {t('Source: Nasdaq')} · {t('US-listed companies of all sizes')} · {t('New York time')} · {t('Past weeks go back two quarters.')}
           {data?` · ${t('Last successful update')} ${stampFormat(data.fetchedAt,locale)}.`:''}
           {failedDays?` ${t('Some days in this week could not be refreshed.')}`:''}
         </p>
@@ -507,5 +509,5 @@ export function EarningsCalendar(){
 }
 
 function capLabel(cap:Cap,t:(text:string)=>string){
-  return cap==='1-10'?t('$1–10B'):cap==='10-50'?t('$10–50B'):cap==='50-200'?t('$50–200B'):t('$200B+');
+  return cap==='under-1'?t('Under $1B'):cap==='unknown'?t('Market cap unavailable'):cap==='1-10'?t('$1–10B'):cap==='10-50'?t('$10–50B'):cap==='50-200'?t('$50–200B'):t('$200B+');
 }

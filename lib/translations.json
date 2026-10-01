@@ -3544,5 +3544,8 @@
   "Name your watchlist (optional)": ["Listenize ad verin (isteğe bağlı)", "Pon nombre a tu lista (opcional)"],
   "Choose a name that helps you recognize this list.": ["Bu listeyi tanımanızı sağlayacak bir ad seçin.", "Elige un nombre que te ayude a reconocer esta lista."],
   "Save your watchlist": ["İzleme listenizi kaydedin", "Guarda tu lista de seguimiento"],
-  "Previous quote": ["Önceki fiyat", "Cotización anterior"]
+  "Previous quote": ["Önceki fiyat", "Cotización anterior"],
+  "Under $1B": ["1 milyar $ altı", "Menos de $1B"],
+  "Market cap unavailable": ["Piyasa değeri bilinmiyor", "Capitalización no disponible"],
+  "US-listed companies of all sizes": ["ABD borsalarındaki her büyüklükte şirket", "Empresas de todos los tamaños cotizadas en EE. UU."]
 }

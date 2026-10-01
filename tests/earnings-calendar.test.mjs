@@ -44,7 +44,7 @@ test('day rows sort by market cap and skip junk tickers',()=>{
   ]);
   assert.equal(rows[0].symbol,'AAPL');
   assert.equal(rows[0].when,'amc');
-  assert.equal(rows.length,1);
+  assert.equal(rows.length,2);
 });
 
 test('busy days keep every large name instead of cutting the list',()=>{
@@ -57,14 +57,15 @@ test('busy days keep every large name instead of cutting the list',()=>{
   assert.equal(rows.length,15);
 });
 
-test('names below $1B are dropped; the rest stay sorted by market cap',()=>{
+test('small companies and unknown caps remain available, sorted after larger names',()=>{
   const rows=normalizeDayRows([
+    {symbol:'UNKNOWN',name:'Unknown',marketCap:'N/A'},
     {symbol:'TINY',name:'Tiny',marketCap:'$500,000,000',time:'time-amc'},
     {symbol:'MID',name:'Mid',marketCap:'$1.2B',time:'time-not-supplied'},
     {symbol:'MSFT',name:'Microsoft',marketCap:'$3,000,000,000,000',time:'time-bmo'},
     {symbol:'EDGE',name:'Edge',marketCap:'$1,000,000,000',time:'time-pre-market'},
   ]);
-  assert.deepEqual(rows.map(row=>row.symbol),['MSFT','MID','EDGE']);
+  assert.deepEqual(rows.map(row=>row.symbol),['MSFT','MID','EDGE','TINY','UNKNOWN']);
   assert.equal(rows[1].when,'unknown');
   assert.equal(rows[1].marketCap,1.2e9);
   assert.equal(rows[2].when,'bmo');

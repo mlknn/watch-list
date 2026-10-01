@@ -25,7 +25,6 @@ export function parseMarketCap(value){
   return n*mult;
 }
 
-export const MIN_MARKET_CAP=1_000_000_000;
 
 /** Future report dates are fetched the day before and held at the edge; today stays shorter so reported flags can move. */
 export function nasdaqCacheTtl(date,today){
@@ -109,7 +108,6 @@ export function normalizeDayRows(rows){
     });
   }
   return companies
-    .filter(row=>row.marketCap>=MIN_MARKET_CAP)
     .sort((a,b)=>b.marketCap-a.marketCap);
 }
 

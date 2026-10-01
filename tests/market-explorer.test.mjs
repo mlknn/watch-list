@@ -20,3 +20,11 @@ test('partial refresh preserves a previous quote with a stale warning',()=>{
  const merged=mergeMarketRows(previous,[{symbol:'A',chart:null,error:'offline'},row('B',3)]);
  assert.equal(merged[0].chart.quote.changePercent,2);assert.equal(merged[0].error,'offline');assert.equal(merged[1].chart.quote.changePercent,3);
 });
+
+ test('paginated market updates preserve stocks from other pages',()=>{
+  const old=[{symbol:'AAPL',chart:{quote:{price:10}},error:null},{symbol:'MSFT',chart:null,error:null}];
+  const rows=mergeMarketRows(old,[{symbol:'MSFT',chart:{quote:{price:20}},error:null}]);
+  assert.equal(rows.length,2);
+  assert.equal(rows[0].chart.quote.price,10);
+  assert.equal(rows[1].chart.quote.price,20);
+});

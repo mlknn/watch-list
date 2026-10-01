@@ -37,6 +37,11 @@ test('week labels follow the product date format',()=>{
 
 test('market-cap and search filters keep comparable rows',()=>{
   assert.equal(capMatch(8e9,'1-10'),true);
+  assert.equal(capMatch(500e6,'under-1'),true);
+  assert.equal(capMatch(500e6,'1-10'),false);
+  assert.equal(capMatch(1e9,'under-1'),false);
+  assert.equal(capMatch(0,'unknown'),true);
+  assert.equal(capMatch(undefined,'under-1'),false);
   assert.equal(capMatch(8e9,'10-50'),false);
   assert.equal(matchesQuery({symbol:'AAPL',name:'Apple Inc.'},'app'),true);
   assert.equal(matchesQuery({symbol:'MSFT',name:'Microsoft'},'app'),false);

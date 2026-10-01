@@ -371,7 +371,7 @@ function GroupTable({group,ready,sort,onSort,onCoin}:{group:Group;ready:boolean;
         <SortHead label={t('Today')} k="change" sort={sort} onSort={onSort}/>
         <span></span>
       </div>
-      {sortRows(group.stocks,sort).map(row=><StockRow key={row.symbol} row={row} pending={!ready} onCoin={onCoin}/>)}
+      {sortRows(group.stocks,sort).map(row=><StockRow key={row.symbol} row={row} pending={!row.chart&&!row.error} onCoin={onCoin}/>)}
     </div>
   </section>;
 }
@@ -398,10 +398,25 @@ function EquityBoard(){
     const loaded=new Set<string>();
     const queue=groupsFor(market).map(group=>group.id);
     async function fetchGroup(id:string){
-      const result=await publicDataJson('/api/market?group='+encodeURIComponent(id)) as {fetchedAt:string;group:{id:string;stocks:Row[]};error?:string};
-      if(!alive)return;
-      setData(prev=>({...prev,fetchedAt:result.fetchedAt,groups:prev.groups.map(group=>group.id===id?{...group,stocks:mergeMarketRows(group.stocks,result.group.stocks)}:group)}));
-      setReady(prev=>({...prev,[id]:true}));
+      let offset:number|null=0;
+      let failed=false;
+      while(offset!==null&&alive){
+        const pageOffset:number=offset;
+        try{
+          const result=await publicDataJson('/api/market?group='+encodeURIComponent(id)+'&offset='+pageOffset) as {nextOffset:number|null;fetchedAt:string;group:{id:string;stocks:Row[]}};
+          if(!alive)return;
+          setData(prev=>({...prev,fetchedAt:result.fetchedAt,groups:prev.groups.map(group=>group.id===id?{...group,stocks:mergeMarketRows(group.stocks,result.group.stocks)}:group)}));
+          offset=result.nextOffset;
+        }catch(e){
+          failed=true;
+          if(alive)setError((e as Error).message);
+          const count=groupsFor(market).find(group=>group.id===id)?.symbols.length||0;
+          const failedRows=(groupsFor(market).find(group=>group.id===id)?.symbols||[]).slice(pageOffset,pageOffset+6).map((symbol:string)=>({symbol,chart:null,error:(e as Error).message}));
+          if(alive)setData(prev=>({...prev,groups:prev.groups.map(group=>group.id===id?{...group,stocks:mergeMarketRows(group.stocks,failedRows)}:group)}));
+          offset=pageOffset+6<count?pageOffset+6:null;
+        }
+      }
+      if(alive&&!failed)setReady(prev=>({...prev,[id]:true}));
     }
     async function pump(){
       while(alive){

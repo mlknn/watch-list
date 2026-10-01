@@ -21,12 +21,12 @@
         {"symbol": "GLD", "name": "SPDR Gold"}
       ],
       "groups": [
-        {"id": "tech", "title": "Technology", "blurb": "Chips, software, cloud and the platforms behind the tape.", "symbols": ["AAPL", "MSFT", "NVDA", "GOOGL", "META", "AVGO", "AMD", "ORCL"]},
-        {"id": "finance", "title": "Finance", "blurb": "Banks, payments and the plumbing of markets.", "symbols": ["JPM", "BAC", "V", "GS", "BRK-B", "MA", "WFC", "MS"]},
-        {"id": "health", "title": "Health care", "blurb": "Insurers, medicines, devices and the businesses behind them.", "symbols": ["UNH", "LLY", "JNJ", "ABBV", "PFE", "MRK", "TMO", "ABT"]},
-        {"id": "consumer", "title": "Consumer", "blurb": "Retail, brands, restaurants and everyday demand.", "symbols": ["AMZN", "TSLA", "WMT", "COST", "HD", "KO", "PG", "NKE"]},
-        {"id": "energy", "title": "Energy", "blurb": "Oil, gas and the companies that move it.", "symbols": ["XOM", "CVX", "COP", "SLB", "EOG", "OXY"]},
-        {"id": "industrial", "title": "Industrials", "blurb": "Machines, aerospace, freight and defense.", "symbols": ["CAT", "GE", "HON", "UNP", "RTX", "BA"]}
+        {"id": "tech", "title": "Technology", "blurb": "Chips, software, cloud and the platforms behind the tape.", "symbols": ["AAPL", "MSFT", "NVDA", "GOOGL", "META", "AVGO", "AMD", "ORCL", "CRM", "ADBE", "INTC", "QCOM", "TXN", "AMAT", "MU", "PANW", "PLTR", "NOW", "CRWD", "SNOW"]},
+        {"id": "finance", "title": "Finance", "blurb": "Banks, payments and the plumbing of markets.", "symbols": ["JPM", "BAC", "V", "GS", "BRK-B", "MA", "WFC", "MS", "C", "SCHW", "BLK", "AXP", "PYPL", "COF", "USB", "PNC", "TFC", "CME", "ICE", "SPGI"]},
+        {"id": "health", "title": "Health care", "blurb": "Insurers, medicines, devices and the businesses behind them.", "symbols": ["UNH", "LLY", "JNJ", "ABBV", "PFE", "MRK", "TMO", "ABT", "AMGN", "GILD", "ISRG", "MDT", "BMY", "CVS", "CI", "HUM", "REGN", "VRTX", "ZTS", "DHR"]},
+        {"id": "consumer", "title": "Consumer", "blurb": "Retail, brands, restaurants and everyday demand.", "symbols": ["AMZN", "TSLA", "WMT", "COST", "HD", "KO", "PG", "NKE", "NFLX", "DIS", "SBUX", "MCD", "LOW", "TGT", "BKNG", "ABNB", "UBER", "DASH", "RCL", "MAR"]},
+        {"id": "energy", "title": "Energy", "blurb": "Oil, gas and the companies that move it.", "symbols": ["XOM", "CVX", "COP", "SLB", "EOG", "OXY", "MPC", "PSX", "VLO", "WMB", "KMI", "LNG", "HAL", "DVN", "FANG", "CHRD", "EQT", "BKR", "TRGP", "OKE"]},
+        {"id": "industrial", "title": "Industrials", "blurb": "Machines, aerospace, freight and defense.", "symbols": ["CAT", "GE", "HON", "UNP", "RTX", "BA", "DE", "UPS", "FDX", "LMT", "NOC", "GD", "ETN", "EMR", "ITW", "WM", "RSG", "CSX", "NSC", "PH"]}
       ]
     },
     {

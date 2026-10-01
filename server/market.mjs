@@ -53,7 +53,7 @@ async function loadSymbol(symbol){
     try{
       const row=asRow(await getQuote(symbol));
       quoteCache.set(symbol,{at:Date.now(),row});
-      if(quoteCache.size>200)quoteCache.delete(quoteCache.keys().next().value);
+      if(quoteCache.size>600)quoteCache.delete(quoteCache.keys().next().value);
       return row;
     }catch(e){
       last=e;
@@ -68,9 +68,12 @@ export async function quotesForSymbols(symbols){
   return mapLimit(unique,3,loadSymbol);
 }
 
-export async function marketGroup(id){
+/** @param {string} id @param {number|null} [offset] */
+export async function marketGroup(id,offset=null){
   const group=findGroup(id);
   if(!group)throw new AppError('Unknown market group.',404);
-  const stocks=await mapLimit(group.symbols,3,loadSymbol);
-  return {fetchedAt:new Date().toISOString(),group:{id:group.id,title:group.title,blurb:group.blurb,stocks}};
+  if(offset!==null&&(!Number.isInteger(offset)||offset<0||offset>=group.symbols.length))throw new AppError('Invalid market page.',400);
+  const symbols=offset===null?group.symbols:group.symbols.slice(offset,offset+6);
+  const stocks=await mapLimit(symbols,3,loadSymbol);
+  return {nextOffset:offset!==null&&offset+6<group.symbols.length?offset+6:null,fetchedAt:new Date().toISOString(),group:{id:group.id,title:group.title,blurb:group.blurb,stocks}};
 }
