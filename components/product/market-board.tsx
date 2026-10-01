@@ -17,6 +17,9 @@ import {exchangeSession,sectorAverage,tapeBreadth,tapeMovers} from '@/lib/market
 import {getMarket,groupsFor,isCryptoCoin,listMarkets} from '@/lib/markets.mjs';
 import {resolveStockInput} from '@/lib/stock-search.mjs';
 import {apiJson} from '@/lib/auth-client';
+import {mergeMarketRows} from '@/lib/market-explorer.mjs';
+import {MarketExplorer} from './market-explorer';
+import {publicDataJson} from '@/lib/request-timeout.mjs';
 import {CryptoMarkets} from '@/components/product/crypto-markets';
 
 type Row={symbol:string;name?:string;short?:string;chart:MarketChart|null;error:string|null};
@@ -388,18 +391,17 @@ function EquityBoard(){
   const [sorts,setSorts]=useState<Record<string,Sort|null>>({});
   const [coinChart,setCoinChart]=useState<{symbol:string;name?:string}|null>(null);
   const [favoritePrompt,setFavoritePrompt]=useState(false);
+  const [refreshVersion,setRefreshVersion]=useState(0),[refreshing,setRefreshing]=useState(false);
   useEffect(()=>{setData(skeleton(market));setReady({});setError('');},[market]);
   useEffect(()=>{let alive=true;
+    setRefreshing(true);
     const loaded=new Set<string>();
     const queue=groupsFor(market).map(group=>group.id);
     async function fetchGroup(id:string){
-      const response=await fetch('/api/market?group='+encodeURIComponent(id),{cache:'no-store'});
-      const result=await response.json() as {fetchedAt:string;group:{id:string;stocks:Row[]};error?:string};
-      if(!response.ok)throw Error(result.error||'Market data is temporarily unavailable.');
+      const result=await publicDataJson('/api/market?group='+encodeURIComponent(id)) as {fetchedAt:string;group:{id:string;stocks:Row[]};error?:string};
       if(!alive)return;
-      setData(prev=>({...prev,fetchedAt:result.fetchedAt,groups:prev.groups.map(group=>group.id===id?{...group,stocks:result.group.stocks}:group)}));
+      setData(prev=>({...prev,fetchedAt:result.fetchedAt,groups:prev.groups.map(group=>group.id===id?{...group,stocks:mergeMarketRows(group.stocks,result.group.stocks)}:group)}));
       setReady(prev=>({...prev,[id]:true}));
-      setError('');
     }
     async function pump(){
       while(alive){
@@ -421,9 +423,9 @@ function EquityBoard(){
     const timer=window.setTimeout(()=>{
       for(const group of groupsFor(market)){const node=document.getElementById(group.id);if(node)observer.observe(node);}
     },0);
-    void pump();
+    void pump().finally(()=>{if(alive)setRefreshing(false);});
     return()=>{alive=false;observer.disconnect();clearTimeout(timer);};
-  },[market]);
+  },[market,refreshVersion]);
   useEffect(()=>{let alive=true;void apiJson<{signedIn:boolean;favorites:Row[]}>('/api/favorites',undefined,false).then(result=>{if(!alive)return;setSignedIn(!!result.signedIn);setFavoriteRows(result.favorites||[]);}).catch(()=>{if(alive){setSignedIn(false);setFavoriteRows([]);}});return()=>{alive=false;};},[]);
   function openCoin(symbol:string,name?:string){
     setCoinChart({symbol,name});
@@ -441,6 +443,7 @@ function EquityBoard(){
     finally{setSearching(false);}
   }
   async function toggle(symbol:string){
+    const before=favoriteRows;
     const on=favoriteRows.some(row=>row.symbol===symbol);
     setFavoriteRows(current=>on?current.filter(row=>row.symbol!==symbol):[{symbol,chart:null,error:null},...current.filter(row=>row.symbol!==symbol)]);
     try{
@@ -448,6 +451,7 @@ function EquityBoard(){
       setSignedIn(true);
       setFavoriteRows(result.favorites||[]);
     }catch(e){
+      setFavoriteRows(current=>{const old=before.find(row=>row.symbol===symbol);return old?[...current.filter(row=>row.symbol!==symbol),old]:current.filter(row=>row.symbol!==symbol);});
       setError((e as Error).message);
     }
   }
@@ -470,7 +474,7 @@ function EquityBoard(){
     router.push(id==='us'?'/dashboard':'/dashboard?market='+id);
   }
   return <Favorites.Provider value={favoriteState}><main className={'market-page'+(isCrypto?' is-crypto':'')}>
-    <LiveTicker market={market} groups={data.groups} ready={ready}/>
+    <LiveTicker key={market.id+refreshVersion} market={market} groups={data.groups} ready={ready}/>
     <div className="page-heading market-heading" id="todays-tape">
       <div>
         <p className="eyebrow">{isCrypto?t('CRYPTO, AROUND THE CLOCK'):t('MARKETS, IN ONE PLACE')}</p>
@@ -492,7 +496,8 @@ function EquityBoard(){
     </form>
     {searchError&&<p className="form-error" role="alert">{searchError}</p>}
     {error&&<p className="error-banner" role="alert">{error}</p>}
-    <IndexHero indices={data.indices} variant={isCrypto?'crypto':undefined}/>
+    <MarketExplorer key={market.id} groups={data.groups} ready={ready} favorites={favoriteRows.map(row=>row.symbol)} from={market.id==='us'?'/dashboard':'/dashboard?market='+market.id} onRefresh={()=>{setError('');setRefreshVersion(v=>v+1);}} refreshing={refreshing} fetchedAt={data.fetchedAt}/>
+    <IndexHero key={market.id+refreshVersion} indices={data.indices} variant={isCrypto?'crypto':undefined}/>
     {isCrypto&&coinGroup&&<CryptoHeat group={coinGroup} ready={!!ready[coinGroup.id]} onOpen={row=>openCoin(row.symbol,coinName(row))}/>}
     <div className="market-top-grid">
       {etfGroup&&<GroupTable group={etfGroup} ready={!!ready[etfGroup.id]} sort={sorts[etfGroup.id]||null} onSort={key=>cycleSort(etfGroup.id,key)} onCoin={openCoin}/>}

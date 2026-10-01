@@ -37,7 +37,7 @@ function asRow(quote){
       sessionDate:null,
       interval:'1d',
       points:[],
-      quote:{price:quote.price,previousClose:previous,change:previous===null?null:quote.price-previous,changePercent,quoteTime:quote.quoteTime||null,open:null,dayLow:null,dayHigh:null,fiftyTwoWeekLow:null,fiftyTwoWeekHigh:null,volume:null},
+      quote:{price:quote.price,previousClose:previous,change:previous===null?null:quote.price-previous,changePercent,quoteTime:quote.quoteTime||null,open:null,dayLow:null,dayHigh:null,fiftyTwoWeekLow:quote.fiftyTwoWeekLow??null,fiftyTwoWeekHigh:quote.fiftyTwoWeekHigh??null,volume:quote.volume??null},
       source:quote.source||'Yahoo Finance',
       fetchedAt:quote.checkedAt||new Date().toISOString(),
     },

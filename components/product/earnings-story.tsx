@@ -5,7 +5,7 @@ import {useEffect,useMemo,useState} from 'react';
 import {LoaderCircle,PanelRightClose,PanelRightOpen} from 'lucide-react';
 import {ResponsiveContainer,AreaChart,Area,XAxis,YAxis,Tooltip,ReferenceLine,BarChart,Bar} from 'recharts';
 import {useChartPalette} from './theme';
-import {apiFetch} from '@/lib/auth-client';
+import {publicDataJson} from '@/lib/request-timeout.mjs';
 import {marketChart} from '@/lib/market';
 import {averageImpact,eventWindows} from '@/lib/earnings-impact.mjs';
 import {addDays,isoDay,nextEarningsSoon,nextEarningsTone,todayInMarket} from '@/lib/next-earnings.mjs';
@@ -37,6 +37,7 @@ export function EarningsStory({symbol,nextDate}:{symbol:string;nextDate?:string}
   const [reports,setReports]=useState<Reports|null>(null);
   const [error,setError]=useState('');
   const [loading,setLoading]=useState(true);
+  const [attempt,setAttempt]=useState(0);
   const [windows,setWindows]=useState<ReturnType<typeof eventWindows>>([]);
   const [calendarHit,setCalendarHit]=useState<{symbol:string;date:string;when:string;epsForecast:string}|null>(null);
   useEffect(()=>{
@@ -61,16 +62,10 @@ export function EarningsStory({symbol,nextDate}:{symbol:string;nextDate?:string}
   useEffect(()=>{
     let alive=true;
     setLoading(true);setError('');setReports(null);
-    void Promise.all([
-      apiFetch('/api/stocks/'+encodeURIComponent(symbol)+'/earnings',{},false).then(async r=>{const result=await r.json() as Reports&{error?:string};if(!r.ok)throw Error(result.error||'Unable to load earnings.');return result;}),
-      marketChart(symbol,'5y').catch(()=>null),
-    ]).then(([data,chart])=>{
-      if(!alive)return;
-      setReports(data);
-      setWindows(eventWindows(chart?.points||[],chart?.earningsDates||[],10));
-    }).catch(e=>{if(alive)setError(e.message);}).finally(()=>{if(alive)setLoading(false);});
+    void publicDataJson('/api/stocks/'+encodeURIComponent(symbol)+'/earnings').then((data:Reports)=>{if(alive)setReports(data);}).catch(e=>{if(alive)setError(e.message);}).finally(()=>{if(alive)setLoading(false);});
     return()=>{alive=false;};
-  },[symbol]);
+  },[symbol,attempt]);
+  useEffect(()=>{let alive=true;setWindows([]);void marketChart(symbol,'5y').then(chart=>{if(alive)setWindows(eventWindows(chart.points,chart.earningsDates||[],10));}).catch(()=>{});return()=>{alive=false;};},[symbol,attempt]);
   const impact=useMemo(()=>averageImpact(windows,10),[windows]);
   const mix=useMemo(()=> (reports?.quarters||[]).map(q=>{
     const rev=q.revenue||0;
@@ -93,7 +88,7 @@ export function EarningsStory({symbol,nextDate}:{symbol:string;nextDate?:string}
     <a href="#earnings-history">{t('View earnings history')} →</a>
   </section>:null;
   if(loading)return <div className="earnings-story">{nextCard}<section className="story-card" aria-live="polite">{nextNotice}<span className="story-loading"><LoaderCircle className="spin"/>{t('Loading quarterly results…')}</span></section></div>;
-  if(error)return <div className="earnings-story">{nextCard}<section className="story-card" role="alert">{nextNotice}<p>{t('Earnings history is temporarily unavailable.')}</p></section></div>;
+  if(error)return <div className="earnings-story">{nextCard}<section className="story-card" role="alert">{nextNotice}<p>{t('Earnings history is temporarily unavailable.')}</p><Button variant="outline" onClick={()=>setAttempt(v=>v+1)}>{t('Retry')}</Button></section></div>;
   if(!reports?.quarters.length)return <div className="earnings-story">{nextCard}<section className="story-card">{nextNotice}<p>{t('No quarterly reports are available for this symbol yet.')}</p></section></div>;
   const maxRev=Math.max(...mix.map(q=>q.revAbs),1);
   return <div className="earnings-story">

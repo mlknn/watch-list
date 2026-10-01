@@ -1,16 +1,17 @@
 'use client';
+import {withTimeout,publicDataJson} from './request-timeout.mjs';
 import {createClient,type SupabaseClient} from '@supabase/supabase-js';
 import type {AccountState} from './watchlist';
 export type Config={localMode:boolean;authReady:boolean;supabaseUrl:string;supabaseKey:string;appUrl:string;googleEnabled:boolean;appleEnabled:boolean;billingReady:boolean;trialDays:number};
 let configPromise:Promise<Config>|null=null;
 let clientPromise:Promise<SupabaseClient>|null=null;
-export function config(){return configPromise??=fetch('/api/config',{cache:'no-store'}).then(async r=>{if(!r.ok)throw new Error('Could not connect. Please reload.');return await r.json() as Config;}).catch(e=>{configPromise=null;throw e;});}
+export function config(){return configPromise??=publicDataJson('/api/config').then((value:Config)=>value).catch((error:Error)=>{configPromise=null;throw error;});}
 export function authClient(){return clientPromise??=config().then(c=>{if(!c.authReady)throw new Error('Sign-up is not available yet. Account setup is still in progress.');return createClient(c.supabaseUrl,c.supabaseKey,{auth:{flowType:'pkce',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});}).catch(e=>{clientPromise=null;throw e;});}
 export async function apiFetch(path:string,init:RequestInit={},requireLogin=true){
   const settings=await config();
   if(settings.localMode){const response=await fetch(path,{...init,credentials:'same-origin',cache:'no-store'});if(response.status===401&&requireLogin){invalidateAccess();window.location.assign('/login');}return response;}
   if(!settings.authReady&&!requireLogin)return fetch(path,{...init,cache:'no-store'});
-  const client=await authClient();const {data,error}=await client.auth.getSession();
+  const client=await authClient();const {data,error}=await withTimeout(()=>client.auth.getSession());
   if(error||!data.session){if(!requireLogin)return fetch(path,{...init,cache:'no-store'});window.location.assign('/login');throw new Error('Please sign in to continue.');}
   const headers=new Headers(init.headers);headers.set('Authorization','Bearer '+data.session.access_token);
   const response=await fetch(path,{...init,headers,cache:'no-store'});
@@ -18,8 +19,9 @@ export async function apiFetch(path:string,init:RequestInit={},requireLogin=true
   return response;
 }
 export async function apiJson<T>(path:string,input?:unknown,requireLogin=true):Promise<T>{
-  const response=await apiFetch(path,input===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input)},requireLogin);
-  const result=await response.json() as T&{error?:string};if(!response.ok)throw new Error(result.error||'Request failed.');return result;
+  const request=()=>apiFetch(path,input===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input)},requireLogin);
+  const response=input===undefined?await withTimeout(request):await request();
+  const result=await withTimeout(()=>response.json()) as T&{error?:string};if(!response.ok)throw new Error(result.error||'Request failed.');return result;
 }
 export async function signedIn(){
   const settings=await config();
@@ -28,7 +30,7 @@ export async function signedIn(){
     return response.ok;
   }
   if(!settings.authReady)return false;
-  try{const {data}=await(await authClient()).auth.getSession();return !!data.session;}catch{return false;}
+  const client=await authClient();const {data,error}=await withTimeout(()=>client.auth.getSession());if(error)throw error;return !!data.session;
 }
 export async function claimGuestWatchlists():Promise<AccountState|null>{
   if(typeof window==='undefined')return null;

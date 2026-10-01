@@ -49,3 +49,8 @@ test('quote falls back to chart previous close when regular previous close is mi
   assert.equal(quote.previousClose,378.9);
   assert.equal(Math.round(quote.changePercent*1000)/1000,0.158);
 });
+
+test('market quotes retain provider volume and 52-week range for comparison',()=>{
+ const quote=quoteFromChart({chart:{result:[{meta:{symbol:'AAPL',currency:'USD',longName:'Apple',regularMarketPrice:200,regularMarketTime:1790186091,regularMarketVolume:123456,fiftyTwoWeekLow:150,fiftyTwoWeekHigh:250}}]}},'AAPL');
+ assert.equal(quote.volume,123456);assert.equal(quote.fiftyTwoWeekLow,150);assert.equal(quote.fiftyTwoWeekHigh,250);
+});
