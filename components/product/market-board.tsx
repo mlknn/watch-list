@@ -62,7 +62,10 @@ function LiveTicker({market,groups,ready}:{market:Market;groups:Board['groups'];
   },[]);
   function go(e:React.MouseEvent<HTMLAnchorElement>,href:string){
     e.preventDefault();
-    document.querySelector(href)?.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});
+    const target=document.querySelector(href);
+    const directory=target?.closest('details');
+    if(directory)directory.open=true;
+    target?.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});
   }
   const moving=!paused&&!reduce;
   return <nav className={'market-ticker'+(moving?'':' is-static')} aria-label={t('Market tape')}>
@@ -505,6 +508,7 @@ function EquityBoard(){
       </div>
       <SessionBadge market={market}/>
     </div>
+    <nav className="market-section-nav" aria-label={t('On this page')}><a href="#stock-scanner">{t('Stock scanner')}</a><a href="#market-indexes">{t('Major markets')}</a><a href="#sector-directory">{t('Sector directory')}</a></nav>
     <form className="market-search" onSubmit={e=>void search(e)} role="search">
       <StockSearch value={query} onChange={v=>{setQuery(v);setSearchError('');}} inputRef={inputRef} onPick={symbol=>void openStock(symbol)} currency={market.currency||undefined} placeholder={isCrypto?t('Search crypto, e.g. BTC'):isGlobal?t('Search global, e.g. Toyota'):undefined}/>
       <Button type="submit" className="primary-button" disabled={searching}>{searching?<LoaderCircle className="spin"/>:<Search/>}<span className="market-search-label">{t('Search')}</span></Button>
@@ -512,16 +516,16 @@ function EquityBoard(){
     {searchError&&<p className="form-error" role="alert">{searchError}</p>}
     {error&&<p className="error-banner" role="alert">{error}</p>}
     <MarketExplorer key={market.id} groups={data.groups} ready={ready} favorites={favoriteRows.map(row=>row.symbol)} from={market.id==='us'?'/dashboard':'/dashboard?market='+market.id} onRefresh={()=>{setError('');setRefreshVersion(v=>v+1);}} refreshing={refreshing} fetchedAt={data.fetchedAt}/>
-    <IndexHero key={market.id+refreshVersion} indices={data.indices} variant={isCrypto?'crypto':undefined}/>
+    <div id="market-indexes"><IndexHero key={market.id+refreshVersion} indices={data.indices} variant={isCrypto?'crypto':undefined}/></div>
     {isCrypto&&coinGroup&&<CryptoHeat group={coinGroup} ready={!!ready[coinGroup.id]} onOpen={row=>openCoin(row.symbol,coinName(row))}/>}
     <div className="market-top-grid">
       {etfGroup&&<GroupTable group={etfGroup} ready={!!ready[etfGroup.id]} sort={sorts[etfGroup.id]||null} onSort={key=>cycleSort(etfGroup.id,key)} onCoin={openCoin}/>}
       <TapeStrip rows={quotedRows} onCoin={openCoin}/>
     </div>
     <FavoritesBoard rows={favoriteRows} onCoin={openCoin}/>
-    {!isCrypto&&<div className="market-sector-grid">
+    {!isCrypto&&<details id="sector-directory" className="market-directory"><summary>{t('Sector directory')}<span>{t('Browse every stock and manage favorites')}</span></summary><div className="market-sector-grid">
       {stockGroups.map(group=><GroupTable key={group.id} group={group} ready={!!ready[group.id]} sort={sorts[group.id]||null} onSort={key=>cycleSort(group.id,key)} onCoin={openCoin}/>)}
-    </div>}
+    </div></details>}
     <p className="market-footnote">{t('Yahoo Finance · Quotes may be delayed')}{data.fetchedAt?` · ${new Date(data.fetchedAt).toLocaleString()}`:''}. {isCrypto?t('Crypto never closes. Click a coin for the chart. Not advice.'):t('Charts are for looking, not advice. Click any row for details and quarterly earnings.')}</p>
     <CoinChartDialog symbol={coinChart?.symbol||null} name={coinChart?.name} onClose={()=>setCoinChart(null)}/>
     <Dialog open={favoritePrompt} onOpenChange={setFavoritePrompt}>

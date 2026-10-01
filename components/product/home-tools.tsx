@@ -83,7 +83,7 @@ export function HomeDiscovery(){
           })}</tbody>
         </table>:<p className="home-panel-status">{t('Market data is temporarily unavailable.')}</p>}
     </Panel>
-    <Panel title={t('Upcoming earnings')} scope={t(earnings.label&&earnings.label!=='Upcoming earnings'?earnings.label:'US-listed companies above $1B')} action={t('View earnings calendar')} href="/earnings">
+    <Panel title={t('Upcoming earnings')} scope={t(earnings.label&&earnings.label!=='Upcoming earnings'?earnings.label:'US-listed companies of all sizes')} action={t('View earnings calendar')} href="/earnings">
       {earnings.status==='loading'&&!earnings.rows.length?<div className="home-panel-skel" role="status" aria-label={t('Loading the calendar…')}><i/><i/><i/><i/></div>
         :earnings.status==='error'?<p className="home-panel-status" role="alert">{t('Earnings data is temporarily unavailable.')}<button type="button" className="home-inline-retry" onClick={earnings.retry}>{t('Retry')}</button></p>
         :earnings.rows.length?<ul>{earnings.rows.slice(0,5).map(row=>{
