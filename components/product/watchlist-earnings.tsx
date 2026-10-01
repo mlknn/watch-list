@@ -19,12 +19,17 @@ export function WatchlistEarnings({stocks}:{stocks:Stock[]}){
   const [attempt,setAttempt]=useState(0),[downloaded,setDownloaded]=useState(false);
   useEffect(()=>{
     const controller=new AbortController();
+    // Wait for the usable watchlist to paint before starting optional calendar work.
+    let nextFrame=0;
+    const frame=requestAnimationFrame(()=>{nextFrame=requestAnimationFrame(()=>{
+    if(!symbolKey)return;
     void publicDataJson('/api/watchlist-earnings?symbols='+encodeURIComponent(symbolKey),{signal:controller.signal}).then((data:{rows:Result[]})=>{
       if(!controller.signal.aborted)setState({key:symbolKey,rows:data.rows,loading:false});
     }).catch(()=>{
       if(!controller.signal.aborted)setState(current=>({key:symbolKey,rows:symbolKey.split(',').map(symbol=>current.rows.find(row=>row.symbol===symbol&&row.date)?{...current.rows.find(row=>row.symbol===symbol&&row.date)!,status:'stale'}:{symbol,date:null,status:'unavailable'}),loading:false}));
     });
-    return()=>controller.abort();
+    });});
+    return()=>{cancelAnimationFrame(frame);cancelAnimationFrame(nextFrame);controller.abort();};
   },[symbolKey,attempt]);
   const loading=state.key!==symbolKey||state.loading;
   const rows=state.key===symbolKey?upcomingEarnings(state.rows,todayInMarket()) as Result[]:[];

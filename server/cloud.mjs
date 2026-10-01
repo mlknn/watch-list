@@ -93,7 +93,7 @@ export function stockView(stock,cached) {
   const dayChangePercent=comparable&&Number.isFinite(fresh.changePercent)?fresh.changePercent:previousClose?((current.price-previousClose)/previousClose)*100:null;
   return {quantity:stock.quantity===null||stock.quantity===undefined?null:Number(stock.quantity),costPerShare:stock.cost_per_share===null||stock.cost_per_share===undefined?null:Number(stock.cost_per_share),acquiredAt:stock.acquired_at||null,notes:stock.notes||'',id:stock.id,symbol:stock.symbol,companyName:base.companyName,currency:base.currency,exchange:base.exchange,addedAt:stock.added_at,addedPrice:base.price,initialQuoteTime:base.quoteTime,currentPrice:current.price,previousClose,dayChangePercent,quoteTime:current.quoteTime,checkedAt:current.checkedAt,quoteError:cached?.error || (fresh&&!comparable?'Latest quote could not be compared. Starting quote is shown.':null)};
 }
-export async function listViews(db,lists,refresh=false) {
+export async function listViews(db,lists,refresh=false,loadQuote=cachedQuote) {
   if(!lists.length)return [];
   const stocks=dbResult(await db.from('wl_stocks').select('*').in('watchlist_id',lists.map(l=>l.id)).order('added_at').order('id'));
   const symbols=[...new Set(stocks.map(s=>s.symbol))];
@@ -101,9 +101,10 @@ export async function listViews(db,lists,refresh=false) {
   if(symbols.length){
     const saved=dbResult(await db.from('wl_quotes').select('*').in('symbol',symbols));
     for(const row of saved)lookup.set(row.symbol,row);
-    const needs=symbols.filter(symbol=>refresh||quoteNeedsRefresh(lookup.get(symbol)));
+    // Initial reads only use saved prices. Provider calls belong to the separate refresh request.
+    const needs=refresh?symbols.filter(symbol=>quoteNeedsRefresh(lookup.get(symbol))):[];
     let i=0;
-    await Promise.all(Array.from({length:Math.min(4,needs.length)},async()=>{while(i<needs.length){const symbol=needs[i++];try{lookup.set(symbol,await cachedQuote(db,symbol));}catch{/* Preserve baseline when provider is unavailable. */}}}));
+    await Promise.all(Array.from({length:Math.min(4,needs.length)},async()=>{while(i<needs.length){const symbol=needs[i++];try{lookup.set(symbol,await loadQuote(db,symbol));}catch{/* Preserve baseline when provider is unavailable. */}}}));
   }
   return lists.map(l=>({id:l.id,name:l.name,mode:l.mode||'basic',createdAt:l.created_at,shareToken:l.share_token,role:'owner',stocks:stocks.filter(s=>s.watchlist_id===l.id).map(s=>stockView(s,lookup.get(s.symbol)))}));
 }

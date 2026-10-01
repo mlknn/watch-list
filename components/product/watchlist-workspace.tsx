@@ -2,7 +2,7 @@
 import {useT} from "@/components/product/language";
 import {LanguageSelect} from '@/components/product/language';
 import {T} from '@/components/product/language';
-import {useCallback,useEffect,useRef,useState} from 'react';
+import {lazy,Suspense,useCallback,useEffect,useRef,useState} from 'react';
 import {Plus,RefreshCw,Eye,Check,Pencil,Trash2,LoaderCircle,AlertCircle,Share2,Link2,Copy,Mail,LockKeyhole,ArrowLeft,CornerRightDown} from 'lucide-react';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
@@ -21,7 +21,7 @@ import {StocksTable} from '@/components/product/stocks-table';
 import {Brand,ProductNav} from '@/components/product/nav';
 import {ThemeToggle} from '@/components/product/theme';
 import {WatchlistSetup} from '@/components/product/watchlist-setup';
-import {WatchlistEarnings} from '@/components/product/watchlist-earnings';
+const WatchlistEarnings=lazy(()=>import('@/components/product/watchlist-earnings').then(module=>({default:module.WatchlistEarnings})));
 import {SaveAccountPrompt} from '@/components/product/save-account-prompt';
 import {MarketLockBanner} from '@/components/product/market-lock-banner';
 import {parseCurrencyMismatch} from '@/lib/portfolio-currency.mjs';
@@ -146,7 +146,7 @@ export function WatchlistWorkspace({compact=false}:{compact?:boolean}){const t=u
 
 
   {active.stocks.length?<div className="watchlist-analytics-layout"><div className="watchlist-table-pane"><StocksTable rowHint={state.guest?<StockPageHint inline/>:undefined} actions={<PerformanceButton list={active} version={state.updatedAt}/>} key={active.id} stocks={active.stocks} advanced={active.mode==='advanced'} onEdit={canEdit?(stock:Stock)=>{setError('');setEditing(stock);setEditDraft({quantity:stock.quantity==null?'':String(stock.quantity),cost:stock.costPerShare==null?'':String(stock.costPerShare),date:(stock.acquiredAt||stock.addedAt).slice(0,10),notes:stock.notes});}:undefined} busy={!!busy} onRemove={canEdit?(stock:Stock)=>{setError('');setDeletion({listId:active.id,stockId:stock.id,label:stock.symbol});}:undefined}/></div><aside className="watchlist-chart-pane"><Portfolio list={active} version={state.updatedAt} guest={!!state.guest}/></aside></div>:<Empty className="empty-watchlist"><div className="empty-icon"><Eye size={27}/></div><EmptyHeader><EmptyTitle className="empty-title"><T text="Your next idea starts here"/></EmptyTitle><EmptyDescription>{t("Search for a company or ticker to start tracking it.")}</EmptyDescription></EmptyHeader><div className="ticker-hints">{t("Try")} {['NVDA','ASML.AS','RY.TO','THYAO.IS'].map(s=><button key={s} type="button" onClick={()=>{setError('');setTicker(s);inputRef.current?.focus({preventScroll:true});inputRef.current?.scrollIntoView({behavior:'smooth',block:'center'});}}>{s}</button>)}</div></Empty>}
-  {!!active.stocks.length&&<WatchlistEarnings key={active.id} stocks={active.stocks}/>}
+  {!!active.stocks.length&&<Suspense fallback={<section className="watchlist-earnings"><p role="status">{t("Loading earnings dates…")}</p></section>}><WatchlistEarnings key={active.id} stocks={active.stocks}/></Suspense>}
   </section>:<Empty className="empty-watchlist"><LoaderCircle className="spin"/><EmptyTitle>{t("Opening your watchlists…")}</EmptyTitle></Empty>}
   {state&&active&&!!active.stocks.length&&<section className="watchlist-invite-row"><div><strong><T text="Good ideas are better together"/></strong><p>{state.guest?t('Save your watchlist with a free account before sharing a read-only link.'):t("Share a read-only link so a friend can follow this watchlist.")}</p></div><Button variant="outline" className="outline-button" disabled={!!busy} onClick={()=>void openShare()}><Share2/><T text="Invite a friend"/></Button></section>}
   <footer className="workspace-footer"><LanguageSelect/><span>{t("Yahoo Finance · Quotes may be delayed")}</span><span>{t("Only the owner can edit · ")}<a href="/privacy"><T text="Privacy"/></a></span></footer>
