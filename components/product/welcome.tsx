@@ -73,6 +73,7 @@ export function Welcome(){
 
     <WatchlistWorkspace compact/>
     <HomeDiscovery/>
+    <section className="home-idea-lab"><div><p className="eyebrow">{t('FROM WATCHING TO LEARNING')}</p><h2>{t('More than a list of tickers')}</h2><p>{t('Bring a watchlist from another app, record a decision checkpoint, compare an idea with an ETF, and explore a hypothetical downside.')}</p></div><a className="solid-link" href="/watchlists#idea-lab">{t('Explore the idea lab')}</a></section>
 
     {!returning&&<section className="home-steps" aria-label={t('How it works')}>
       <article>
