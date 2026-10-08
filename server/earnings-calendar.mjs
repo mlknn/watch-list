@@ -127,7 +127,7 @@ async function nasdaqDay(date,{fetchImpl=fetch}={}){
         },
         // Tomorrow’s list is cached 24h so a call made today still answers tomorrow.
         cf:{cacheTtl:nasdaqCacheTtl(date,ymdInZone(new Date())),cacheEverything:true},
-        signal:AbortSignal.timeout(2500),
+        signal:AbortSignal.timeout(4000),
       });
       if(!response.ok)throw new AppError('US earnings calendar is temporarily unavailable.',502);
       const body=await response.json();
