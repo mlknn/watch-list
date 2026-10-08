@@ -222,9 +222,6 @@ export async function earningsWeek(week,{loadDay=nasdaqDay,now=new Date()}={}){
   const saved=weekCache.get(monday);
   const age=saved?Date.now()-saved.at:Infinity;
   const data=age<FRESH_MS?saved.data:age<STALE_MS?(void refreshWeek(monday,loadDay,now).catch(()=>{}),saved.data):await refreshWeek(monday,loadDay,now);
-  // Future weeks warm after this response is ready, so this week never waits on them.
-  const delay=setTimeout(()=>{void prefetchAhead(monday,{now}).catch(()=>{});},0);
-  delay.unref?.();
   return data;
 }
 

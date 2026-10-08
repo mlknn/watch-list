@@ -39,6 +39,7 @@ const UNAVAILABLE='The earnings calendar is temporarily unavailable.';
 const VIEW_KEY='earnings:view';
 const weekStore=new Map<string,Board>();
 const weekPending=new Map<string,Promise<Board>>();
+let prefetchQueue=Promise.resolve();
 
 function rememberWeek(monday:string,result:Board){
   weekStore.set(result.weekStart,result);
@@ -50,7 +51,7 @@ function pullWeek(monday:string){
   const existing=weekPending.get(key)||(!monday?weekPending.get(''):undefined);
   if(existing)return existing;
   const query=monday?'?week='+encodeURIComponent(monday):'';
-  const task=fetch('/api/earnings-calendar'+query).then(async r=>{
+  const task=fetch('/api/earnings-calendar'+query,{signal:AbortSignal.timeout(10000)}).then(async r=>{
     const result=await r.json() as Board&{error?:string};
     if(!r.ok)throw Error(result.error||UNAVAILABLE);
     rememberWeek(monday,result);
@@ -64,8 +65,10 @@ function cachedWeek(monday:string){return weekStore.get(monday)||(!monday?weekSt
 function warmAround(monday:string,bounds?:{minWeek?:string;maxWeek?:string}){
   if(!monday)return;
   for(const next of weeksToPrefetch(monday,bounds)){
-    if(weekStore.has(next)||weekPending.has(next))continue;
-    void pullWeek(next).catch(()=>{/* Visible week stays on screen if a neighbor misses. */});
+    prefetchQueue=prefetchQueue.then(async()=>{
+      if(weekStore.has(next)||weekPending.has(next))return;
+      await pullWeek(next).catch(()=>{/* Visible week stays on screen if a neighbor misses. */});
+    });
   }
 }
 
@@ -141,7 +144,7 @@ export function EarningsCalendar(){
     const monday=week||mondayOnOrBefore(today);
     const hit=cachedWeek(week)||cachedWeek(monday);
     if(hit){setData(hit);setLoading(false);setError('');setStaleNotice('');warmAround(monday,{minWeek:hit.minWeek,maxWeek:hit.maxWeek});}
-    else{setLoading(true);setError('');setStaleNotice('');warmAround(monday);}
+    else{setData(null);setLoading(true);setError('');setStaleNotice('');}
     if(hit&&!attempt)return()=>{alive=false;};
     void pullWeek(week).then(result=>{
       if(!alive)return;
@@ -169,7 +172,6 @@ export function EarningsCalendar(){
   const go=useCallback((next:string)=>{
     if(!data||next<data.minWeek||next>data.maxWeek)return;
     if(!cachedWeek(next))void pullWeek(next).catch(()=>{});
-    warmAround(next,{minWeek:data.minWeek,maxWeek:data.maxWeek});
     replace({week:next===data.todayMonday?null:next});
   },[data,params]);
 
