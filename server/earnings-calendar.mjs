@@ -3,6 +3,7 @@ import {AppError,normalizeTicker} from './quotes.mjs';
 const weekCache=new Map();
 const dayCache=new Map();
 const inFlight=new Map();
+const dayInFlight=new Map();
 const NY='America/New_York';
 const FRESH_MS=15*60*1000;
 /** Keep yesterday’s snapshot long enough that today’s homepage does not wait on Nasdaq. */
@@ -24,7 +25,6 @@ export function parseMarketCap(value){
   const mult={K:1e3,M:1e6,B:1e9,T:1e12}[match[2]]||1;
   return n*mult;
 }
-
 
 /** Future report dates are fetched the day before and held at the edge; today stays shorter so reported flags can move. */
 export function nasdaqCacheTtl(date,today){
@@ -107,15 +107,15 @@ export function normalizeDayRows(rows){
       epsForecast:String(row.epsForecast||'').trim(),
     });
   }
-  return companies
-    .sort((a,b)=>b.marketCap-a.marketCap);
+  return companies.sort((a,b)=>b.marketCap-a.marketCap);
 }
 
 async function nasdaqDay(date,{fetchImpl=fetch}={}){
   const saved=dayCache.get(date);
   if(saved&&Date.now()-saved.at<FRESH_MS)return saved.companies;
-  let last=null;
-  for(let attempt=0;attempt<2;attempt++){
+  const pending=dayInFlight.get(date);
+  if(pending)return pending;
+  const task=(async()=>{
     try{
       const response=await fetchImpl('https://api.nasdaq.com/api/calendar/earnings?date='+encodeURIComponent(date),{
         headers:{
@@ -127,7 +127,7 @@ async function nasdaqDay(date,{fetchImpl=fetch}={}){
         },
         // Tomorrow’s list is cached 24h so a call made today still answers tomorrow.
         cf:{cacheTtl:nasdaqCacheTtl(date,ymdInZone(new Date())),cacheEverything:true},
-        signal:AbortSignal.timeout(7000),
+        signal:AbortSignal.timeout(4000),
       });
       if(!response.ok)throw new AppError('US earnings calendar is temporarily unavailable.',502);
       const body=await response.json();
@@ -136,12 +136,12 @@ async function nasdaqDay(date,{fetchImpl=fetch}={}){
       if(dayCache.size>80)dayCache.delete(dayCache.keys().next().value);
       return companies;
     }catch(e){
-      last=e;
-      if(attempt===0)await new Promise(resolve=>setTimeout(resolve,300));
+      if(saved)return saved.companies;
+      throw e;
     }
-  }
-  if(saved)return saved.companies;
-  throw last||new AppError('US earnings calendar is temporarily unavailable.',502);
+  })().finally(()=>dayInFlight.delete(date));
+  dayInFlight.set(date,task);
+  return task;
 }
 
 async function mapLimit(items,limit,fn){
