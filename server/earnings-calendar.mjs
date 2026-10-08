@@ -127,7 +127,7 @@ async function nasdaqDay(date,{fetchImpl=fetch}={}){
         },
         // Tomorrow’s list is cached 24h so a call made today still answers tomorrow.
         cf:{cacheTtl:nasdaqCacheTtl(date,ymdInZone(new Date())),cacheEverything:true},
-        signal:AbortSignal.timeout(4000),
+        signal:AbortSignal.timeout(2500),
       });
       if(!response.ok)throw new AppError('US earnings calendar is temporarily unavailable.',502);
       const body=await response.json();
@@ -221,7 +221,8 @@ export async function earningsWeek(week,{loadDay=nasdaqDay,now=new Date()}={}){
   if(loadDay!==nasdaqDay)return loadWeek(monday,loadDay,now);
   const saved=weekCache.get(monday);
   const age=saved?Date.now()-saved.at:Infinity;
-  const data=age<FRESH_MS?saved.data:age<STALE_MS?(void refreshWeek(monday,loadDay,now).catch(()=>{}),saved.data):await refreshWeek(monday,loadDay,now);
+  const complete=saved?.data.days.every(day=>day.status==='ok');
+  const data=age<FRESH_MS&&complete?saved.data:age<STALE_MS&&saved?(void refreshWeek(monday,loadDay,now).catch(()=>{}),saved.data):await refreshWeek(monday,loadDay,now);
   return data;
 }
 
