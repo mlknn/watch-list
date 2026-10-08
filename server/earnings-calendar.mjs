@@ -1,4 +1,5 @@
 import {AppError,normalizeTicker} from './quotes.mjs';
+import {earningsWeekMonday} from '../lib/next-earnings.mjs';
 
 const weekCache=new Map();
 const dayCache=new Map();
@@ -26,9 +27,9 @@ export function parseMarketCap(value){
   return n*mult;
 }
 
-/** Future report dates are fetched the day before and held at the edge; today stays shorter so reported flags can move. */
+/** Keep future dates on a short edge cache so empty pre-release responses cannot hide later rows. */
 export function nasdaqCacheTtl(date,today){
-  return String(date)>String(today)?86400:900;
+  return String(date)>String(today)?300:900;
 }
 
 export function ymdInZone(date,tz=NY){
@@ -62,7 +63,7 @@ const LOOKBACK_WEEKS=26;
 const LOOKAHEAD_WEEKS=26;
 
 export function earningsWindow(now=new Date()){
-  const todayMonday=mondayOnOrBefore(ymdInZone(now));
+  const todayMonday=earningsWeekMonday(ymdInZone(now));
   return {
     todayMonday,
     minWeek:addDays(todayMonday,-LOOKBACK_WEEKS*7),
@@ -117,7 +118,7 @@ async function nasdaqDay(date,{fetchImpl=fetch}={}){
   if(pending)return pending;
   const task=(async()=>{
     try{
-      const response=await fetchImpl('https://api.nasdaq.com/api/calendar/earnings?date='+encodeURIComponent(date),{
+      const response=await fetchImpl('https://api.nasdaq.com/api/calendar/earnings?date='+encodeURIComponent(date)+'&swl=2',{
         headers:{
           Accept:'application/json, text/javascript, */*; q=0.01',
           'Accept-Language':'en-US,en;q=0.9',
@@ -294,7 +295,7 @@ export function previewScopeLabel(rows,today,weekStart){
 
 export async function earningsHomePreview({loadDay=nasdaqDay,now=new Date(),limit=5}={}){
   const today=ymdInZone(now);
-  const monday=mondayOnOrBefore(today);
+  const monday=earningsWeekMonday(today);
   const nextMonday=addDays(monday,7);
   const thisWeek=await readWeek(monday,loadDay,now);
   let nextWeek=loadDay===nasdaqDay?peekCachedWeek(nextMonday):null;

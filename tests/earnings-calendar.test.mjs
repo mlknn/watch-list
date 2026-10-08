@@ -160,8 +160,8 @@ test('average path is relative to the earnings close',()=>{
   assert.ok(avg.day!==null);
 });
 
-test('future report dates stay cached a day; today refreshes sooner',()=>{
-  assert.equal(nasdaqCacheTtl('2026-09-22','2026-09-21'),86400);
+test('future dates refresh quickly so new rows can appear; today refreshes normally',()=>{
+  assert.equal(nasdaqCacheTtl('2026-09-22','2026-09-21'),300);
   assert.equal(nasdaqCacheTtl('2026-09-21','2026-09-21'),900);
 });
 

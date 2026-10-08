@@ -10,7 +10,7 @@ import {Input} from '@/components/ui/input';
 import {Sheet,SheetContent,SheetDescription,SheetHeader,SheetTitle} from '@/components/ui/sheet';
 import {apiJson,signedIn} from '@/lib/auth-client';
 import {readGuestState} from '@/lib/guest-watchlist.mjs';
-import {addDays,mondayOnOrBefore,todayInMarket} from '@/lib/next-earnings.mjs';
+import {addDays,earningsWeekMonday,todayInMarket} from '@/lib/next-earnings.mjs';
 import {weeksToPrefetch} from '@/lib/earnings-week-prefetch.mjs';
 import type {AccountState} from '@/lib/watchlist';
 import {earningsCsv,epsSurprise,filterEarningsRows,formatCap,formatEps,formatSurprise,sortEarningsRows,summaryCounts,weekRangeLabel} from '@/lib/earnings-compare.mjs';
@@ -47,7 +47,7 @@ function rememberWeek(monday:string,result:Board){
 }
 
 function pullWeek(monday:string){
-  const key=monday||mondayOnOrBefore(todayInMarket())||'';
+  const key=monday||earningsWeekMonday(todayInMarket())||'';
   const existing=weekPending.get(key)||(!monday?weekPending.get(''):undefined);
   if(existing)return existing;
   const query=monday?'?week='+encodeURIComponent(monday):'';
@@ -141,7 +141,7 @@ export function EarningsCalendar(){
 
   useEffect(()=>{
     let alive=true;
-    const monday=week||mondayOnOrBefore(today);
+    const monday=week||earningsWeekMonday(today);
     const hit=cachedWeek(week)||cachedWeek(monday);
     if(hit){setData(hit);setLoading(false);setError('');setStaleNotice('');warmAround(monday,{minWeek:hit.minWeek,maxWeek:hit.maxWeek});}
     else{setData(null);setLoading(true);setError('');setStaleNotice('');}
