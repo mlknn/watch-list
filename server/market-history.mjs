@@ -42,13 +42,16 @@ async function baseline(symbol,range,date){
   let last;
   for(const host of ['query2.finance.yahoo.com','query1.finance.yahoo.com'])try{
     const url=`https://${host}/v8/finance/chart/${encodeURIComponent(symbol)}?period1=${from}&period2=${to}&interval=1d&events=div`;
-    const response=await fetch(url,{headers,signal:AbortSignal.timeout(10_000)});if(!response.ok)throw new Error('Historical prices are temporarily unavailable.');
-    const result=(await response.json())?.chart?.result?.[0];
+    const response=await fetch(url,{headers,signal:AbortSignal.timeout(10_000)});
+    if(response.status===404){const error=new Error('No trading history at the selected date.');error.code='not-listed';throw error;}
+    if(!response.ok)throw new Error('Historical prices are temporarily unavailable.');
+    const payload=await response.json(),result=payload?.chart?.result?.[0];
+    if(!result&&payload?.chart?.error){const error=new Error('No trading history at the selected date.');error.code='not-listed';throw error;}
     const times=result?.timestamp||[],close=result?.indicators?.quote?.[0]?.close||[];
     const bars=times.map((time,index)=>({time,price:close[index]})).filter(row=>Number.isFinite(row.price)&&row.price>0);
     const target=Math.floor(date.getTime()/1000);
     const bar=bars.find(row=>row.time>=target)||bars.at(-1);
-    if(!bar)throw new Error('Historical price is unavailable.');
+    if(!bar){const error=new Error('No trading history at the selected date.');error.code='not-listed';throw error;}
     historyCache.set(key,{at:Date.now(),price:bar.price});if(historyCache.size>2000)historyCache.delete(historyCache.keys().next().value);
     return bar.price;
   }catch(error){last=error;}
@@ -67,8 +70,8 @@ export async function marketHistory(range='ytd',offset=0,now=new Date()){
         const startPrice=await baseline(item.symbol,range,date);
         const changePercent=item.price===null?null:(item.price/startPrice-1)*100;
         const historicalMarketCap=item.price===null?null:item.marketCap*startPrice/item.price;
-        output.push({...item,historicalMarketCap,changePercent,historyAvailable:true});
-      }catch{output.push({...item,historicalMarketCap:null,changePercent:null,historyAvailable:false});}
+        output.push({...item,historicalMarketCap,changePercent,historyStatus:item.price===null?'unavailable':'available'});
+      }catch(error){const historyStatus=error?.code==='not-listed'?'not-listed':'unavailable';output.push({...item,historicalMarketCap:null,changePercent:null,historyStatus});}
     }
     return output;
   }));

@@ -1497,6 +1497,7 @@ html.dark .home-history-table .down{color:#ff9aa4}
 @media(max-width:900px){.home-history{grid-template-columns:minmax(0,1fr) 230px;gap:12px}.home-history-main,.home-history-controls{padding:16px}}
 @media(max-width:700px){.home-history{grid-template-columns:minmax(0,1fr)}.home-history-controls{grid-row:1}.home-history-heading{flex-wrap:wrap}.home-history-heading>span{width:100%}.home-history-scroll{max-height:560px}}
 .market-history-page{max-width:1600px;margin:20px auto 36px;padding:0 24px;min-height:calc(100vh - 250px)}
+.market-history-connector{position:fixed;inset:0;z-index:20;width:100vw;height:100vh;overflow:visible;pointer-events:none}
 .market-history-columns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
 .market-history-side{min-width:0;padding:15px 16px 18px;border:1px solid #e1e8f3;border-radius:14px;background:#fff}
 .market-history-side-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 12px}
@@ -1523,6 +1524,7 @@ html.dark .home-history-table .down{color:#ff9aa4}
 .market-history-change{font-size:10px;font-variant-numeric:tabular-nums}
 .market-history-change.up{color:#14845b}
 .market-history-change.down{color:#b44450}
+.market-history-missing{display:inline-block;max-width:145px;color:#718097;font-size:10px;line-height:1.3;white-space:normal}
 .market-history-source{margin:12px 2px;color:#718097;font-size:10px;line-height:1.5}
 html.dark .market-history-side{background:#141f1a;border-color:#2a4438}
 html.dark .market-history-side-heading .eyebrow,html.dark .market-history-side-heading>span,html.dark .market-history-select,html.dark .market-history-date,html.dark .market-history-source{color:#b8ccc0}
@@ -1532,6 +1534,7 @@ html.dark .market-history-table tbody tr:hover{background:#1e3529}
 html.dark .market-history-table tbody tr.is-selected{background:#193862;box-shadow:inset 3px 0 #8eb6ff}
 html.dark .market-history-change.up{color:#5fe3a4}
 html.dark .market-history-change.down{color:#ff9aa4}
+html.dark .market-history-missing{color:#b8ccc0}
 @media(max-width:900px){.market-history-page{padding:0 14px}.market-history-columns{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}.market-history-side{padding:12px 10px}.market-history-table th,.market-history-table td{padding:5px 3px}.market-history-table tbody th small{max-width:110px}.market-history-table thead th small{display:block}}
 @media(max-width:640px){.market-history-page{margin:14px auto 28px;padding:0 10px}.market-history-columns{grid-template-columns:minmax(0,1fr)}.market-history-side{padding:14px 12px}.market-history-table th,.market-history-table td{padding:6px 5px}.market-history-table tbody th small{max-width:190px}.market-history-select{min-width:140px}}
 
