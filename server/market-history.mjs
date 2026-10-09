@@ -90,7 +90,7 @@ export async function historicalMarketHistory(range='ytd',offset=0,now=new Date(
     if(!pending){
       pending=(async()=>{
         const candidates=await leaders();let cursor=0;const priced=[];
-        await Promise.all(Array.from({length:20},async()=>{
+        await Promise.all(Array.from({length:10},async()=>{
           while(cursor<candidates.length){
             const item=candidates[cursor++];
             try{
@@ -98,7 +98,7 @@ export async function historicalMarketHistory(range='ytd',offset=0,now=new Date(
               if(item.price===null)continue;
               const historicalMarketCap=item.marketCap*startPrice/item.price;
               priced.push({...item,historicalMarketCap,changePercent:(item.price/startPrice-1)*100,historyStatus:'available'});
-            }catch(error){if(error?.code!=='not-listed')throw error;}
+            }catch{/* Skip names Yahoo cannot price for this date; the broader candidate pool keeps the ranked set usable. */}
           }
         }));
         const ranked=priced.sort((a,b)=>b.historicalMarketCap-a.historicalMarketCap).slice(0,100).map((row,index)=>({...row,rank:index+1}));
