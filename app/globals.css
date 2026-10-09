@@ -1454,6 +1454,59 @@ html.dark .market-section-nav a{background:#18281f;border-color:#344c40}html.dar
 html.dark .idea-lab-shell,html.dark .idea-panel,html.dark .home-idea-lab{background:#111f18;border-color:#344c40}html.dark .idea-panel input,html.dark .idea-panel select,html.dark .idea-panel textarea,html.dark .idea-metrics>div,html.dark .checkpoint-list article{background:#192a22;border-color:#3d594a}html.dark .idea-preview li{border-color:#344c40}html.dark .idea-panel>p,html.dark .idea-lab header p,html.dark .idea-lab-shell>summary>span,html.dark .idea-metrics span,html.dark .checkpoint-list small{color:#b8ccc0}
 @media(max-width:760px){.idea-lab-shell{padding:12px}.idea-panel{padding:12px}.idea-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.idea-tabs button{font-size:12px}.idea-fields{grid-template-columns:minmax(0,1fr)}.idea-panel input,.idea-panel select,.idea-panel textarea{font-size:16px}.idea-metrics strong{font-size:21px}.home-idea-lab{padding:18px}.scenario-stocks{gap:0 10px}}
 
+.home-discover{display:block}
+.home-discover-tabs{display:flex;gap:22px;overflow-x:auto;border-bottom:1px solid #dce4f0;margin:0 0 18px}
+.home-discover-tabs button{position:relative;flex:0 0 auto;min-height:44px;padding:0 3px;border:0;background:transparent;color:#65758d;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.home-discover-tabs button.is-active{color:#365bd8}
+.home-discover-tabs button.is-active:after{position:absolute;right:0;bottom:-1px;left:0;height:3px;border-radius:3px 3px 0 0;background:#365bd8;content:""}
+.home-discover-panels{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.home-history{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:20px;align-items:start}
+.home-history-main,.home-history-controls{min-width:0;border:1px solid #e1e8f3;border-radius:16px;background:#fff;padding:20px 22px}
+.home-history-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:12px}
+.home-history-heading .eyebrow{margin:0 0 5px;font-size:10px;letter-spacing:.08em;color:#71819a}
+.home-history-heading h2{font-size:20px;letter-spacing:-.4px}
+.home-history-heading p:not(.eyebrow){margin:5px 0 0;color:#6b7a91;font-size:12px;line-height:1.5}
+.home-history-heading>span{flex:0 0 auto;color:#77869c;font-size:11px}
+.home-history-scroll{max-height:680px;overflow:auto;border-top:1px solid #e8edf4;border-bottom:1px solid #e8edf4}
+.home-history-table{width:100%;min-width:600px;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
+.home-history-table th,.home-history-table td{padding:8px 7px;border-bottom:1px solid #eef2f7;text-align:right;white-space:nowrap}
+.home-history-table thead th{position:sticky;top:0;z-index:1;background:#f8faff;color:#6b7a91;font-size:10px;font-weight:650}
+.home-history-table th:first-child,.home-history-table td:first-child{text-align:left;width:30px;color:#8290a4}
+.home-history-table th:nth-child(2),.home-history-table td:nth-child(2){text-align:left}
+.home-history-table tbody th{font-weight:500}
+.home-history-table tbody th a{display:flex;align-items:center;gap:7px;min-width:0;text-decoration:none;color:inherit}
+.home-history-table tbody th .company-icon{width:22px;height:22px;flex:0 0 22px}
+.home-history-table tbody th span{min-width:0}
+.home-history-table tbody th strong,.home-history-table tbody th small{display:block;max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.home-history-table tbody th strong{font-size:12px;font-weight:650}
+.home-history-table tbody th small{margin-top:1px;color:#718097;font-size:10px}
+.home-history-table .up{color:#14845b;font-weight:650}
+.home-history-table .down{color:#b44450;font-weight:650}
+.home-history-loading{display:flex;align-items:center;justify-content:center;gap:9px;min-height:180px;color:#65758d;font-size:13px}
+.home-history-source{margin:10px 0 0;color:#718097;font-size:10px;line-height:1.55}
+.home-history-controls .eyebrow{margin:0 0 7px;color:#71819a;font-size:10px;letter-spacing:.08em}
+.home-history-controls h3{font-size:18px;letter-spacing:-.25px}
+.home-history-controls>p:not(.eyebrow){margin:7px 0 16px;color:#6b7a91;font-size:12px;line-height:1.6}
+.home-history-controls label{display:block;margin:0 0 6px;color:#55657b;font-size:12px;font-weight:650}
+.home-history-controls select{width:100%;min-height:42px;padding:8px 10px;border:1px solid #d5deeb;border-radius:8px;background:#fff;color:#25334a;font:inherit;font-size:13px}
+.home-history-selected{display:grid;gap:5px;margin-top:18px;padding-top:15px;border-top:1px solid #e8edf4}
+.home-history-selected span{color:#718097;font-size:11px}
+.home-history-selected strong{margin-bottom:5px;font-size:14px;font-variant-numeric:tabular-nums}
+.home-history-refresh{display:flex;align-items:center;gap:6px;margin-top:12px;color:#718097;font-size:11px}
+html.dark .home-discover-tabs{border-color:#2a4438}
+html.dark .home-discover-tabs button{color:#b8ccc0}
+html.dark .home-discover-tabs button.is-active{color:#8eb6ff}
+html.dark .home-discover-tabs button.is-active:after{background:#8eb6ff}
+html.dark .home-history-main,html.dark .home-history-controls{background:#141f1a;border-color:#2a4438}
+html.dark .home-history-heading p:not(.eyebrow),html.dark .home-history-heading>span,html.dark .home-history-controls>p:not(.eyebrow),html.dark .home-history-controls label,html.dark .home-history-table tbody th small,html.dark .home-history-table thead th,html.dark .home-history-table td:first-child,html.dark .home-history-source,html.dark .home-history-selected span,html.dark .home-history-refresh{color:#b8ccc0}
+html.dark .home-history-scroll,html.dark .home-history-table th,html.dark .home-history-table td,html.dark .home-history-selected{border-color:#2a4438}
+html.dark .home-history-table thead th{background:#101a16}
+html.dark .home-history-controls select{background:#101a16;border-color:#365440;color:#f4fff8}
+html.dark .home-history-table .up{color:#5fe3a4}
+html.dark .home-history-table .down{color:#ff9aa4}
+@media(max-width:900px){.home-history{grid-template-columns:minmax(0,1fr) 230px;gap:12px}.home-history-main,.home-history-controls{padding:16px}}
+@media(max-width:700px){.home-discover-panels,.home-history{grid-template-columns:minmax(0,1fr)}.home-history-controls{grid-row:1}.home-history-heading{flex-wrap:wrap}.home-history-heading>span{width:100%}.home-history-scroll{max-height:560px}.home-discover-tabs{gap:18px}}
+
 /* Keep share details with the starting price and fit the remaining columns. */
 .position-fields .quantity-reminder{margin:0;color:#c62828;font-size:13px;font-weight:600}
 html.dark .position-fields .quantity-reminder{color:#ff7380}
