@@ -24,7 +24,7 @@ async function leaders(){
       const payload=await response.json();
       const quotes=payload?.finance?.result?.[0]?.quotes;
       if(!Array.isArray(quotes)||!quotes.length)throw new Error('Market leaders are temporarily unavailable.');
-      const rows=quotes.filter(row=>row?.symbol&&Number.isFinite(row.marketCap)&&row.marketCap>0)
+      const rows=quotes.filter(row=>row?.symbol&&['NMS','NYQ'].includes(row.exchange)&&Number.isFinite(row.marketCap)&&row.marketCap>0)
         .map(row=>({symbol:String(row.symbol).toUpperCase(),name:row.longName||row.shortName||row.symbol,marketCap:row.marketCap,price:Number.isFinite(row.regularMarketPrice)?row.regularMarketPrice:null,currency:row.currency||'USD'}))
         .sort((a,b)=>b.marketCap-a.marketCap).slice(0,250);
       if(rows.length<50)throw new Error('The market leaders list is incomplete.');
