@@ -77,10 +77,11 @@ export function HomeDiscovery(){
   const [tab,setTab]=useState<'markets'|'earnings'|'history'>('markets');
   const [range,setRange]=useState('ytd');
   const history=useMarketHistory(range,tab==='history');
+  useEffect(()=>{const selectHash=()=>{if(window.location.hash==='#history')setTab('history');};selectHash();window.addEventListener('hashchange',selectHash);return()=>window.removeEventListener('hashchange',selectHash);},[]);
   const session=(when?:string)=>when==='bmo'?t('Before open'):when==='amc'?t('After close'):when==='during'?t('During market hours'):'';
   return <section className="home-discover" aria-label={t('Markets and earnings')}>
     <nav className="home-discover-tabs" aria-label={t('Market information')}>
-      {([['markets',t('Markets')],['earnings',t('Earnings')],['history',t('History')]] as const).map(([id,label])=><button type="button" key={id} aria-pressed={tab===id} className={tab===id?'is-active':''} onClick={()=>setTab(id)}>{label}</button>)}
+      {([['markets',t('Markets')],['earnings',t('Earnings')],['history',t('History')]] as const).map(([id,label])=><button type="button" id={id==='history'?'history':undefined} key={id} aria-pressed={tab===id} className={tab===id?'is-active':''} onClick={()=>setTab(id)}>{label}</button>)}
     </nav>
     {tab==='history'?<section className="home-history" aria-label={t('Market history')}>
       <div className="home-history-main">
