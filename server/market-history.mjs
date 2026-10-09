@@ -65,8 +65,10 @@ export async function marketHistory(range='ytd',offset=0,now=new Date()){
       const item=companies[next++];
       try{
         const startPrice=await baseline(item.symbol,range,date);
-        output.push({...item,changePercent:item.price===null?null:(item.price/startPrice-1)*100,historyAvailable:true});
-      }catch{output.push({...item,changePercent:null,historyAvailable:false});}
+        const changePercent=item.price===null?null:(item.price/startPrice-1)*100;
+        const historicalMarketCap=item.price===null?null:item.marketCap*startPrice/item.price;
+        output.push({...item,historicalMarketCap,changePercent,historyAvailable:true});
+      }catch{output.push({...item,historicalMarketCap:null,changePercent:null,historyAvailable:false});}
     }
     return output;
   }));
