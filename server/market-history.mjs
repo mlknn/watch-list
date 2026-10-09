@@ -102,7 +102,7 @@ export async function historicalMarketHistory(range='ytd',offset=0,now=new Date(
           }
         }));
         const ranked=priced.sort((a,b)=>b.historicalMarketCap-a.historicalMarketCap).slice(0,100).map((row,index)=>({...row,rank:index+1}));
-        if(ranked.length<100)throw new AppError('Historical market leaders are temporarily incomplete. Please retry.',502);
+        if(!ranked.length)throw new AppError('Historical market leaders are temporarily unavailable. Please retry.',502);
         rankedCache.set(key,{at:Date.now(),rows:ranked});return ranked;
       })();
       rankedPending.set(key,pending);
