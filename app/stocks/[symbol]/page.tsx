@@ -1,6 +1,6 @@
 'use client';
 import {useT} from "@/components/product/language";
-import {use,useEffect,useState} from 'react';
+import {use,useEffect,useRef,useState} from 'react';
 import {useSearchParams} from 'next/navigation';
 import {ArrowUpRight,ArrowDownRight,Plus,RefreshCw,LoaderCircle} from 'lucide-react';
 import {PublicNav,PublicFooter} from '@/components/product/nav';
@@ -32,7 +32,7 @@ export default function StockDetails({params}:{params:Promise<{symbol:string}>})
   const searchParams=useSearchParams();
   const backHref=safeReturnPath(searchParams.get('from'),'/dashboard');
   const backLabel=backHref.startsWith('/watchlists')?t('← Watchlists'):backHref.startsWith('/earnings')?t('← Earnings'):backHref.startsWith('/dashboard')?t('← Markets'):t('← Home');
-  const {symbol:raw}=use(params);const symbol=raw.toUpperCase();const crypto=isCryptoCoin(symbol);const [range,setRange]=useState('1d'),[chartStyle,setChartStyle]=useState<ChartStyle>('line'),[chart,setChart]=useState<MarketChart|null>(null),[overview,setOverview]=useState<MarketChart|null>(null),[fund,setFund]=useState<Fundamentals|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[full,setFull]=useState(false),[adding,setAdding]=useState(false),[account,setAccount]=useState<AccountState|null>(null),[listId,setListId]=useState(''),[addError,setAddError]=useState(''),[saving,setSaving]=useState(false),[saved,setSaved]=useState(''),[version,setVersion]=useState(0),[favorite,setFavorite]=useState(false),[signedIn,setSignedIn]=useState(false),[savingFavorite,setSavingFavorite]=useState(false);
+  const {symbol:raw}=use(params);const symbol=raw.toUpperCase();const crypto=isCryptoCoin(symbol);const autoAddHandled=useRef(false);const [range,setRange]=useState('1d'),[chartStyle,setChartStyle]=useState<ChartStyle>('line'),[chart,setChart]=useState<MarketChart|null>(null),[overview,setOverview]=useState<MarketChart|null>(null),[fund,setFund]=useState<Fundamentals|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[full,setFull]=useState(false),[adding,setAdding]=useState(false),[account,setAccount]=useState<AccountState|null>(null),[listId,setListId]=useState(''),[addError,setAddError]=useState(''),[saving,setSaving]=useState(false),[saved,setSaved]=useState(''),[version,setVersion]=useState(0),[favorite,setFavorite]=useState(false),[signedIn,setSignedIn]=useState(false),[savingFavorite,setSavingFavorite]=useState(false);
   useEffect(()=>{let alive=true;setBusy(true);setError('');void marketChart(symbol,range).then(data=>{if(alive){setChart(data);if(range==='1d')setOverview(data);}}).catch(e=>{if(alive)setError(e.message);}).finally(()=>{if(alive)setBusy(false);});return()=>{alive=false;};},[symbol,range,version]);
   useEffect(()=>{const timer=setInterval(()=>{if(!document.hidden)setVersion(v=>v+1);},60000);return()=>clearInterval(timer);},[symbol]);
   useEffect(()=>{if(range==='1d')return;let alive=true;void marketChart(symbol,'1d').then(data=>{if(alive)setOverview(data);}).catch(()=>{});return()=>{alive=false;};},[symbol,range,version]);
@@ -46,6 +46,7 @@ export default function StockDetails({params}:{params:Promise<{symbol:string}>})
   const unit=quoteUnit({symbol,quoteType:data?.quoteType});
   const formatQuote=(value:number)=>price(value,data?.currency||'USD',unit);
   async function openAdd(){setAdding(true);setAddError('');setSaved('');try{if(await hasAccount()){const result=await apiJson<AccountState>('/api/watchlists');setAccount(result);setListId(result.watchlists[0]?.id||'');return;}const guest=ensureGuestList(window.localStorage);setAccount(guest);setListId(guest.watchlists[0].id);}catch(e){setAddError((e as Error).message);}}
+  useEffect(()=>{if(searchParams.get('add')==='1'&&quote&&!autoAddHandled.current){autoAddHandled.current=true;void openAdd();}},[searchParams,quote]);
   async function toggleFavorite(){if(!signedIn){setFavoritePrompt(true);return;}const next=!favorite;setFavorite(next);setSavingFavorite(true);try{const result=await apiJson<{signedIn:boolean;favorites:{symbol:string}[]}>('/api/favorites',{symbol,favorite:next});setSignedIn(true);setFavorite(!!result.favorites?.some(row=>row.symbol===symbol));}catch(e){setFavorite(!next);setError((e as Error).message);}finally{setSavingFavorite(false);}}
   function positionPayload(){
     const quantity=position.quantity.trim();

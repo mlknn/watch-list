@@ -1,26 +1,30 @@
 'use client';
-import {useEffect,useState} from 'react';
-import {LoaderCircle} from 'lucide-react';
+import {useEffect,useMemo,useRef,useState} from 'react';
+import {ArrowDown,ArrowDownRight,ArrowUp,ArrowUpRight,ExternalLink,LoaderCircle,Plus,Search,TrendingDown,TrendingUp,X} from 'lucide-react';
 import {useT} from '@/components/product/language';
 import {CompanyIcon} from './company-icon';
 
-type Row={rank:number;symbol:string;name:string;marketCap:number;historicalMarketCap:number|null;changePercent:number|null;historyStatus:'available'|'not-listed'|'unavailable'};
-type Page={range:string;offset:number;nextOffset:number|null;total:number;asOf:string;startDate:string;rows:Row[]};
-type Data=Page;
-type Connector={symbol:string;x1:number;y1:number;x2:number;y2:number;color:string};
+type Range='ytd'|'1y'|'2y'|'5y'|'10y';
+type ApiRow={rank:number;symbol:string;name:string;marketCap:number;historicalMarketCap:number|null;changePercent:number|null;historyStatus:'available'|'not-listed'|'unavailable'};
+type Page={range:string;offset:number;nextOffset:number|null;total:number;asOf:string;startDate:string;rows:ApiRow[]};
+type View='current'|'historical';
+type CompareRow={symbol:string;name:string;rankToday:number|null;rankThen:number|null;rankDelta:number|null;marketCap:number|null;historicalMarketCap:number|null;changePercent:number|null;historyStatus:'available'|'not-listed'|'unavailable'|'outside';isEntrant:boolean;isExit:boolean};
+type SortKey='rankToday'|'rankThen'|'rankDelta'|'name'|'marketCap'|'historicalMarketCap'|'changePercent';
+type Insight='climbers'|'fallers'|'gainers'|'losers'|'entrants'|'exits'|null;
 
-function useMarketHistory(range:string,enabled=true,view:'current'|'historical'='current'){
-  const [data,setData]=useState<Data|null>(null);
+const ranges:{value:Range;label:string}[]=[{value:'ytd',label:'Beginning of this year'},{value:'1y',label:'1 year ago'},{value:'2y',label:'2 years ago'},{value:'5y',label:'5 years ago'},{value:'10y',label:'10 years ago'}];
+
+function useMarketHistory(range:Range,view:View){
+  const [data,setData]=useState<Page|null>(null);
   const [status,setStatus]=useState<'loading'|'ready'|'error'>('loading');
   const [attempt,setAttempt]=useState(0);
   useEffect(()=>{
-    if(!enabled)return;
-    let alive=true;setData(null);setStatus('loading');
+    let alive=true;const controller=new AbortController();setData(null);setStatus('loading');
     void(async()=>{
       try{
-        let offset:number|null=0,combined:Data|null=null;
-        while(offset!==null){
-          const response=await fetch(`/api/market-history?range=${range}&offset=${offset}&view=${view}`);
+        let offset:number|null=0,combined:Page|null=null;
+        while(offset!==null&&alive){
+          const response=await fetch(`/api/market-history?range=${range}&offset=${offset}&view=${view}`,{signal:controller.signal});
           const result=await response.json() as Page&{error?:string};
           if(!response.ok)throw Error(result.error||'Market history is temporarily unavailable.');
           combined=combined?{...result,rows:[...combined.rows,...result.rows]}:result;
@@ -30,87 +34,134 @@ function useMarketHistory(range:string,enabled=true,view:'current'|'historical'=
         if(alive)setStatus('ready');
       }catch{if(alive)setStatus('error');}
     })();
-    return()=>{alive=false;};
-  },[range,attempt,enabled,view]);
+    return()=>{alive=false;controller.abort();};
+  },[range,view,attempt]);
   return {data,status,retry:()=>setAttempt(value=>value+1)};
 }
 
 export function MarketHistoryPage(){
   const t=useT();
-  const [range,setRange]=useState('ytd');
-  const [selected,setSelected]=useState<{symbol:string;from:'current'|'historical'}|null>(null);
-  const [connectors,setConnectors]=useState<Connector[]>([]);
-  const current=useMarketHistory('ytd');
-  const historical=useMarketHistory(range,true,'historical');
-  const otherData=historical.data;
-  const otherStatus=historical.status;
-  const historicalRows=otherData?.rows||[];
+  const [range,setRange]=useState<Range>('ytd');
+  const [rangeReady,setRangeReady]=useState(false);
+  const [query,setQuery]=useState('');
+  const [onlyWithHistory,setOnlyWithHistory]=useState(false);
+  const [onlyMovers,setOnlyMovers]=useState(false);
+  const [insight,setInsight]=useState<Insight>(null);
+  const [sort,setSort]=useState<{key:SortKey;direction:'asc'|'desc'}>({key:'rankToday',direction:'asc'});
+  const [selectedSymbol,setSelectedSymbol]=useState('');
+  const current=useMarketHistory(range,'current');
+  const historical=useMarketHistory(range,'historical');
+  const panelRef=useRef<HTMLElement>(null);
 
   useEffect(()=>{
-    if(!selected)return;
-    const target=selected.from==='current'?'historical':'current';
-    if(target==='historical'&&selected.from==='current'&&current.data?.rows.find(row=>row.symbol===selected.symbol)?.historyStatus!=='available')return;
-    const targetRow=document.getElementById(`${target}-${selected.symbol}`);
-    if(targetRow)targetRow.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center',inline:'nearest'});
-  },[selected,current.data?.rows,otherData?.rows.length,range]);
-
+    const params=new URLSearchParams(window.location.search),value=params.get('range');
+    if(ranges.some(option=>option.value===value))setRange(value as Range);
+    setRangeReady(true);
+  },[]);
   useEffect(()=>{
-    let frame=0;
-    const update=()=>{
-      if(!window.matchMedia('(min-width: 641px)').matches){setConnectors([]);return;}
-      const historicalSymbols=new Set((otherData?.rows||[]).map(row=>row.symbol));
-      const symbols=new Set((current.data?.rows||[]).slice(0,10).filter(row=>row.historyStatus==='available'&&historicalSymbols.has(row.symbol)).map(row=>row.symbol));
-      if(selected&&historicalSymbols.has(selected.symbol))symbols.add(selected.symbol);
-      const next:Connector[]=[];
-      for(const symbol of symbols){
-        const left=document.getElementById(`current-${symbol}`),right=document.getElementById(`historical-${symbol}`);
-        if(!left||!right)continue;
-        const a=left.getBoundingClientRect(),b=right.getBoundingClientRect();
-        next.push({symbol,x1:a.right-1,y1:a.top+a.height/2,x2:b.left+1,y2:b.top+b.height/2,color:`hsl(${colorFor(symbol)} 78% 50%)`});
-      }
-      setConnectors(next);
-    };
-    const schedule=()=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(update);};
-    schedule();window.addEventListener('scroll',schedule,true);window.addEventListener('resize',schedule);
-    return()=>{cancelAnimationFrame(frame);window.removeEventListener('scroll',schedule,true);window.removeEventListener('resize',schedule);};
-  },[selected,current.data?.rows.length,otherData?.rows.length,range]);
+    if(!rangeReady)return;
+    const url=new URL(window.location.href);url.searchParams.set('range',range);window.history.replaceState(window.history.state,'',url);
+  },[range,rangeReady]);
+  useEffect(()=>{
+    if(!selectedSymbol)return;
+    const onKey=(event:KeyboardEvent)=>{if(event.key==='Escape'){document.getElementById(`company-${selectedSymbol}`)?.focus();setSelectedSymbol('');}};
+    window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey);
+  },[selectedSymbol]);
+  useEffect(()=>{if(selectedSymbol)panelRef.current?.focus();},[selectedSymbol]);
 
-  const retry=historical.retry;
-  return <main className="market-history-page">
-    <div className="market-history-columns">
-      <section className="market-history-side" aria-label={t('Current market capitalization')}>
-        <header className="market-history-side-heading"><div><p className="eyebrow">{t('CURRENT')}</p><h1>{t('Market cap today')}</h1></div><span>{current.data?.asOf?`${t('As of')} ${new Date(current.data.asOf).toLocaleDateString()}`:''}</span></header>
-        <HistoryTable rows={current.data?.rows||[]} loading={current.status==='loading'&&!current.data} error={current.status==='error'&&!current.data} selectedSymbol={selected?.symbol||''} side="current" onSelect={symbol=>setSelected({symbol,from:'current'})} retry={current.retry} caption={t('Top 100 companies by current market cap')} formatValue={row=>formatCap(row.marketCap)} formatChange={row=>formatHistoryStatus(t,row,'current')}/>
+  const rows=useMemo(()=>{
+    const today=current.data?.rows||[],then=historical.data?.rows||[];
+    const todayBySymbol=new Map(today.map(row=>[row.symbol,row])),thenBySymbol=new Map(then.map(row=>[row.symbol,row]));
+    const symbols=new Set([...todayBySymbol.keys(),...thenBySymbol.keys()]);
+    return [...symbols].map(symbol=>{
+      const now=todayBySymbol.get(symbol),past=thenBySymbol.get(symbol);
+      const rankToday=now?.rank??null,rankThen=past?.rank??null;
+      const historyStatus=past?'available':now?.historyStatus==='not-listed'?'not-listed':now?.historyStatus==='unavailable'?'unavailable':now?'outside':'available';
+      return {symbol,name:now?.name||past?.name||symbol,rankToday,rankThen,rankDelta:rankToday!==null&&rankThen!==null?rankThen-rankToday:null,marketCap:now?.marketCap??past?.marketCap??null,historicalMarketCap:past?.historicalMarketCap??now?.historicalMarketCap??null,changePercent:now?.changePercent??past?.changePercent??null,historyStatus,isEntrant:!!now&&!past&&historyStatus==='outside',isExit:!!past&&!now} satisfies CompareRow;
+    });
+  },[current.data?.rows,historical.data?.rows]);
+
+  const shown=useMemo(()=>{
+    const needle=query.trim().toLowerCase();
+    const chosen=rows.filter(row=>{
+      if(needle&&!`${row.symbol} ${row.name}`.toLowerCase().includes(needle))return false;
+      if(onlyWithHistory&&row.historyStatus!=='available')return false;
+      if(onlyMovers&&(row.rankDelta===null||Math.abs(row.rankDelta)<5))return false;
+      if(insight==='climbers'&&(row.rankDelta===null||row.rankDelta<=0))return false;
+      if(insight==='fallers'&&(row.rankDelta===null||row.rankDelta>=0))return false;
+      if(insight==='gainers'&&(row.changePercent===null||row.changePercent<=0))return false;
+      if(insight==='losers'&&(row.changePercent===null||row.changePercent>=0))return false;
+      if(insight==='entrants'&&!row.isEntrant)return false;
+      if(insight==='exits'&&!row.isExit)return false;
+      return true;
+    });
+    return chosen.sort((a,b)=>{
+      const first=a[sort.key],second=b[sort.key];
+      if(first===null)return 1;if(second===null)return -1;
+      let order=typeof first==='string'?first.localeCompare(String(second)):(first as number)-(second as number);
+      if(sort.direction==='desc')order=-order;
+      return order||a.symbol.localeCompare(b.symbol);
+    });
+  },[rows,query,onlyWithHistory,onlyMovers,insight,sort]);
+  useEffect(()=>{if(selectedSymbol&&!shown.some(row=>row.symbol===selectedSymbol))setSelectedSymbol('');},[selectedSymbol,shown]);
+
+  const movers=rows.filter(row=>row.rankDelta!==null),withReturns=rows.filter(row=>row.changePercent!==null);
+  const climber=movers.filter(row=>row.rankDelta!>0).sort((a,b)=>(b.rankDelta||0)-(a.rankDelta||0))[0];
+  const faller=movers.filter(row=>row.rankDelta!<0).sort((a,b)=>(a.rankDelta||0)-(b.rankDelta||0))[0];
+  const gainer=withReturns.slice().sort((a,b)=>(b.changePercent||0)-(a.changePercent||0))[0];
+  const loser=withReturns.slice().sort((a,b)=>(a.changePercent||0)-(b.changePercent||0))[0];
+  const entrants=rows.filter(row=>row.isEntrant),exits=rows.filter(row=>row.isExit);
+  const isLoading=!rangeReady||current.status==='loading'||historical.status==='loading';
+  const hasError=current.status==='error'||historical.status==='error';
+  const selected=rows.find(row=>row.symbol===selectedSymbol)||null;
+  const retry=()=>{current.retry();historical.retry();};
+
+  function changeSort(key:SortKey){setSort(value=>value.key===key?{key,direction:value.direction==='asc'?'desc':'asc'}:{key,direction:key==='rankToday'||key==='rankThen'||key==='name'?'asc':'desc'});}
+  const sortButton=(key:SortKey,label:string)=><button type="button" className="mh-sort" onClick={()=>changeSort(key)} aria-label={`${t('Sort by')} ${t(label)}`}>{t(label)}{sort.key===key&&(sort.direction==='asc'?<ArrowUp size={12}/>:<ArrowDown size={12}/>)}</button>;
+  const chooseInsight=(value:Insight)=>setInsight(old=>old===value?null:value);
+
+  return <main className="market-history-page mh-page">
+    <header className="mh-heading"><div><p className="eyebrow">{t('MARKET HISTORY')}</p><h1>{t('Who rose and fell among the giants?')}</h1><p>{t('Compare today’s largest US companies with their estimated rank and market cap at a past date.')}</p></div><span className="mh-asof">{current.data?.asOf?`${t('Market data as of')} ${new Date(current.data.asOf).toLocaleDateString()}`:''}</span></header>
+
+    {isLoading?<HistorySkeleton/>:hasError?<section className="mh-state" role="alert"><h2>{t('Market history could not load')}</h2><p>{t('Please check your connection and try again.')}</p><button type="button" className="mh-primary" onClick={retry}><LoaderCircle size={15}/>{t('Retry')}</button></section>:<>
+      <section className="mh-insights" aria-label={t('Market history insights')}>
+        <InsightCard icon={<TrendingUp/>} label={t('Biggest rank climber')} row={climber} value={climber?`↑ ${climber.rankDelta}`:t('No rank change')} tone="up" onClick={()=>chooseInsight('climbers')} active={insight==='climbers'}/>
+        <InsightCard icon={<TrendingDown/>} label={t('Biggest rank faller')} row={faller} value={faller?`↓ ${Math.abs(faller.rankDelta||0)}`:t('No rank change')} tone="down" onClick={()=>chooseInsight('fallers')} active={insight==='fallers'}/>
+        <InsightCard icon={<ArrowUpRight/>} label={t('Largest % gainer')} row={gainer} value={gainer?formatPercent(gainer.changePercent):'—'} tone="up" onClick={()=>chooseInsight('gainers')} active={insight==='gainers'}/>
+        <InsightCard icon={<ArrowDownRight/>} label={t('Largest % loser')} row={loser} value={loser?formatPercent(loser.changePercent):'—'} tone="down" onClick={()=>chooseInsight('losers')} active={insight==='losers'}/>
+        <InsightCard icon={<Plus/>} label={t('New entrants')} row={null} value={`${entrants.length} ${t('names')}`} tone="neutral" onClick={()=>chooseInsight('entrants')} active={insight==='entrants'}/>
+        <InsightCard icon={<ArrowDown/>} label={t('Top-100 exits')} row={null} value={`${exits.length} ${t('names')}`} tone="neutral" onClick={()=>chooseInsight('exits')} active={insight==='exits'}/>
       </section>
-      <section className="market-history-side" aria-label={t('Historical market capitalization')}>
-        <header className="market-history-side-heading historical-heading"><div><p className="eyebrow">{t('HISTORICAL')}</p><h2>{t('Market cap at a past date')}</h2></div><label className="market-history-select"><span>{t('Compare from')}</span><select value={range} onChange={event=>setRange(event.target.value)}><option value="ytd">{t('Beginning of this year')}</option><option value="1y">{t('1 year ago')}</option><option value="2y">{t('2 years ago')}</option><option value="5y">{t('5 years ago')}</option><option value="10y">{t('10 years ago')}</option></select></label></header>
-        {otherData&&<p className="market-history-date">{t('Estimated market caps at')} {new Date(otherData.startDate+'T12:00:00Z').toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric',timeZone:'UTC'})} · {t('Ranked at that date')}</p>}
-        <HistoryTable rows={historicalRows} loading={otherStatus==='loading'&&!otherData} error={otherStatus==='error'&&!otherData} selectedSymbol={selected?.symbol||''} side="historical" onSelect={symbol=>setSelected({symbol,from:'historical'})} retry={retry} caption={t('Top companies by estimated market cap at the selected date')} formatValue={row=>row.historicalMarketCap===null?'—':formatCap(row.historicalMarketCap)} formatChange={row=>formatHistoryStatus(t,row,'historical')}/>
-        {otherStatus==='loading'&&otherData&&otherData.rows.length<100&&<p className="home-history-refresh" role="status"><LoaderCircle className="spin" size={14}/>{t('Loading the rest of the top 100…')}</p>}
+
+      <section className="mh-controls" aria-label={t('Filter and search market history')}>
+        <label className="mh-range"><span>{t('Compare from')}</span><select value={range} onChange={event=>{setRange(event.target.value as Range);setInsight(null);setSelectedSymbol('');}}>{ranges.map(option=><option key={option.value} value={option.value}>{t(option.label)}</option>)}</select></label>
+        <label className="mh-search"><Search size={17}/><span className="sr-only">{t('Search ticker or company')}</span><input type="search" value={query} onChange={event=>setQuery(event.target.value)} placeholder={t('Search ticker or company')}/>{query&&<button type="button" aria-label={t('Clear search')} onClick={()=>setQuery('')}><X size={15}/></button>}</label>
+        <label className="mh-toggle"><input type="checkbox" checked={onlyWithHistory} onChange={event=>setOnlyWithHistory(event.target.checked)}/><span>{t('Historical data only')}</span></label>
+        <label className="mh-toggle"><input type="checkbox" checked={onlyMovers} onChange={event=>setOnlyMovers(event.target.checked)}/><span>{t('Rank movers ≥ 5')}</span></label>
       </section>
-    </div>
-    {connectors.length>0&&<svg className="market-history-connector" aria-hidden="true">{connectors.map(connector=><path key={connector.symbol} d={`M${connector.x1} ${connector.y1} C${(connector.x1+connector.x2)/2} ${connector.y1}, ${(connector.x1+connector.x2)/2} ${connector.y2}, ${connector.x2} ${connector.y2}`} fill="none" stroke={connector.color} strokeWidth={connector.symbol===selected?.symbol?2.5:1.5} strokeOpacity={connector.symbol===selected?.symbol?1:.68}/>)}</svg>}
-    <p className="market-history-source">{t('Source: Yahoo Finance. Historical rankings are estimates from a broader sample of today’s largest listed companies, using today’s shares outstanding and split-adjusted prices. Companies no longer listed and historical share-count changes may be missing; returns exclude dividends.')}</p>
+
+      <div className="mh-summary" aria-live="polite"><strong>{shown.length} {t('names shown')}</strong><span>{climber?`${t('Top climber')}: ${climber.symbol} +${climber.rankDelta}`:''}</span><span>{faller?`${t('Top faller')}: ${faller.symbol} −${Math.abs(faller.rankDelta||0)}`:''}</span><span>{gainer?`${t('Top gainer')}: ${gainer.symbol} ${formatPercent(gainer.changePercent)}`:''}</span><span>{loser?`${t('Top loser')}: ${loser.symbol} ${formatPercent(loser.changePercent)}`:''}</span></div>
+
+      {insight&&<div className="mh-filter-note">{t('Filtered by insight')}<button type="button" onClick={()=>setInsight(null)}>{t('Clear filter')} <X size={13}/></button></div>}
+      {shown.length===0?<div className="mh-empty"><h2>{t('No companies match these filters')}</h2><p>{t('Try another search or clear one of the filters.')}</p><button type="button" onClick={()=>{setQuery('');setOnlyWithHistory(false);setOnlyMovers(false);setInsight(null);}}>{t('Clear filters')}</button></div>:<>
+        <div className="mh-table-wrap"><table className="mh-table"><caption className="sr-only">{t('Top companies ranked today and at the selected past date')}</caption><thead><tr>{(['rankToday','rankThen','rankDelta','name','marketCap','historicalMarketCap','changePercent'] as SortKey[]).map((key,index)=>{const labels=['Rank today','Rank then','Δ Rank','Company','Market cap today','Market cap then','Change since date'];return <th key={key} aria-sort={sort.key===key?sort.direction==='asc'?'ascending':'descending':'none'}>{sortButton(key,labels[index])}</th>;})}</tr></thead><tbody>{shown.map(row=><tr key={row.symbol} className={selectedSymbol===row.symbol?'is-selected':''}>
+          <td className="mh-rank">{row.rankToday??<span className="mh-chip">{t('Outside today’s top 100')}</span>}</td><td className="mh-rank">{row.rankThen??<MissingChip row={row} t={t}/>}</td><td><RankDelta value={row.rankDelta} t={t}/></td><th scope="row"><button id={`company-${row.symbol}`} className="mh-company" type="button" aria-expanded={selectedSymbol===row.symbol} aria-controls="market-history-details" onClick={()=>setSelectedSymbol(old=>old===row.symbol?'':row.symbol)}><CompanyIcon symbol={row.symbol}/><span><strong>{row.symbol}</strong><small>{row.name}</small></span></button></th><td className="mh-cap">{row.marketCap===null?'—':formatCap(row.marketCap)}</td><td className="mh-cap">{row.historicalMarketCap===null?<MissingChip row={row} t={t}/>:formatCap(row.historicalMarketCap)}</td><td><ChangeValue value={row.changePercent} status={row.historyStatus} t={t}/></td>
+        </tr>)}</tbody></table></div>
+        <div className="mh-cards">{shown.map(row=><article key={row.symbol} className={`mh-card ${selectedSymbol===row.symbol?'is-selected':''}`}><button type="button" className="mh-card-head" aria-expanded={selectedSymbol===row.symbol} aria-controls="market-history-details" onClick={()=>setSelectedSymbol(old=>old===row.symbol?'':row.symbol)}><CompanyIcon symbol={row.symbol}/><span><strong>{row.symbol}</strong><small>{row.name}</small></span><RankDelta value={row.rankDelta} t={t}/></button><div className="mh-card-grid"><span>{t('Rank today')}<strong>{row.rankToday??'—'}</strong></span><span>{t('Rank then')}<strong>{row.rankThen??<MissingChip row={row} t={t}/>}</strong></span><span>{t('Market cap today')}<strong>{row.marketCap===null?'—':formatCap(row.marketCap)}</strong></span><span>{t('Market cap then')}<strong>{row.historicalMarketCap===null?<MissingChip row={row} t={t}/>:formatCap(row.historicalMarketCap)}</strong></span><span>{t('Change since date')}<strong><ChangeValue value={row.changePercent} status={row.historyStatus} t={t}/></strong></span></div></article>)}</div>
+      </>}
+      {selected&&<aside id="market-history-details" className="mh-detail" ref={panelRef} tabIndex={-1} aria-label={`${selected.symbol} ${t('comparison details')}`}><div className="mh-detail-heading"><div><CompanyIcon symbol={selected.symbol}/><div><strong>{selected.symbol}</strong><span>{selected.name}</span></div></div><button type="button" aria-label={t('Close details')} onClick={()=>{setSelectedSymbol('');document.getElementById(`company-${selected.symbol}`)?.focus();}}><X size={18}/></button></div><div className="mh-detail-stats"><span>{t('Market cap today')}<strong>{selected.marketCap===null?'—':formatCap(selected.marketCap)}</strong></span><span>{t('Market cap then')}<strong>{selected.historicalMarketCap===null?'—':formatCap(selected.historicalMarketCap)}</strong></span><span>{t('Change since date')}<strong><ChangeValue value={selected.changePercent} status={selected.historyStatus} t={t}/></strong></span><span>{t('Rank today / then')}<strong>{selected.rankToday??'—'} / {selected.rankThen??'—'}</strong></span></div><p className="mh-detail-freeze">{t('Add this company to a watchlist. Its latest available price will be recorded as the starting price.')}</p><div className="mh-detail-actions"><a className="mh-primary" href={`/stocks/${encodeURIComponent(selected.symbol)}?from=${encodeURIComponent('/history?range='+range)}&add=1`}><Plus size={16}/>{t('Add to my watchlist')}</a><a className="mh-secondary" href={`/stocks/${encodeURIComponent(selected.symbol)}?from=${encodeURIComponent('/history?range='+range)}`}>{t('View company')}<ExternalLink size={15}/></a></div></aside>}
+
+      <details className="mh-methodology"><summary>{t('How this data is calculated')}</summary><p>{t('Source: Yahoo Finance. Historical rankings are estimates from a broader sample of today’s largest listed companies, using today’s shares outstanding and split-adjusted prices. Companies no longer listed and historical share-count changes may be missing; returns exclude dividends. Market caps and quotes may be delayed.')}</p></details>
+    </>}
   </main>;
 }
 
-function HistoryTable({rows,loading,error,selectedSymbol,side,onSelect,retry,caption,formatValue,formatChange}:{rows:Row[];loading:boolean;error:boolean;selectedSymbol:string;side:'current'|'historical';onSelect:(symbol:string)=>void;retry:()=>void;caption:string;formatValue:(row:Row)=>string;formatChange:(row:Row)=>string}){
-  const t=useT();
-  if(loading)return <div className="market-history-loading" role="status"><LoaderCircle className="spin"/>{t('Loading market history…')}</div>;
-  if(error)return <p className="home-panel-status" role="alert">{t('Market history is temporarily unavailable.')}<button type="button" className="home-inline-retry" onClick={retry}>{t('Retry')}</button></p>;
-  return <div className="market-history-table-wrap"><table className="home-history-table market-history-table"><caption className="sr-only">{caption}</caption><thead><tr><th scope="col">#</th><th scope="col">{t('Company')}</th><th scope="col">{t('Market cap')} <small>({t(side==='current'?'YTD change':'Change since selected date')})</small></th></tr></thead><tbody>{rows.map(row=><tr id={`${side}-${row.symbol}`} key={row.symbol} className={selectedSymbol===row.symbol?'is-selected':''} onClick={()=>onSelect(row.symbol)}><td>{row.rank}</td><th scope="row"><button type="button" className="market-history-company" aria-pressed={selectedSymbol===row.symbol} onClick={()=>onSelect(row.symbol)}><CompanyIcon symbol={row.symbol}/><span><strong>{row.symbol}</strong><small>{row.name}</small></span></button></th><td>{side==='historical'&&row.historyStatus!=='available'?<span className="market-history-missing">{formatChange(row)}</span>:<><strong>{formatValue(row)}</strong> <span className={'market-history-change '+(row.changePercent===null?'':row.changePercent>=0?'up':'down')}>({formatChange(row)})</span></>}</td></tr>)}</tbody></table></div>;
+function InsightCard({icon,label,row,value,tone,onClick,active}:{icon:React.ReactNode;label:string;row:CompareRow|null;value:string;tone:'up'|'down'|'neutral';onClick:()=>void;active:boolean}){
+  return <div className={`mh-insight ${tone} ${active?'active':''}`}><button type="button" onClick={onClick} aria-pressed={active}><span className="mh-insight-icon">{icon}</span><span className="mh-insight-copy"><small>{label}</small><strong>{row?row.symbol:value}</strong>{row&&<em>{value}</em>}</span></button></div>;
 }
-
-function formatCap(value:number){
-  if(!Number.isFinite(value)||value<=0)return '—';
-  const units:[number,string][]=[[1e12,'T'],[1e9,'B'],[1e6,'M']];
-  const [scale,suffix]=units.find(([threshold])=>value>=threshold)||[1,''];
-  return `$${(value/scale).toLocaleString(undefined,{maximumFractionDigits:2})}${suffix}`;
-}
+function HistorySkeleton(){return <div className="mh-loading" role="status" aria-label="Loading market history"><div className="mh-skeleton-strip">{Array.from({length:5},(_,i)=><span key={i}/>)}</div><div className="mh-skeleton-controls"/><div className="mh-skeleton-table">{Array.from({length:12},(_,i)=><span key={i}/>)}</div><span className="sr-only">Loading market history…</span></div>;}
+function MissingChip({row,t}:{row:CompareRow;t:(value:string)=>string}){const label=row.historyStatus==='not-listed'?'Not listed then':row.historyStatus==='unavailable'?'Data unavailable':'Outside top 100 then';return <span className={`mh-chip ${row.historyStatus}`}>{t(label)}</span>;}
+function RankDelta({value,t}:{value:number|null;t:(value:string)=>string}){if(value===null)return <span className="mh-neutral">—</span>;if(value===0)return <span className="mh-neutral">{t('No change')}</span>;const improved=value>0;return <span className={`mh-delta ${improved?'up':'down'}`} aria-label={`${improved?t('Up'):t('Down')} ${Math.abs(value)} ${t('places')}`}>{improved?<ArrowUp size={14}/>:<ArrowDown size={14}/>} {Math.abs(value)}</span>;}
+function ChangeValue({value,status,t}:{value:number|null;status:CompareRow['historyStatus'];t:(value:string)=>string}){if(value===null)return <MissingChip row={{historyStatus:status} as CompareRow} t={t}/>;return <span className={`mh-percent ${value>=0?'up':'down'}`}>{value>=0?<ArrowUpRight size={14}/>:<ArrowDownRight size={14}/>} {formatPercent(value)}</span>;}
+function formatCap(value:number){if(!Number.isFinite(value)||value<=0)return '—';const units:[number,string][]=[[1e12,'T'],[1e9,'B'],[1e6,'M']];const [scale,suffix]=units.find(([threshold])=>value>=threshold)||[1,''];return `$${(value/scale).toLocaleString(undefined,{maximumFractionDigits:2})}${suffix}`;}
 function formatPercent(value:number|null){return value===null?'—':`${value>=0?'+':''}${value.toFixed(2)}%`;}
-function colorFor(symbol:string){let hash=0;for(const char of symbol)hash=(hash*31+char.charCodeAt(0))%360;return hash;}
-function formatHistoryStatus(t:(value:string)=>string,row:Row,side:'current'|'historical'){
-  if(row.historyStatus==='not-listed')return t(side==='current'?'Not listed at the start of this year':'Not listed by this date');
-  if(row.historyStatus==='unavailable')return t('Historical data unavailable');
-  return formatPercent(row.changePercent);
-}
