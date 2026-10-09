@@ -90,7 +90,7 @@ export async function historicalMarketHistory(range='ytd',offset=0,now=new Date(
     if(!pending){
       pending=(async()=>{
         const candidates=await leaders();let cursor=0;const priced=[];
-        await Promise.all(Array.from({length:10},async()=>{
+        await Promise.all(Array.from({length:6},async()=>{
           while(cursor<candidates.length){
             const item=candidates[cursor++];
             try{
