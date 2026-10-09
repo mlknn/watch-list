@@ -24,7 +24,8 @@ function useMarketHistory(range:Range,view:View){
       try{
         let offset:number|null=0,combined:Page|null=null;
         while(offset!==null&&alive){
-          const response=await fetch(`/api/market-history?range=${range}&offset=${offset}&view=${view}`,{signal:controller.signal});
+          const apiView=view==='historical'?'history-candidates':'current-us';
+          const response=await fetch(`/api/market-history?range=${range}&offset=${offset}&view=${apiView}`,{signal:controller.signal});
           const result=await response.json() as Page&{error?:string};
           if(!response.ok)throw Error(result.error||'Market history is temporarily unavailable.');
           combined=combined?{...result,rows:[...combined.rows,...result.rows]}:result;

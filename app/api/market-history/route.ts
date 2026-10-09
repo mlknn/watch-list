@@ -8,6 +8,6 @@ export async function GET(request:Request){
     const range=params.get('range')||'ytd';
     const offset=params.has('offset')?Number(params.get('offset')):0;
     const view=params.get('view');
-    return publicJson(await (view==='historical'?historicalMarketHistory(range,offset):marketHistory(range,offset)),300);
+    return publicJson(await (view==='history-candidates'?historicalMarketHistory(range,offset):marketHistory(range,offset)),300);
   }catch(error){return failure(error);}
 }
