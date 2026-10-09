@@ -70,14 +70,16 @@ export function MarketHistoryPage(){
   useEffect(()=>{if(selectedSymbol)panelRef.current?.focus();},[selectedSymbol]);
 
   const rows=useMemo(()=>{
-    const today=current.data?.rows||[],then=historical.data?.rows||[];
-    const todayBySymbol=new Map(today.map(row=>[row.symbol,row])),thenBySymbol=new Map(then.map(row=>[row.symbol,row]));
+    const today=current.data?.rows||[],candidates=historical.data?.rows||[];
+    const then=candidates.filter(row=>row.historicalMarketCap!==null).slice().sort((a,b)=>(b.historicalMarketCap||0)-(a.historicalMarketCap||0)).slice(0,100).map((row,index)=>({...row,rank:index+1}));
+    const todayBySymbol=new Map(today.map(row=>[row.symbol,row])),thenBySymbol=new Map(then.map(row=>[row.symbol,row])),candidateBySymbol=new Map(candidates.map(row=>[row.symbol,row]));
     const symbols=new Set([...todayBySymbol.keys(),...thenBySymbol.keys()]);
     return [...symbols].map(symbol=>{
       const now=todayBySymbol.get(symbol),past=thenBySymbol.get(symbol);
       const rankToday=now?.rank??null,rankThen=past?.rank??null;
       const historyStatus=past?'available':now?.historyStatus==='not-listed'?'not-listed':now?.historyStatus==='unavailable'?'unavailable':now?'outside':'available';
-      return {symbol,name:now?.name||past?.name||symbol,rankToday,rankThen,rankDelta:rankToday!==null&&rankThen!==null?rankThen-rankToday:null,marketCap:now?.marketCap??past?.marketCap??null,historicalMarketCap:past?.historicalMarketCap??now?.historicalMarketCap??null,changePercent:now?.changePercent??past?.changePercent??null,historyStatus,isEntrant:!!now&&!past&&historyStatus==='outside',isExit:!!past&&!now} satisfies CompareRow;
+      const candidate=candidateBySymbol.get(symbol);
+      return {symbol,name:now?.name||past?.name||candidate?.name||symbol,rankToday,rankThen,rankDelta:rankToday!==null&&rankThen!==null?rankThen-rankToday:null,marketCap:now?.marketCap??past?.marketCap??candidate?.marketCap??null,historicalMarketCap:past?.historicalMarketCap??candidate?.historicalMarketCap??now?.historicalMarketCap??null,changePercent:now?.changePercent??past?.changePercent??candidate?.changePercent??null,historyStatus,isEntrant:!!now&&!past&&historyStatus==='outside',isExit:!!past&&!now} satisfies CompareRow;
     });
   },[current.data?.rows,historical.data?.rows]);
 

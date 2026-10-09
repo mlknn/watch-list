@@ -3,7 +3,7 @@ import {failure,publicJson,publicRate} from '@/server/http.mjs';
 
 export async function GET(request:Request){
   try{
-    publicRate(request,'market-history',12,60);
+    publicRate(request,'market-history',30,60);
     const params=new URL(request.url).searchParams;
     const range=params.get('range')||'ytd';
     const offset=params.has('offset')?Number(params.get('offset')):0;

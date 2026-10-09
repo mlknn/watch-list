@@ -4,7 +4,6 @@ const SCREENER='https://query1.finance.yahoo.com/v1/finance/screener/predefined/
 const ranges=new Set(['ytd','1y','2y','5y','10y']);
 const historyCache=new Map();
 let leadersCache=null,leadersPending=null;
-const rankedCache=new Map(),rankedPending=new Map();
 const headers={'User-Agent':'Mozilla/5.0','Accept':'application/json'};
 
 function startDate(range,now=new Date()){
@@ -82,32 +81,21 @@ export async function marketHistory(range='ytd',offset=0,now=new Date()){
 
 export async function historicalMarketHistory(range='ytd',offset=0,now=new Date()){
   if(!ranges.has(range))throw new AppError('Choose YTD, 1 year, 2 years, 5 years, or 10 years.');
-  if(!Number.isInteger(offset)||offset<0||offset>80||offset%20!==0)throw new AppError('Choose a valid page of market history.');
-  const date=startDate(range,now),key=`${range}:${date.toISOString().slice(0,10)}`;
-  let rows=rankedCache.get(key);
-  if(!rows||Date.now()-rows.at>6*60*60_000){
-    let pending=rankedPending.get(key);
-    if(!pending){
-      pending=(async()=>{
-        const candidates=await leaders();let cursor=0;const priced=[];
-        await Promise.all(Array.from({length:6},async()=>{
-          while(cursor<candidates.length){
-            const item=candidates[cursor++];
-            try{
-              const startPrice=await baseline(item.symbol,range,date);
-              if(item.price===null)continue;
-              const historicalMarketCap=item.marketCap*startPrice/item.price;
-              priced.push({...item,historicalMarketCap,changePercent:(item.price/startPrice-1)*100,historyStatus:'available'});
-            }catch{/* Skip names Yahoo cannot price for this date; the broader candidate pool keeps the ranked set usable. */}
-          }
-        }));
-        const ranked=priced.sort((a,b)=>b.historicalMarketCap-a.historicalMarketCap).slice(0,100).map((row,index)=>({...row,rank:index+1}));
-        if(!ranked.length)throw new AppError('Historical market leaders are temporarily unavailable. Please retry.',502);
-        rankedCache.set(key,{at:Date.now(),rows:ranked});return ranked;
-      })();
-      rankedPending.set(key,pending);
+  if(!Number.isInteger(offset)||offset<0||offset>240||offset%20!==0)throw new AppError('Choose a valid page of market history.');
+  const all=await leaders(),companies=all.slice(offset,offset+20),date=startDate(range,now);let next=0;
+  const pages=await Promise.all(Array.from({length:6},async()=>{
+    const output=[];
+    while(next<companies.length){
+      const item=companies[next++];
+      try{
+        const startPrice=await baseline(item.symbol,range,date);
+        const historicalMarketCap=item.price===null?null:item.marketCap*startPrice/item.price;
+        const changePercent=item.price===null?null:(item.price/startPrice-1)*100;
+        output.push({...item,historicalMarketCap,changePercent,historyStatus:item.price===null?'unavailable':'available'});
+      }catch(error){const historyStatus=error?.code==='not-listed'?'not-listed':'unavailable';output.push({...item,historicalMarketCap:null,changePercent:null,historyStatus});}
     }
-    try{rows=await pending;}finally{rankedPending.delete(key);}
-  }else rows=rows.rows;
-  return {range,offset,nextOffset:offset+20<rows.length?offset+20:null,total:rows.length,asOf:new Date().toISOString(),startDate:date.toISOString().slice(0,10),source:'Yahoo Finance; estimated using current shares outstanding',rows:rows.slice(offset,offset+20)};
+    return output;
+  }));
+  const rows=pages.flat().sort((a,b)=>b.marketCap-a.marketCap);
+  return {range,offset,nextOffset:offset+20<all.length?offset+20:null,total:all.length,asOf:new Date().toISOString(),startDate:date.toISOString().slice(0,10),source:'Yahoo Finance; estimated using current shares outstanding',rows:rows.map((row,index)=>({...row,rank:offset+index+1}))};
 }
