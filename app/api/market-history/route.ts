@@ -1,4 +1,4 @@
-import {marketHistory} from '@/server/market-history.mjs';
+import {historicalMarketHistory,marketHistory} from '@/server/market-history.mjs';
 import {failure,publicJson,publicRate} from '@/server/http.mjs';
 
 export async function GET(request:Request){
@@ -7,6 +7,7 @@ export async function GET(request:Request){
     const params=new URL(request.url).searchParams;
     const range=params.get('range')||'ytd';
     const offset=params.has('offset')?Number(params.get('offset')):0;
-    return publicJson(await marketHistory(range,offset),300);
+    const view=params.get('view');
+    return publicJson(await (view==='historical'?historicalMarketHistory(range,offset):marketHistory(range,offset)),300);
   }catch(error){return failure(error);}
 }

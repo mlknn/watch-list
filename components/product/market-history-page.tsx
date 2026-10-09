@@ -9,7 +9,7 @@ type Page={range:string;offset:number;nextOffset:number|null;total:number;asOf:s
 type Data=Page;
 type Connector={symbol:string;x1:number;y1:number;x2:number;y2:number;color:string};
 
-function useMarketHistory(range:string,enabled=true){
+function useMarketHistory(range:string,enabled=true,view:'current'|'historical'='current'){
   const [data,setData]=useState<Data|null>(null);
   const [status,setStatus]=useState<'loading'|'ready'|'error'>('loading');
   const [attempt,setAttempt]=useState(0);
@@ -20,7 +20,7 @@ function useMarketHistory(range:string,enabled=true){
       try{
         let offset:number|null=0,combined:Data|null=null;
         while(offset!==null){
-          const response=await fetch(`/api/market-history?range=${range}&offset=${offset}`);
+          const response=await fetch(`/api/market-history?range=${range}&offset=${offset}&view=${view}`);
           const result=await response.json() as Page&{error?:string};
           if(!response.ok)throw Error(result.error||'Market history is temporarily unavailable.');
           combined=combined?{...result,rows:[...combined.rows,...result.rows]}:result;
@@ -31,7 +31,7 @@ function useMarketHistory(range:string,enabled=true){
       }catch{if(alive)setStatus('error');}
     })();
     return()=>{alive=false;};
-  },[range,attempt,enabled]);
+  },[range,attempt,enabled,view]);
   return {data,status,retry:()=>setAttempt(value=>value+1)};
 }
 
@@ -41,23 +41,26 @@ export function MarketHistoryPage(){
   const [selected,setSelected]=useState<{symbol:string;from:'current'|'historical'}|null>(null);
   const [connectors,setConnectors]=useState<Connector[]>([]);
   const current=useMarketHistory('ytd');
-  const historical=useMarketHistory(range,range!=='ytd');
-  const otherData=range==='ytd'?current.data:historical.data;
-  const otherStatus=range==='ytd'?current.status:historical.status;
-  const historicalRows=(otherData?.rows||[]).slice().sort((a,b)=>(b.historicalMarketCap??-1)-(a.historicalMarketCap??-1)||a.symbol.localeCompare(b.symbol)).map((row,index)=>({...row,rank:index+1}));
+  const historical=useMarketHistory(range,true,'historical');
+  const otherData=historical.data;
+  const otherStatus=historical.status;
+  const historicalRows=otherData?.rows||[];
 
   useEffect(()=>{
     if(!selected)return;
     const target=selected.from==='current'?'historical':'current';
-    document.getElementById(`${target}-${selected.symbol}`)?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center',inline:'nearest'});
-  },[selected,current.data?.rows.length,otherData?.rows.length,range]);
+    if(target==='historical'&&selected.from==='current'&&current.data?.rows.find(row=>row.symbol===selected.symbol)?.historyStatus!=='available')return;
+    const targetRow=document.getElementById(`${target}-${selected.symbol}`);
+    if(targetRow)targetRow.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center',inline:'nearest'});
+  },[selected,current.data?.rows,otherData?.rows.length,range]);
 
   useEffect(()=>{
     let frame=0;
     const update=()=>{
       if(!window.matchMedia('(min-width: 641px)').matches){setConnectors([]);return;}
-      const symbols=new Set((current.data?.rows||[]).slice(0,10).map(row=>row.symbol));
-      if(selected)symbols.add(selected.symbol);
+      const historicalSymbols=new Set((otherData?.rows||[]).map(row=>row.symbol));
+      const symbols=new Set((current.data?.rows||[]).slice(0,10).filter(row=>row.historyStatus==='available'&&historicalSymbols.has(row.symbol)).map(row=>row.symbol));
+      if(selected&&historicalSymbols.has(selected.symbol))symbols.add(selected.symbol);
       const next:Connector[]=[];
       for(const symbol of symbols){
         const left=document.getElementById(`current-${symbol}`),right=document.getElementById(`historical-${symbol}`);
@@ -72,7 +75,7 @@ export function MarketHistoryPage(){
     return()=>{cancelAnimationFrame(frame);window.removeEventListener('scroll',schedule,true);window.removeEventListener('resize',schedule);};
   },[selected,current.data?.rows.length,otherData?.rows.length,range]);
 
-  const retry=range==='ytd'?current.retry:historical.retry;
+  const retry=historical.retry;
   return <main className="market-history-page">
     <div className="market-history-columns">
       <section className="market-history-side" aria-label={t('Current market capitalization')}>
@@ -87,7 +90,7 @@ export function MarketHistoryPage(){
       </section>
     </div>
     {connectors.length>0&&<svg className="market-history-connector" aria-hidden="true">{connectors.map(connector=><path key={connector.symbol} d={`M${connector.x1} ${connector.y1} C${(connector.x1+connector.x2)/2} ${connector.y1}, ${(connector.x1+connector.x2)/2} ${connector.y2}, ${connector.x2} ${connector.y2}`} fill="none" stroke={connector.color} strokeWidth={connector.symbol===selected?.symbol?2.5:1.5} strokeOpacity={connector.symbol===selected?.symbol?1:.68}/>)}</svg>}
-    <p className="market-history-source">{t('Source: Yahoo Finance. Market caps and quotes may be delayed. Past market caps are estimates based on today’s shares outstanding and split-adjusted prices; returns exclude dividends.')}</p>
+    <p className="market-history-source">{t('Source: Yahoo Finance. Historical rankings are estimates from a broader sample of today’s largest listed companies, using today’s shares outstanding and split-adjusted prices. Companies no longer listed and historical share-count changes may be missing; returns exclude dividends.')}</p>
   </main>;
 }
 
