@@ -58,8 +58,8 @@ export async function requireUser(request) {
 export async function rate(db,key,max=60,seconds=60) {
   if(!dbResult(await db.rpc('wl_rate',{p_key:key,p_max:max,p_seconds:seconds}))) throw new AppError('Too many updates. Please wait a moment and try again.',429);
 }
-export function planFor() {
-  return {...OPEN_PLAN};
+export function planFor(user={}) {
+  return {...OPEN_PLAN,maxLists:user.email?.toLowerCase()==='mahir.alkan.100@gmail.com'?null:OPEN_PLAN.maxLists};
 }
 export async function ownerList(db,userId,listId) {
   if(typeof listId!=='string'||! /^[0-9a-f-]{36}$/i.test(listId)) throw new AppError('Watchlist not found.',404);
@@ -111,17 +111,17 @@ export async function listViews(db,lists,refresh=false,loadQuote=cachedQuote) {
 export async function accountState(db,user,refresh=false) {
   const profile=dbResult(await db.from('wl_profiles').select('*').eq('id',user.id).single());
   const lists=dbResult(await db.from('wl_watchlists').select('*').eq('owner_id',user.id).order('created_at').order('id'));
-  return {version:2,updatedAt:new Date().toISOString(),user:{id:user.id,name:profile.display_name,email:user.email,analytics:canViewAnalytics(user.email),local:localMode(),country:profile.country_code,hasBilling:!!profile.stripe_customer_id},plan:planFor(profile),watchlists:await listViews(db,lists,refresh)};
+  return {version:2,updatedAt:new Date().toISOString(),user:{id:user.id,name:profile.display_name,email:user.email,analytics:canViewAnalytics(user.email),local:localMode(),country:profile.country_code,hasBilling:!!profile.stripe_customer_id},plan:planFor(user),watchlists:await listViews(db,lists,refresh)};
 }
 export async function importGuestLists(db,user,lists){
   if(!Array.isArray(lists))throw new AppError('Invalid request.');
   let state=await accountState(db,user);
-  for(const raw of lists.slice(0,state.plan.maxLists)){
+  for(const raw of lists.slice(0,state.plan.maxLists??undefined)){
     const name=String(raw?.name||'').trim().slice(0,60)||'My watchlist';
     const stocks=Array.isArray(raw?.stocks)?raw.stocks:[];
     let target=state.watchlists.find(list=>!list.stocks.length);
     if(!target){
-      if(state.watchlists.length>=state.plan.maxLists)target=state.watchlists[0];
+      if(state.plan.maxLists!==null&&state.watchlists.length>=state.plan.maxLists)target=state.watchlists[0];
       else{
         state=await accountAction(db,user,{action:'createList',name,mode:'advanced'});
         target=[...state.watchlists].sort((a,b)=>Date.parse(b.createdAt)-Date.parse(a.createdAt))[0];
@@ -149,6 +149,14 @@ export async function accountAction(db,user,input) {
   if(input.action==='importGuest')return importGuestLists(db,user,input.lists);
   const allowed=['createList','renameList','deleteList','addStock','removeStock','shareList','revokeShare','convertList','initializePosition'];
   if(!allowed.includes(input.action))throw new AppError('Unknown action.');
+  // Hosted identity comes from requireUser/getUser, never from the request body.
+  // This account has no list-count quota; other accounts retain the locked RPC check.
+  if(input.action==='createList'&&planFor(user).maxLists===null&&!localMode()){
+    const name=typeof input.name==='string'?input.name.trim():'';
+    if(!name||name.length>60)throw new AppError('Enter a name between 1 and 60 characters.');
+    dbResult(await db.from('wl_watchlists').insert({owner_id:user.id,name,mode:'advanced'}));
+    return accountState(db,user);
+  }
   if(input.action!=='createList')await ownerList(db,user.id,input.listId);
   let quote=null;
   if(input.action==='addStock') {

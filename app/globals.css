@@ -980,8 +980,14 @@ html.dark .tool-preview-head{color:#9ab0a3}
   .workspace.is-member{grid-template-columns:1fr}
   .watchlist-rail{position:static;grid-row:auto}
   .workspace.is-member>.watch-card,.workspace.is-member>.watchlist-invite-row,.workspace.is-member>.empty-watchlist{grid-column:1}
-  .watchlist-rail-list{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
-  .watchlist-rail-list li{flex:0 0 220px}
+  .watchlist-rail-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;overflow:visible;padding:0}
+  .watchlist-rail-list li{min-width:0}
+  .watchlist-rail-list button{height:100%;min-height:94px;grid-template-columns:minmax(0,1fr);align-content:start;gap:8px;padding:12px;border:1px solid #dce5f1;background:#f8faff}
+  .watchlist-rail-list button.is-active{border-color:#496ce2;box-shadow:inset 0 0 0 1px #496ce2;background:#eef3ff}
+  .watchlist-rail-name{white-space:normal;overflow-wrap:anywhere;line-height:1.4}
+  .watchlist-rail-list button:focus-visible{outline:2px solid #496ce2;outline-offset:2px}
+  html.dark .watchlist-rail-list button{background:#192b21;border-color:#365440}
+  html.dark .watchlist-rail-list button.is-active{background:#12301f;border-color:#71c798;box-shadow:inset 0 0 0 1px #71c798}
   .workspace.is-member .watchlist-analytics-layout{grid-template-columns:1fr}
   .home-hero-points{grid-template-columns:1fr}
   .watchlist-alloc-body,.watchlist-alloc.is-compact .watchlist-alloc-body{grid-template-columns:1fr}
@@ -1447,3 +1453,117 @@ html.dark .market-section-nav a{background:#18281f;border-color:#344c40}html.dar
 .idea-lab-shell{margin:24px 0;border:1px solid #cddcf1;border-radius:16px;padding:18px;min-width:0;scroll-margin-top:24px}.idea-lab-shell>summary{cursor:pointer;font-size:18px;font-weight:650}.idea-lab-shell>summary>span{display:block;font-size:12px;font-weight:400;margin:8px 0;color:#61718a}.idea-lab{padding-top:18px;min-width:0}.idea-lab header h3{font-size:24px;margin:4px 0}.idea-lab header p,.idea-panel>p{font-size:13px;line-height:1.6;color:#61718a}.idea-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:20px 0}.idea-tabs button{white-space:normal;min-height:44px;height:auto}.idea-panel{background:#f8faff;border:1px solid #dce5ef;border-radius:12px;padding:20px;min-width:0}.idea-panel h4{font-size:19px;margin:0 0 8px}.idea-panel label{display:grid;gap:7px;font-size:12px;font-weight:600;margin:12px 0;min-width:0}.idea-panel select,.idea-panel textarea,.idea-panel input{width:100%;min-width:0;max-width:100%;background:#fff;border:1px solid #cfdaeb;border-radius:8px;padding:10px;color:inherit;font-size:14px}.idea-panel textarea{resize:vertical}.idea-panel input[type=file]{white-space:normal}.idea-fields,.scenario-stocks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px}.idea-actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.idea-preview{list-style:none;padding:0;max-height:280px;overflow:auto;margin:16px 0}.idea-preview li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #dce5ef;font-size:12px;overflow-wrap:anywhere}.idea-preview li>span{text-align:right}.idea-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:18px 0}.idea-metrics>div{padding:14px;border:1px solid #dce5ef;background:#fff;border-radius:10px;min-width:0}.idea-metrics span,.idea-metrics strong,.idea-metrics small{display:block;overflow-wrap:anywhere}.idea-metrics span{font-size:12px;color:#61718a}.idea-metrics strong{font-size:24px;margin-top:7px;font-variant-numeric:tabular-nums}.checkpoint-list{display:grid;gap:12px;margin-top:20px}.checkpoint-list article{padding:16px;border:1px solid #dce5ef;border-radius:10px;background:#fff;overflow-wrap:anywhere}.checkpoint-list article header{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px}.checkpoint-list small{font-size:11px;color:#61718a}.checkpoint-list p{font-size:13px;white-space:pre-wrap}.home-idea-lab{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:24px;margin:24px 0;border:1px solid #cddcf1;border-radius:18px;background:#f5f8ff}.home-idea-lab>div{max-width:650px}.home-idea-lab h2{font-size:25px}.home-idea-lab p{font-size:14px;line-height:1.6}
 html.dark .idea-lab-shell,html.dark .idea-panel,html.dark .home-idea-lab{background:#111f18;border-color:#344c40}html.dark .idea-panel input,html.dark .idea-panel select,html.dark .idea-panel textarea,html.dark .idea-metrics>div,html.dark .checkpoint-list article{background:#192a22;border-color:#3d594a}html.dark .idea-preview li{border-color:#344c40}html.dark .idea-panel>p,html.dark .idea-lab header p,html.dark .idea-lab-shell>summary>span,html.dark .idea-metrics span,html.dark .checkpoint-list small{color:#b8ccc0}
 @media(max-width:760px){.idea-lab-shell{padding:12px}.idea-panel{padding:12px}.idea-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.idea-tabs button{font-size:12px}.idea-fields{grid-template-columns:minmax(0,1fr)}.idea-panel input,.idea-panel select,.idea-panel textarea{font-size:16px}.idea-metrics strong{font-size:21px}.home-idea-lab{padding:18px}.scenario-stocks{gap:0 10px}}
+
+/* Keep share details with the starting price and fit the remaining columns. */
+.position-fields .quantity-reminder{margin:0;color:#c62828;font-size:13px;font-weight:600}
+html.dark .position-fields .quantity-reminder{color:#ff7380}
+.stock-table th,.stock-table td{padding-inline:12px}
+.stock-table th{white-space:normal}
+.stock-table .company-name{max-width:180px}
+.stock-table .position-note-preview{max-width:160px;white-space:normal;overflow-wrap:anywhere}
+
+.earnings-month-calendar{background:transparent;padding:22px}
+.earnings-calendar-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:22px 0 16px}
+.earnings-month-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.earnings-month-tabs button{padding:9px 15px;border-radius:9px;font-size:13px;color:#596b82;border:1px solid transparent;cursor:pointer}
+.earnings-month-tabs button[aria-pressed=true]{background:#eaf0ff;border-color:#bdcdfa;color:#3155cf;font-weight:650}
+.earnings-calendar-toolbar nav{display:flex;align-items:center;gap:2px}
+.earnings-calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border:1px solid #dce5f1;border-radius:12px;overflow:hidden}
+.earnings-weekday{padding:12px 4px;text-align:center;background:#f3f6fb;font-size:11px;font-weight:650;color:#63738a}
+.earnings-day{min-height:94px;padding:9px;border-top:1px solid #e3e9f2;border-right:1px solid #e3e9f2;min-width:0;background:#fff}
+.earnings-day:nth-child(7n){border-right:0}
+.earnings-day.is-empty{background:#f8faff}
+.earnings-day>time{display:flex;align-items:center;justify-content:center;width:25px;height:25px;font-size:12px;color:#67788e;border-radius:50%}
+.earnings-day.is-today>time{background:#365bda;color:white;font-weight:700}
+.earnings-day-events{display:flex;flex-direction:column;gap:5px;margin-top:7px}
+.earnings-company-event{display:flex;align-items:center;gap:6px;padding:5px;border-radius:7px;background:#eef3ff;min-width:0;text-decoration:none;color:#263e78}
+.earnings-company-event:hover{background:#dce7ff}
+.earnings-company-event strong{font-size:11px;overflow-wrap:anywhere;min-width:0}
+.earnings-company-event .company-icon{width:24px;height:24px;flex-basis:24px;border-radius:6px;font-size:8px}
+.earnings-company-event .company-icon img{width:18px;height:18px}
+.earnings-calendar-status{margin-top:12px}
+html.dark .earnings-day{background:#182a21;border-color:#30493b}
+html.dark .earnings-day.is-empty,html.dark .earnings-weekday{background:#13221b}
+html.dark .earnings-weekday,html.dark .earnings-day>time,html.dark .earnings-month-tabs button{color:#b8ccc0}
+html.dark .earnings-calendar-grid{border-color:#30493b}
+html.dark .earnings-month-tabs button[aria-pressed=true],html.dark .earnings-company-event{background:#264334;border-color:#456c52;color:#e6f9eb}
+@media(max-width:600px){
+.earnings-month-calendar{padding:12px}
+.earnings-calendar-toolbar{gap:6px;margin-top:14px}
+.earnings-month-tabs{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.earnings-month-tabs button{padding:6px;font-size:11px}
+.earnings-calendar-toolbar nav{margin-left:auto}
+.earnings-day{min-height:78px;padding:4px}
+.earnings-company-event{flex-direction:column;gap:3px;padding:4px 1px}
+.earnings-company-event strong{font-size:9px}
+.earnings-weekday{font-size:10px}
+}
+
+.add-quote-total{display:block;margin-top:7px;font-size:12px;line-height:1.5;color:#596b82;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+html.dark .add-quote-total{color:#d5e6db}
+.add-quote-price{min-width:0}
+
+.earnings-months-overview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:20px}
+.earnings-mini-month{min-width:0}
+.earnings-mini-month h4{font-size:13px;font-weight:650;margin:0 0 10px;text-transform:capitalize}
+.earnings-mini-month .earnings-weekday{font-size:9px;padding:7px 1px}
+.earnings-mini-month .earnings-day{min-height:43px;padding:3px;border-radius:0}
+.earnings-mini-month .earnings-day>time{font-size:10px;width:18px;height:18px}
+.earnings-mini-month .earnings-day-events{flex-direction:row;flex-wrap:wrap;gap:2px;margin-top:2px}
+.earnings-mini-month .earnings-company-event{padding:1px;background:transparent;gap:0}
+.earnings-mini-month .earnings-company-event strong{display:none}
+.earnings-mini-month .earnings-company-event .company-icon{width:20px;height:20px;flex-basis:20px;border-radius:5px}
+.earnings-mini-month .earnings-company-event .company-icon img{width:15px;height:15px}
+@media(max-width:1100px){.earnings-months-overview{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:400px){.earnings-months-overview{grid-template-columns:minmax(0,1fr)}}
+
+.watchlist-alloc-company{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.4}
+.watchlist-alloc-name small{margin-top:2px;font-size:10px}
+@media(max-width:960px){
+  .watchlist-alloc-chart,.watchlist-alloc.is-compact .watchlist-alloc-chart{justify-self:center}
+  .watchlist-alloc-body,.watchlist-alloc.is-compact .watchlist-alloc-body{gap:16px}
+  .watchlist-alloc-list,.watchlist-alloc.is-compact .watchlist-alloc-list{width:100%;max-width:340px;justify-self:center;gap:0}
+  .watchlist-alloc-list li,.watchlist-alloc.is-compact .watchlist-alloc-list li{grid-template-columns:8px minmax(0,1fr) 44px 52px;gap:8px;padding:8px 0;font-size:12px;border-bottom:1px solid #edf0f5}
+  .watchlist-alloc-list li:last-child{border-bottom:0}
+  .watchlist-alloc-list li>strong,.watchlist-alloc-list li>em{text-align:right;font-size:11px}
+  html.dark .watchlist-alloc-list li{border-color:#2a4438}
+}
+@media(max-width:960px){
+  .watchlist-rail-list{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+  .watchlist-rail-list button{min-height:0;height:100%;grid-template-columns:minmax(0,1fr) auto;align-content:center;align-items:center;padding:8px;gap:6px;border-radius:8px}
+  .watchlist-rail-name{font-size:11px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+  .watchlist-rail-copy{gap:2px}
+  .watchlist-rail-count{font-size:10px;line-height:1.2}
+  .watchlist-rail-change{font-size:10px;line-height:1.2;white-space:nowrap}
+}
+@media(max-width:760px){
+  .mobile-stock-card{padding:9px 10px}
+  .mobile-stock-heading{gap:7px;align-items:center}
+  .mobile-stock-heading .company-icon{width:26px;height:26px;flex-basis:26px;border-radius:6px}
+  .mobile-stock-heading .company-icon img{width:19px;height:19px}
+  .mobile-stock-heading .stock-detail-link strong{font-size:14px}
+  .mobile-stock-heading .company-name{font-size:10px;line-height:1.25;margin-top:1px}
+  .mobile-stock-heading .change-pill{font-size:10px;padding:3px 5px}
+  .mobile-stock-values{gap:7px 10px;margin:9px 0 0}
+  .mobile-stock-values dt{font-size:9px;line-height:1.25;margin-bottom:2px}
+  .mobile-stock-values dd{font-size:12px;line-height:1.3}
+  .mobile-stock-values dd small{font-size:9px;line-height:1.25}
+  .mobile-stock-values dd>small:not(.quote-time){margin-left:4px}
+  .mobile-stock-values .quote-time{margin-top:3px}
+  .mobile-holding-gain{grid-column:auto;padding:0;background:transparent;border-radius:0}
+  html.dark .mobile-holding-gain{background:transparent}
+  .mobile-stock-footer{gap:5px;margin-top:4px}
+  .mobile-stock-footer>span{font-size:9px;line-height:1.25}
+  .mobile-stock-footer .icon-button{margin-block:-4px}
+  .mobile-investment-note{margin-top:6px;font-size:10px;line-height:1.35}
+}
+
+.watchlist-alloc-legend{min-width:0}
+.watchlist-alloc-labels{display:grid;grid-template-columns:minmax(0,1fr) 54px 70px;gap:8px;align-items:end;margin-bottom:6px;font-size:10px;line-height:1.3;color:#6b7a91}
+.watchlist-alloc-labels span:not(:first-child){text-align:right}
+.watchlist-alloc-list li,.watchlist-alloc.is-compact .watchlist-alloc-list li{grid-template-columns:8px minmax(0,1fr) 54px 70px}
+.watchlist-alloc-list li>strong,.watchlist-alloc-list li>em{text-align:right}
+html.dark .watchlist-alloc-labels{color:#b8ccc0}
+@media(max-width:960px){
+.watchlist-alloc-legend{width:100%;max-width:340px;justify-self:center}
+}

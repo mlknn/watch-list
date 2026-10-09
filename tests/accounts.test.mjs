@@ -2,7 +2,7 @@ import {test,before,after} from 'node:test';
 import assert from 'node:assert/strict';
 import {readdir,readFile} from 'node:fs/promises';
 import {PGlite} from '@electric-sql/pglite';
-import {planFor,stockView,requireUser,quoteNeedsRefresh} from '../server/cloud.mjs';
+import {accountAction,planFor,stockView,requireUser,quoteNeedsRefresh} from '../server/cloud.mjs';
 import {subscriptionEntitlement} from '../server/billing.mjs';
 const A='11111111-1111-4111-8111-111111111111',B='22222222-2222-4222-8222-222222222222',C='33333333-3333-4333-8333-333333333333';
 let db;
@@ -31,3 +31,50 @@ test('cached quotes older than a minute are treated as stale',()=>{
   assert.equal(quoteNeedsRefresh({fetched_at:'2026-09-21T18:27:00Z'},now),true);
 });
 test('advanced add works without a paid plan and rejects invalid positions',async()=>{const id=await list(C);await db.query("select wl_advanced_action($1,'convertList',$2)",[C,id]);assert.equal((await db.query('select mode from wl_watchlists where id=$1',[id])).rows[0].mode,'advanced');await assert.rejects(db.query("select wl_advanced_action($1,'addStock',$2,p_symbol=>'ADV',p_quote=>$3,p_quantity=>-1,p_cost=>10,p_acquired=>now())",[C,id,JSON.stringify(quote('ADV'))]),/positive/);await db.query("select wl_advanced_action($1,'addStock',$2,p_symbol=>'ADV',p_quote=>$3,p_quantity=>100,p_cost=>50,p_acquired=>'2023-01-03')",[C,id,JSON.stringify(quote('ADV'))]);const row=(await db.query('select * from wl_stocks where watchlist_id=$1',[id])).rows[0];assert.equal(Number(row.quantity),100);assert.equal(row.snapshot.price,100);await assert.rejects(db.query("select wl_advanced_action($1,'updatePosition',$2,p_stock=>$3,p_quantity=>20,p_cost=>10,p_acquired=>now())",[A,id,row.id]),/do not own/);await assert.rejects(db.query("select wl_advanced_action($1,'updatePosition',$2,p_stock=>$3,p_quantity=>20,p_cost=>10,p_acquired=>now())",[C,id,row.id]),/fixed after adding/);});
+
+test('only the designated email receives unlimited watchlists in the API plan',()=>{
+  assert.equal(planFor({email:'mahir.alkan.100@gmail.com'}).maxLists,null);
+  assert.equal(planFor({email:'MAHIR.ALKAN.100@GMAIL.COM'}).maxLists,null);
+  for(const email of [undefined,'other@gmail.com','mahir.alkan.100+other@gmail.com']){
+    assert.equal(planFor({email}).maxLists,5);
+  }
+  assert.equal(planFor({email:'mahir.alkan.100@gmail.com'}).maxStocks,20);
+});
+
+test('database grants the designated identity more than five lists and preserves ownership',async()=>{
+  const owner='44444444-4444-4444-8444-444444444444';
+  await db.exec('alter table auth.users add column email text');
+  await db.query('insert into auth.users(id,email) values($1,$2)',[owner,'mahir.alkan.100@gmail.com']);
+  await db.query('select wl_ensure_profile($1,$2,0)',[owner,'Owner']);
+  for(let i=0;i<8;i++)await db.query("select wl_advanced_action(p_user=>$1,p_action=>'createList',p_name=>$2)",[owner,'Unlimited '+i]);
+  assert.equal((await db.query('select count(*)::int as n from wl_watchlists where owner_id=$1',[owner])).rows[0].n,9);
+  await assert.rejects(action(owner,'renameList',await list(A),'Not mine'),/do not own/);
+  await db.query('update auth.users set email=$2 where id=$1',[owner,'other@gmail.com']);
+  await assert.rejects(action(owner,'createList',null,'Limited again'),/limit reached/);
+});
+
+
+test('hosted unlimited creation uses trusted identity and validates list names',async()=>{
+  const user={id:A,email:'mahir.alkan.100@gmail.com'};
+  let inserted;
+  const dbMock={
+    from(table){
+      const query={
+        select(){return query;},
+        eq(){return query;},
+        order(){return query;},
+        single:async()=>({data:{display_name:'Owner'},error:null}),
+        then(resolve){return Promise.resolve({data:[],error:null}).then(resolve);},
+        insert:async row=>{assert.equal(table,'wl_watchlists');inserted=row;return {data:null,error:null};}
+      };
+      return query;
+    },
+    rpc(){throw Error('Unexpected quota RPC');}
+  };
+  await accountAction(dbMock,user,{action:'createList',name:'  New list  ',owner_id:B});
+  assert.deepEqual(inserted,{owner_id:A,name:'New list',mode:'advanced'});
+  for(const name of ['', ' ', 'x'.repeat(61),42]){
+    await assert.rejects(accountAction(dbMock,user,{action:'createList',name}),/Enter a name/);
+  }
+  await assert.rejects(accountAction(dbMock,{id:B,email:'other@gmail.com'},{action:'createList',name:'Other',email:user.email}),/Unexpected quota RPC/);
+});

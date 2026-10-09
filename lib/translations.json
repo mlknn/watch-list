@@ -1,4 +1,15 @@
 {
+  "List weight": ["Listedeki pay", "Peso en la lista"],
+  "Change since added": ["Eklenmeden beri değişim", "Cambio desde la adición"],
+  "Others": ["Diğerleri", "Otros"],
+  "Calendar navigation": ["Takvim gezinmesi", "Navegación del calendario"],
+  "Previous month": ["Önceki ay", "Mes anterior"],
+  "Next month": ["Sonraki ay", "Mes siguiente"],
+  "This month": ["Bu ay", "Este mes"],
+  "No published earnings dates for this month.": ["Bu ay için yayımlanmış bilanço tarihi yok.", "No hay fechas de resultados publicadas para este mes."],
+  "This calendar shows upcoming dates only; historical reports are not included.": ["Bu takvim yalnızca yaklaşan tarihleri gösterir; geçmiş raporlar dahil değildir.", "Este calendario solo muestra fechas próximas; no incluye informes históricos."],
+  "Estimated dates may change.": ["Tahmini tarihler değişebilir.", "Las fechas estimadas pueden cambiar."],
+  "Change the quantity to match your shares.": ["Adedi kendi hisse miktarınıza göre değiştirin.", "Cambia la cantidad según tus acciones."],
   "Watchlists": [
     "İzleme listeleri",
     "Listas de seguimiento"

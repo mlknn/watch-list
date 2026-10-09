@@ -39,7 +39,7 @@ export default function Account(){
             <span className="account-icon"><List/></span>
             <p className="eyebrow">{t('List limits')}</p>
             <h2><T text="Watchlists"/></h2>
-            <p>{t('Used')} {usedLists} / {state.plan.maxLists} {t('watchlists')} · {usedStocks} {t('stocks across lists')} · {state.plan.maxStocks} {t('per list')}.</p>
+            <p>{t('Used')} {usedLists} / {state.plan.maxLists??'∞'} {t('watchlists')} · {usedStocks} {t('stocks across lists')} · {state.plan.maxStocks} {t('per list')}.</p>
           </div>
         </section>
         {state.user.analytics&&<section className="account-card">
