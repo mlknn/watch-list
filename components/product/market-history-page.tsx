@@ -7,7 +7,7 @@ import {CompanyIcon} from './company-icon';
 type Row={rank:number;symbol:string;name:string;marketCap:number;historicalMarketCap:number|null;changePercent:number|null;historyStatus:'available'|'not-listed'|'unavailable'};
 type Page={range:string;offset:number;nextOffset:number|null;total:number;asOf:string;startDate:string;rows:Row[]};
 type Data=Page;
-type Connector={x1:number;y1:number;x2:number;y2:number;color:string}|null;
+type Connector={symbol:string;x1:number;y1:number;x2:number;y2:number;color:string};
 
 function useMarketHistory(range:string,enabled=true){
   const [data,setData]=useState<Data|null>(null);
@@ -39,7 +39,7 @@ export function MarketHistoryPage(){
   const t=useT();
   const [range,setRange]=useState('ytd');
   const [selected,setSelected]=useState<{symbol:string;from:'current'|'historical'}|null>(null);
-  const [connector,setConnector]=useState<Connector>(null);
+  const [connectors,setConnectors]=useState<Connector[]>([]);
   const current=useMarketHistory('ytd');
   const historical=useMarketHistory(range,range!=='ytd');
   const otherData=range==='ytd'?current.data:historical.data;
@@ -53,14 +53,19 @@ export function MarketHistoryPage(){
   },[selected,current.data?.rows.length,otherData?.rows.length,range]);
 
   useEffect(()=>{
-    if(!selected){setConnector(null);return;}
     let frame=0;
     const update=()=>{
-      if(!window.matchMedia('(min-width: 641px)').matches){setConnector(null);return;}
-      const left=document.getElementById(`current-${selected.symbol}`),right=document.getElementById(`historical-${selected.symbol}`);
-      if(!left||!right){setConnector(null);return;}
-      const a=left.getBoundingClientRect(),b=right.getBoundingClientRect();
-      setConnector({x1:a.right-1,y1:a.top+a.height/2,x2:b.left+1,y2:b.top+b.height/2,color:`hsl(${colorFor(selected.symbol)} 78% 50%)`});
+      if(!window.matchMedia('(min-width: 641px)').matches){setConnectors([]);return;}
+      const symbols=new Set((current.data?.rows||[]).slice(0,10).map(row=>row.symbol));
+      if(selected)symbols.add(selected.symbol);
+      const next:Connector[]=[];
+      for(const symbol of symbols){
+        const left=document.getElementById(`current-${symbol}`),right=document.getElementById(`historical-${symbol}`);
+        if(!left||!right)continue;
+        const a=left.getBoundingClientRect(),b=right.getBoundingClientRect();
+        next.push({symbol,x1:a.right-1,y1:a.top+a.height/2,x2:b.left+1,y2:b.top+b.height/2,color:`hsl(${colorFor(symbol)} 78% 50%)`});
+      }
+      setConnectors(next);
     };
     const schedule=()=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(update);};
     schedule();window.addEventListener('scroll',schedule,true);window.addEventListener('resize',schedule);
@@ -81,7 +86,7 @@ export function MarketHistoryPage(){
         {otherStatus==='loading'&&otherData&&otherData.rows.length<100&&<p className="home-history-refresh" role="status"><LoaderCircle className="spin" size={14}/>{t('Loading the rest of the top 100…')}</p>}
       </section>
     </div>
-    {connector&&<svg className="market-history-connector" aria-hidden="true"><defs><marker id="market-history-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7z" fill={connector.color}/></marker></defs><path d={`M${connector.x1} ${connector.y1} C${(connector.x1+connector.x2)/2} ${connector.y1}, ${(connector.x1+connector.x2)/2} ${connector.y2}, ${connector.x2} ${connector.y2}`} fill="none" stroke="white" strokeWidth="5"/><path d={`M${connector.x1} ${connector.y1} C${(connector.x1+connector.x2)/2} ${connector.y1}, ${(connector.x1+connector.x2)/2} ${connector.y2}, ${connector.x2} ${connector.y2}`} fill="none" stroke={connector.color} strokeWidth="2.5" markerEnd="url(#market-history-arrow)"/></svg>}
+    {connectors.length>0&&<svg className="market-history-connector" aria-hidden="true">{connectors.map(connector=><path key={connector.symbol} d={`M${connector.x1} ${connector.y1} C${(connector.x1+connector.x2)/2} ${connector.y1}, ${(connector.x1+connector.x2)/2} ${connector.y2}, ${connector.x2} ${connector.y2}`} fill="none" stroke={connector.color} strokeWidth={connector.symbol===selected?.symbol?2.5:1.5} strokeOpacity={connector.symbol===selected?.symbol?1:.68}/>)}</svg>}
     <p className="market-history-source">{t('Source: Yahoo Finance. Market caps and quotes may be delayed. Past market caps are estimates based on today’s shares outstanding and split-adjusted prices; returns exclude dividends.')}</p>
   </main>;
 }
