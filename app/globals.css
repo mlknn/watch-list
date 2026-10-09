@@ -1454,12 +1454,6 @@ html.dark .market-section-nav a{background:#18281f;border-color:#344c40}html.dar
 html.dark .idea-lab-shell,html.dark .idea-panel,html.dark .home-idea-lab{background:#111f18;border-color:#344c40}html.dark .idea-panel input,html.dark .idea-panel select,html.dark .idea-panel textarea,html.dark .idea-metrics>div,html.dark .checkpoint-list article{background:#192a22;border-color:#3d594a}html.dark .idea-preview li{border-color:#344c40}html.dark .idea-panel>p,html.dark .idea-lab header p,html.dark .idea-lab-shell>summary>span,html.dark .idea-metrics span,html.dark .checkpoint-list small{color:#b8ccc0}
 @media(max-width:760px){.idea-lab-shell{padding:12px}.idea-panel{padding:12px}.idea-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.idea-tabs button{font-size:12px}.idea-fields{grid-template-columns:minmax(0,1fr)}.idea-panel input,.idea-panel select,.idea-panel textarea{font-size:16px}.idea-metrics strong{font-size:21px}.home-idea-lab{padding:18px}.scenario-stocks{gap:0 10px}}
 
-.home-discover{display:block}
-.home-discover-tabs{display:flex;gap:22px;overflow-x:auto;border-bottom:1px solid #dce4f0;margin:0 0 18px}
-.home-discover-tabs button{position:relative;flex:0 0 auto;min-height:44px;padding:0 3px;border:0;background:transparent;color:#65758d;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
-.home-discover-tabs button.is-active{color:#365bd8}
-.home-discover-tabs button.is-active:after{position:absolute;right:0;bottom:-1px;left:0;height:3px;border-radius:3px 3px 0 0;background:#365bd8;content:""}
-.home-discover-panels{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
 .home-history{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:20px;align-items:start}
 .home-history-main,.home-history-controls{min-width:0;border:1px solid #e1e8f3;border-radius:16px;background:#fff;padding:20px 22px}
 .home-history-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:12px}
@@ -1493,10 +1487,6 @@ html.dark .idea-lab-shell,html.dark .idea-panel,html.dark .home-idea-lab{backgro
 .home-history-selected span{color:#718097;font-size:11px}
 .home-history-selected strong{margin-bottom:5px;font-size:14px;font-variant-numeric:tabular-nums}
 .home-history-refresh{display:flex;align-items:center;gap:6px;margin-top:12px;color:#718097;font-size:11px}
-html.dark .home-discover-tabs{border-color:#2a4438}
-html.dark .home-discover-tabs button{color:#b8ccc0}
-html.dark .home-discover-tabs button.is-active{color:#8eb6ff}
-html.dark .home-discover-tabs button.is-active:after{background:#8eb6ff}
 html.dark .home-history-main,html.dark .home-history-controls{background:#141f1a;border-color:#2a4438}
 html.dark .home-history-heading p:not(.eyebrow),html.dark .home-history-heading>span,html.dark .home-history-controls>p:not(.eyebrow),html.dark .home-history-controls label,html.dark .home-history-table tbody th small,html.dark .home-history-table thead th,html.dark .home-history-table td:first-child,html.dark .home-history-source,html.dark .home-history-selected span,html.dark .home-history-refresh{color:#b8ccc0}
 html.dark .home-history-scroll,html.dark .home-history-table th,html.dark .home-history-table td,html.dark .home-history-selected{border-color:#2a4438}
@@ -1505,7 +1495,16 @@ html.dark .home-history-controls select{background:#101a16;border-color:#365440;
 html.dark .home-history-table .up{color:#5fe3a4}
 html.dark .home-history-table .down{color:#ff9aa4}
 @media(max-width:900px){.home-history{grid-template-columns:minmax(0,1fr) 230px;gap:12px}.home-history-main,.home-history-controls{padding:16px}}
-@media(max-width:700px){.home-discover-panels,.home-history{grid-template-columns:minmax(0,1fr)}.home-history-controls{grid-row:1}.home-history-heading{flex-wrap:wrap}.home-history-heading>span{width:100%}.home-history-scroll{max-height:560px}.home-discover-tabs{gap:18px}}
+@media(max-width:700px){.home-history{grid-template-columns:minmax(0,1fr)}.home-history-controls{grid-row:1}.home-history-heading{flex-wrap:wrap}.home-history-heading>span{width:100%}.home-history-scroll{max-height:560px}}
+.market-history-page{max-width:1480px;margin:38px auto 56px;padding:0 4%;min-height:calc(100vh - 260px)}
+.market-history-page-heading{margin:0 0 22px}
+.market-history-page-heading .eyebrow{margin:0 0 8px;color:#71819a;font-size:11px;letter-spacing:.1em;font-weight:650}
+.market-history-page-heading h1{max-width:26ch;font-size:clamp(28px,3vw,38px);letter-spacing:-1px;line-height:1.15}
+.market-history-page-heading>p:last-child{max-width:760px;margin:10px 0 0;color:#6b7a91;font-size:15px;line-height:1.6}
+.market-history-page .home-history{grid-template-columns:minmax(0,1fr) 300px}
+html.dark .market-history-page-heading .eyebrow,html.dark .market-history-page-heading>p:last-child{color:#b8ccc0}
+@media(max-width:900px){.market-history-page{padding:0 20px}.market-history-page .home-history{grid-template-columns:minmax(0,1fr) 260px}}
+@media(max-width:700px){.market-history-page{margin:24px auto 36px;padding:0 14px;min-height:calc(100vh - 220px)}.market-history-page .home-history{grid-template-columns:minmax(0,1fr)}.market-history-page .home-history-controls{grid-row:1}}
 
 /* Keep share details with the starting price and fit the remaining columns. */
 .position-fields .quantity-reminder{margin:0;color:#c62828;font-size:13px;font-weight:600}
