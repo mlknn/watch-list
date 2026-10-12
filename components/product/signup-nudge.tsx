@@ -9,9 +9,21 @@ import {Button} from '@/components/ui/button';
 import {Dialog,DialogContent,DialogDescription,DialogTitle} from '@/components/ui/dialog';
 import {authClient,config,signedIn,type Config} from '@/lib/auth-client';
 
-const SNOOZE_KEY='watchlist:signup-nudge-until';
+const SNOOZE_KEY='watchlist:signup-nudge-until:v2';
 const SNOOZE_MS=7*24*60*60*1000;
-const WAIT_MS=25_000;
+const WAIT_MS=15_000;
+
+function promptCopy(path:string){
+  if(path==='/earnings')return {title:'Keep up with earnings season',continueLabel:'Continue viewing earnings'};
+  if(path==='/dashboard')return {title:'Stay ahead of market moves',continueLabel:'Continue browsing markets'};
+  if(path==='/history')return {title:'See how market leaders changed',continueLabel:'Continue viewing market history'};
+  if(path==='/watchlists')return {title:'Keep your watchlists saved',continueLabel:'Continue browsing watchlists'};
+  if(path.startsWith('/stocks/'))return {title:'Keep this company on your radar',continueLabel:'Continue viewing this company'};
+  if(path==='/compare')return {title:'Make smarter company comparisons',continueLabel:'Continue comparing companies'};
+  if(path.startsWith('/share/'))return {title:'Start a watchlist of your own',continueLabel:'Continue browsing'};
+  if(path==='/')return {title:'Keep your ideas with you',continueLabel:'Continue browsing'};
+  return {title:'Keep your ideas with you',continueLabel:'Continue browsing'};
+}
 
 function canShowOn(path:string){
   return !['/login','/signup','/forgot-password','/account','/insights','/privacy','/auth'].some(route=>path===route||path.startsWith(route+'/'));
@@ -20,6 +32,7 @@ function canShowOn(path:string){
 export function SignupNudge(){
   const t=useT();
   const path=usePathname()||'/';
+  const copy=promptCopy(path);
   const [settings,setSettings]=useState<Config|null>(null);
   const [openedAtPath,setOpenedAtPath]=useState('');
   const snoozedUntil=useRef(0);
@@ -67,7 +80,7 @@ export function SignupNudge(){
 
   return <Dialog open={open} onOpenChange={value=>{if(!busy&&!value)setOpenedAtPath('');}}>
     <DialogContent className="list-dialog signup-nudge">
-      <DialogTitle>{t('Keep your ideas with you')}</DialogTitle>
+      <DialogTitle>{t(copy.title)}</DialogTitle>
       <DialogDescription>{t('Create a free account to save watchlists and favorites, then pick up on any device.')}</DialogDescription>
       <p className="signup-nudge-benefit">{t('Free: up to 5 watchlists and 20 stocks per list. No card needed.')}</p>
       {error&&<p className="form-error" role="alert">{error}</p>}
@@ -76,7 +89,7 @@ export function SignupNudge(){
       </Button>}
       <Link className="signup-nudge-email" href="/signup?next=%2Fwatchlists"><T text="Continue with email"/><ArrowRight size={16}/></Link>
       <p className="auth-bottom"><Link href="/login?next=%2Fwatchlists">{t('Already have an account? Sign in')}</Link></p>
-      <Button variant="ghost" className="signup-nudge-later" disabled={busy} onClick={()=>setOpenedAtPath('')}>{t('Maybe later')}</Button>
+      <Button variant="ghost" className="signup-nudge-later" disabled={busy} onClick={()=>setOpenedAtPath('')}>{t(copy.continueLabel)}</Button>
     </DialogContent>
   </Dialog>;
 }

@@ -3734,5 +3734,19 @@
   "Keep your ideas with you": ["Fikirlerinizi yanınızda taşıyın", "Lleva tus ideas contigo"],
   "Create a free account to save watchlists and favorites, then pick up on any device.": ["İzleme listelerinizi ve favorilerinizi kaydetmek, dilediğiniz cihazdan devam etmek için ücretsiz hesap oluşturun.", "Crea una cuenta gratis para guardar tus listas y favoritos y continuar desde cualquier dispositivo."],
   "Free: up to 5 watchlists and 20 stocks per list. No card needed.": ["Ücretsiz: 5 izleme listesine kadar, her listede 20 hisse. Kart gerekmez.", "Gratis: hasta 5 listas con 20 acciones cada una. No necesitas tarjeta."],
-  "Maybe later": ["Daha sonra", "Quizás más tarde"]
+  "Maybe later": ["Daha sonra", "Quizás más tarde"],
+  "Keep up with earnings season": ["Bilanço sezonunu takip edin", "Sigue la temporada de resultados"],
+  "Continue viewing earnings": ["Bilanço takvimini görüntülemeye devam et", "Seguir viendo resultados"],
+  "Stay ahead of market moves": ["Piyasa hareketlerini yakından izleyin", "Mantente al día de los movimientos del mercado"],
+  "Continue browsing markets": ["Piyasaları incelemeye devam et", "Seguir explorando los mercados"],
+  "See how market leaders changed": ["Piyasa liderlerinin nasıl değiştiğini görün", "Descubre cómo cambiaron los líderes del mercado"],
+  "Continue viewing market history": ["Piyasa geçmişini görüntülemeye devam et", "Seguir viendo el historial del mercado"],
+  "Keep your watchlists saved": ["İzleme listelerinizi kaydedin", "Guarda tus listas de seguimiento"],
+  "Continue browsing watchlists": ["İzleme listelerine göz atmaya devam et", "Seguir explorando las listas"],
+  "Keep this company on your radar": ["Bu şirketi radarınızda tutun", "Mantén esta empresa en tu radar"],
+  "Continue viewing this company": ["Bu şirketi incelemeye devam et", "Seguir viendo esta empresa"],
+  "Make smarter company comparisons": ["Şirketleri daha bilinçli karşılaştırın", "Compara empresas con más criterio"],
+  "Continue comparing companies": ["Şirketleri karşılaştırmaya devam et", "Seguir comparando empresas"],
+  "Start a watchlist of your own": ["Kendi izleme listenizi oluşturun", "Crea tu propia lista de seguimiento"],
+  "Continue browsing": ["Göz atmaya devam et", "Seguir explorando"]
 }
