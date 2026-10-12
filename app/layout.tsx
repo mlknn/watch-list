@@ -1,6 +1,7 @@
 import {LanguageProvider} from '@/components/product/language';
 import {ThemeProvider} from '@/components/product/theme';
 import {Analytics} from '@/components/product/analytics';
+import {SignupNudge} from '@/components/product/signup-nudge';
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 export const metadata: Metadata = {
@@ -76,7 +77,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </head>
     <body>
       <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(softwareJsonLd).replace(/</g,'\\u003c')}} />
-      <LanguageProvider><ThemeProvider><Analytics/>{children}</ThemeProvider></LanguageProvider>
+      <LanguageProvider><ThemeProvider><Analytics/><SignupNudge/>{children}</ThemeProvider></LanguageProvider>
     </body>
   </html>;
 }

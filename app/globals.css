@@ -1742,6 +1742,16 @@ html.dark .add-quote-total{color:#d5e6db}
 .watchlist-alloc-list li,.watchlist-alloc.is-compact .watchlist-alloc-list li{grid-template-columns:8px minmax(0,1fr) 54px 70px}
 .watchlist-alloc-list li>strong,.watchlist-alloc-list li>em{text-align:right}
 html.dark .watchlist-alloc-labels{color:#b8ccc0}
+.signup-nudge{max-width:440px;text-align:center;gap:13px}
+.signup-nudge [data-slot=dialog-description]{line-height:1.6}
+.signup-nudge-benefit{margin:0;padding:11px 13px;border-radius:10px;background:#f4f7fb;color:#5e6f85;font-size:13px;line-height:1.5}
+.signup-nudge-google,.signup-nudge-email{width:100%;min-height:46px;display:flex;align-items:center;justify-content:center;gap:9px;font-weight:650}
+.signup-nudge-google{border-color:#d8dfeb;background:white}
+.signup-nudge-email{margin-top:0;border:1px solid #d8dfeb;border-radius:8px;color:#365bd8;text-decoration:none;font-weight:600}
+.signup-nudge-email:hover{background:#f5f8fc}
+.signup-nudge .auth-bottom{margin:0;font-size:13px}
+.signup-nudge-later{justify-self:center;min-height:36px;color:#78869a}
+html.dark .signup-nudge-benefit{background:#17241d;color:#b8ccc0}
 @media(max-width:960px){
 .watchlist-alloc-legend{width:100%;max-width:340px;justify-self:center}
 }

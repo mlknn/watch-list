@@ -3730,5 +3730,9 @@
   "comparison details": ["karşılaştırma ayrıntıları", "detalles de comparación"],
   "names": ["şirket", "empresas"],
   "names shown": ["şirket gösteriliyor", "empresas mostradas"],
-  "places": ["basamak", "puestos"]
+  "places": ["basamak", "puestos"],
+  "Keep your ideas with you": ["Fikirlerinizi yanınızda taşıyın", "Lleva tus ideas contigo"],
+  "Create a free account to save watchlists and favorites, then pick up on any device.": ["İzleme listelerinizi ve favorilerinizi kaydetmek, dilediğiniz cihazdan devam etmek için ücretsiz hesap oluşturun.", "Crea una cuenta gratis para guardar tus listas y favoritos y continuar desde cualquier dispositivo."],
+  "Free: up to 5 watchlists and 20 stocks per list. No card needed.": ["Ücretsiz: 5 izleme listesine kadar, her listede 20 hisse. Kart gerekmez.", "Gratis: hasta 5 listas con 20 acciones cada una. No necesitas tarjeta."],
+  "Maybe later": ["Daha sonra", "Quizás más tarde"]
 }
