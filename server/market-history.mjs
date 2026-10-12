@@ -3,8 +3,20 @@ import {AppError} from './quotes.mjs';
 const SCREENER='https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved?count=250&scrIds=largest_market_cap&formatted=false&lang=en-US&region=US';
 const ranges=new Set(['ytd','1y','2y','5y','10y']);
 const historyCache=new Map();
+const EDGE_HISTORY_CACHE='https://stockwatchlist.app/__cache/market-history/';
 let leadersCache=null,leadersPending=null;
 const headers={'User-Agent':'Mozilla/5.0','Accept':'application/json'};
+
+function edgeCache(){try{return globalThis.caches?.default||null;}catch{return null;}}
+function edgeHistoryRequest(range,offset,date){return new Request(`${EDGE_HISTORY_CACHE}${date}/${range}/${offset}`);}
+async function readEdgeHistory(range,offset,date){
+  const cache=edgeCache();if(!cache)return null;
+  try{const response=await cache.match(edgeHistoryRequest(range,offset,date));return response?await response.json():null;}catch{return null;}
+}
+async function writeEdgeHistory(range,offset,date,data){
+  const cache=edgeCache();if(!cache)return;
+  try{await cache.put(edgeHistoryRequest(range,offset,date),Response.json(data,{headers:{'Cache-Control':'public, max-age=604800'}}));}catch{/* Cache API is unavailable in local development. */}
+}
 
 function startDate(range,now=new Date()){
   const date=new Date(now);
@@ -98,4 +110,28 @@ export async function historicalMarketHistory(range='ytd',offset=0,now=new Date(
   }));
   const rows=pages.flat().sort((a,b)=>b.marketCap-a.marketCap);
   return {range,offset,nextOffset:offset+20<all.length?offset+20:null,total:all.length,asOf:new Date().toISOString(),startDate:date.toISOString().slice(0,10),source:'Yahoo Finance; estimated using current shares outstanding',rows:rows.map((row,index)=>({...row,rank:offset+index+1}))};
+}
+
+/** Precompute the five YTD history pages for immediate first-visit rendering. */
+export async function refreshYtdMarketHistory(now=new Date()){
+  const date=startDate('ytd',now).toISOString().slice(0,10);
+  const offsets=[0,20,40,60,80];
+  let next=0;
+  await Promise.all(Array.from({length:2},async()=>{
+    while(next<offsets.length){
+      const offset=offsets[next++];
+      const data=await historicalMarketHistory('ytd',offset,now);
+      await writeEdgeHistory('ytd',offset,date,data);
+    }
+  }));
+  return {range:'ytd',startDate:date,pages:offsets.length};
+}
+
+export async function cachedHistoricalMarketHistory(range='ytd',offset=0,now=new Date()){
+  if(range!=='ytd')return historicalMarketHistory(range,offset,now);
+  if(!Number.isInteger(offset)||offset<0||offset>240||offset%20!==0)throw new AppError('Choose a valid page of market history.');
+  const date=startDate(range,now).toISOString().slice(0,10);
+  const cached=await readEdgeHistory(range,offset,date);
+  if(cached?.rows?.length)return cached;
+  return historicalMarketHistory(range,offset,now);
 }

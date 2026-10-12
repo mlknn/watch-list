@@ -10,6 +10,31 @@ const FRESH_MS=15*60*1000;
 /** Keep yesterday’s snapshot long enough that today’s homepage does not wait on Nasdaq. */
 const STALE_MS=36*60*60*1000;
 const TRILLION=1_000_000_000_000;
+const EDGE_WEEK_CACHE='https://stockwatchlist.app/__cache/earnings-week/';
+const localWeekDays=new Map();
+
+function edgeCache(){
+  try{return globalThis.caches?.default||null;}catch{return null;}
+}
+
+function edgeWeekRequest(monday){return new Request(EDGE_WEEK_CACHE+monday);}
+
+async function readEdgeWeek(monday){
+  const cache=edgeCache();
+  if(!cache)return null;
+  try{
+    const response=await cache.match(edgeWeekRequest(monday));
+    if(!response)return null;
+    const saved=await response.json();
+    return saved?.data?.weekStart===monday?saved.data:null;
+  }catch{return null;}
+}
+
+async function writeEdgeWeek(monday,data){
+  const cache=edgeCache();
+  if(!cache)return;
+  try{await cache.put(edgeWeekRequest(monday),Response.json({data},{headers:{'Cache-Control':'public, max-age=604800'}}));}catch{/* Local development and some runtimes do not expose the edge cache. */}
+}
 
 export function toYahooSymbol(value){
   const raw=String(value||'').trim().toUpperCase();
@@ -180,7 +205,8 @@ function refreshWeek(monday,loadDay,now){
   const running=inFlight.get(monday);
   if(running)return running;
   const task=loadWeek(monday,loadDay,now).then(data=>{
-    weekCache.set(monday,{at:Date.now(),data});
+    weekCache.set(monday,{at:Date.now(),data,day:ymdInZone(now)});
+    if(loadDay===nasdaqDay)void writeEdgeWeek(monday,data);
     if(weekCache.size>40)weekCache.delete(weekCache.keys().next().value);
     return data;
   }).finally(()=>inFlight.delete(monday));
@@ -223,8 +249,23 @@ export async function earningsWeek(week,{loadDay=nasdaqDay,now=new Date()}={}){
   const saved=weekCache.get(monday);
   const age=saved?Date.now()-saved.at:Infinity;
   const complete=saved?.data.days.every(day=>day.status==='ok');
-  const data=age<FRESH_MS&&complete?saved.data:age<STALE_MS&&saved?(void refreshWeek(monday,loadDay,now).catch(()=>{}),saved.data):await refreshWeek(monday,loadDay,now);
+  const edgeSaved=(!saved||age>=FRESH_MS||!complete)?await readEdgeWeek(monday):null;
+  if(edgeSaved?.weekStart===monday&&edgeSaved?.days?.length===5){weekCache.set(monday,{at:Date.now(),data:edgeSaved,day:localWeekDays.get(monday)||''});}
+  const cached=weekCache.get(monday);
+  const cachedAge=cached?Date.now()-cached.at:Infinity;
+  const cachedComplete=cached?.data.days.every(day=>day.status==='ok');
+  const today=ymdInZone(now);
+  const crossedMidnight=!!cached?.day&&cached.day!==today;
+  const data=!crossedMidnight&&cachedAge<FRESH_MS&&cachedComplete?cached.data:cachedAge<STALE_MS&&cached?(void refreshWeek(monday,loadDay,now).catch(()=>{}),cached.data):await refreshWeek(monday,loadDay,now);
   return data;
+}
+
+/** Refresh the current New York earnings week before the day begins. */
+export async function refreshEarningsWeek(now=new Date()){
+  const monday=earningsWeekMonday(ymdInZone(now));
+  localWeekDays.set(monday,ymdInZone(now));
+  const data=await refreshWeek(monday,nasdaqDay,now);
+  return {weekStart:monday,fetchedAt:data.fetchedAt};
 }
 
 function peekCachedWeek(monday){
