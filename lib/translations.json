@@ -3748,5 +3748,6 @@
   "Make smarter company comparisons": ["Şirketleri daha bilinçli karşılaştırın", "Compara empresas con más criterio"],
   "Continue comparing companies": ["Şirketleri karşılaştırmaya devam et", "Seguir comparando empresas"],
   "Start a watchlist of your own": ["Kendi izleme listenizi oluşturun", "Crea tu propia lista de seguimiento"],
-  "Continue browsing": ["Göz atmaya devam et", "Seguir explorando"]
+  "Continue browsing": ["Göz atmaya devam et", "Seguir explorando"],
+  "Sign in or create a free account to continue browsing.": ["Göz atmaya devam etmek için giriş yapın veya ücretsiz hesap oluşturun.", "Inicia sesión o crea una cuenta gratis para seguir navegando."]
 }
