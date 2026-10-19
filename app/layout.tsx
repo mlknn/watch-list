@@ -72,8 +72,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return <html lang="en" suppressHydrationWarning>
     <head>
       <script dangerouslySetInnerHTML={{__html:"(function(){try{var t=localStorage.getItem('watchlist-theme');document.documentElement.classList.toggle('dark',t==='dark');}catch(e){document.documentElement.classList.remove('dark');}})();"}}/>
-      <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18447742703"/>
-      <script dangerouslySetInnerHTML={{__html:"window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','AW-18447742703');"}}/>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-CJYB736H2B"/>
+      <script dangerouslySetInnerHTML={{__html:"window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-CJYB736H2B');gtag('config','AW-18447742703');gtag('config','GT-P845TGV3');"}}/>
     </head>
     <body>
       <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(softwareJsonLd).replace(/</g,'\\u003c')}} />

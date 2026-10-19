@@ -47,7 +47,7 @@ export default function Privacy() {
           <li>Billing association: if you subscribe, Stripe customer and subscription status. We do not receive or store full card numbers.</li>
           <li>Technical session data: a session token in your browser so you can stay signed in. Signing out clears that session.</li>
           <li>Anonymous product analytics: a random identifier in local storage used only to count unique daily visitors and product actions (opening the app, viewing the dashboard, searching a stock, creating a watchlist, and completing sign-up). We do not store IP addresses for these counts. This first-party count is separate from advertising measurement below.</li>
-          <li>Advertising measurement: on stockwatchlist.app we load Google’s conversion tag (Google Ads / gtag) so we can tell Google Ads whether a visit or sign-up likely came from an ad. That tag may set cookies or similar storage on your device and send technical data (such as browser type, page URL, and a click identifier) to Google. It does not receive your Google Sign-In name or email from us.</li>
+          <li>Google Analytics and advertising measurement: on stockwatchlist.app we load Google’s tag to measure visits and usage (including daily active and unique users) and Google Ads conversions. It may set cookies or similar storage on your device and send technical data (such as browser type and page URL) to Google. It does not receive your Google Sign-In name or email from us.</li>
         </ul>
         <p>We load delayed public market quotes and company information from market-data providers to display prices and research pages. Those requests are for market data, not for your Google account.</p>
 
@@ -64,13 +64,13 @@ export default function Privacy() {
           <li>Stripe — checkout, payment method storage, and subscription management</li>
           <li>Our hosting provider — to serve the website</li>
         </ul>
-        <p>We may disclose information if required by law. We do not install Google Analytics as a general traffic product. We do load Google’s Ads conversion tag on stockwatchlist.app to measure ad clicks.</p>
+        <p>We may disclose information if required by law. We use Google Analytics for general traffic and usage measurement and Google Ads conversion measurement on stockwatchlist.app.</p>
 
         <h2>Community map</h2>
         <p>We count unique verified accounts that have opened the app. If you choose a country, that country can appear on the public map as one aggregate pin. Countries with very few members are not shown as separate pins. You can clear the country preference in Account settings.</p>
 
         <h2>Cookies and local storage</h2>
-        <p>We use a session cookie or equivalent browser storage so you remain signed in. We store a language preference in local storage. Guests may also have a draft watchlist in local storage. We store a random analytics identifier in local storage so we can count unique visitors per day without using an IP address. Google’s conversion tag may also store advertising cookies used to measure whether you reached the site from a Google ad.</p>
+        <p>We use a session cookie or equivalent browser storage so you remain signed in. We store a language preference in local storage. Guests may also have a draft watchlist in local storage. We store a random analytics identifier in local storage so we can count unique visitors per day without using an IP address. Google Analytics and Google Ads tags may also store cookies used to measure site usage and ad conversions.</p>
 
         <h2 id="rights">Retention and your choices</h2>
         <p>We keep account and watchlist data while your account exists. You can remove stocks and watchlists, turn off share links, and clear your country preference in the app. You can sign out to clear the local session. To request deletion of your StockWatchlist account and associated personal data (including Google name and email stored for sign-in), email <a href="mailto:privacy@stockwatchlist.app">privacy@stockwatchlist.app</a> from the address on the account. We will delete or anonymize that account data unless we must retain a limited record for legal, security, or billing reasons (for example, Stripe transaction history held by Stripe).</p>
