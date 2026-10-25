@@ -3,6 +3,7 @@ import {useLang,useT} from '@/components/product/language';
 import {T} from '@/components/product/language';
 import {useCallback,useEffect,useMemo,useRef,useState} from 'react';
 import {useRouter,useSearchParams} from 'next/navigation';
+import Link from 'next/link';
 import {CalendarDays,ChevronLeft,ChevronRight,Download,List,LoaderCircle,Search,Star,X} from 'lucide-react';
 import {CompanyIcon} from './company-icon';
 import {Button} from '@/components/ui/button';
@@ -15,11 +16,13 @@ import {weeksToPrefetch} from '@/lib/earnings-week-prefetch.mjs';
 import type {AccountState} from '@/lib/watchlist';
 import {earningsCsv,epsSurprise,filterEarningsRows,formatCap,formatEps,formatSurprise,sortEarningsRows,weekRangeLabel} from '@/lib/earnings-compare.mjs';
 import {stockHref} from '@/lib/safe-return.mjs';
+import {price} from '@/lib/watchlist';
 
 type Company={symbol:string;name:string;when:string;reported:boolean;eps:string;epsForecast:string;marketCap?:number};
 type Day={date:string;status:string;companies:Company[]};
 type Board={weekStart:string;weekEnd:string;days:Day[];minWeek:string;maxWeek:string;todayMonday:string;source:string;timezone:string;fetchedAt:string};
 type Row=Company&{date:string;dayStatus:string};
+type DayQuote={symbol:string;currency:string;price:number;changePercent:number|null};
 type Session='bmo'|'amc'|'during'|'unknown';
 type Status='upcoming'|'reported';
 type Cap='under-1'|'unknown'|'1-10'|'10-50'|'50-200'|'200+';
@@ -39,6 +42,7 @@ const UNAVAILABLE='The earnings calendar is temporarily unavailable.';
 const VIEW_KEY='earnings:view';
 const weekStore=new Map<string,Board>();
 const weekPending=new Map<string,Promise<Board>>();
+const dayQuoteCache=new Map<string,{at:number;quote:DayQuote}>();
 let prefetchQueue=Promise.resolve();
 
 function rememberWeek(monday:string,result:Board){
@@ -92,10 +96,13 @@ export function EarningsCalendar(){
   const [attempt,setAttempt]=useState(0);
   const [query,setQuery]=useState(params.get('q')||'');
   const [watchSymbols,setWatchSymbols]=useState<Set<string>>(new Set());
+  const [isMember,setIsMember]=useState(false);
+  const [dayQuotes,setDayQuotes]=useState<Record<string,DayQuote|null>>({});
   const [watchError,setWatchError]=useState('');
   const [staleNotice,setStaleNotice]=useState('');
   const [selected,setSelected]=useState<Row|null>(null);
   const [expandedDays,setExpandedDays]=useState<Set<string>>(new Set());
+  const [calendarMode,setCalendarMode]=useState<'weekly'|'day'>('weekly');
   const [sort,setSort]=useState<{key:SortKey;dir:'asc'|'desc'}>({key:'cap',dir:'desc'});
   const [mobileFilters,setMobileFilters]=useState(false);
   const [view,setViewState]=useState<View>(()=>{
@@ -104,6 +111,11 @@ export function EarningsCalendar(){
   });
   const triggerRef=useRef<HTMLButtonElement|null>(null);
   const today=useMemo(()=>todayInMarket(),[]);
+  const [selectedDay,setSelectedDay]=useState(()=>{
+    const current=todayInMarket();
+    const weekday=new Date(current+'T12:00:00Z').getUTCDay();
+    return weekday===0||weekday===6?earningsWeekMonday(current):current;
+  });
   const urlView=params.get('view');
   const session=(params.get('session')||'') as Session|'';
   const status=(params.get('status')||'') as Status|'';
@@ -116,6 +128,7 @@ export function EarningsCalendar(){
     void (async()=>{
       try{
         if(await signedIn()){
+          setIsMember(true);
           const state=await apiJson<AccountState>('/api/watchlists');
           if(!alive)return;
           const symbols=new Set(state.watchlists.flatMap(list=>list.stocks.map(stock=>stock.symbol)));
@@ -174,12 +187,22 @@ export function EarningsCalendar(){
     if(!data||next<data.minWeek||next>data.maxWeek)return;
     if(!cachedWeek(next))void pullWeek(next).catch(()=>{});
     replace({week:next===data.todayMonday?null:next});
-  },[data,params]);
+  },[data,params,calendarMode]);
 
   const setView=(next:View)=>{
     setViewState(next);
     try{window.localStorage.setItem(VIEW_KEY,next);}catch{/* View still updates in the URL. */}
     replace({view:next==='calendar'?null:next});
+  };
+
+  const moveSelectedDay=(delta:number)=>{
+    let candidate=addDays(selectedDay,delta);
+    let weekday=new Date(candidate+'T12:00:00Z').getUTCDay();
+    if(weekday===0)candidate=addDays(candidate,delta>0?1:-2);
+    else if(weekday===6)candidate=addDays(candidate,delta>0?2:-1);
+    setSelectedDay(candidate);
+    const monday=earningsWeekMonday(candidate);
+    if(monday&&monday!==data?.weekStart)go(monday);
   };
 
   useEffect(()=>{
@@ -233,6 +256,30 @@ export function EarningsCalendar(){
   const sortedRows=useMemo(()=>sortEarningsRows(rows,sort),[rows,sort]);
 
   const days=data?.days||[];
+  const selectedDayBoard=days.find(day=>day.date===selectedDay);
+  const selectedDayRows=filteredByDay.get(selectedDay)||[];
+  useEffect(()=>{
+    if(calendarMode!=='day'||!selectedDayRows.length)return;
+    let alive=true;
+    const missing=selectedDayRows.map(row=>row.symbol).filter(symbol=>{const cached=dayQuoteCache.get(symbol);if(cached&&Date.now()-cached.at<30000)return false;dayQuoteCache.delete(symbol);return true;});
+    const cached=Object.fromEntries(selectedDayRows.filter(row=>dayQuoteCache.has(row.symbol)).map(row=>[row.symbol,dayQuoteCache.get(row.symbol)!.quote]));
+    setDayQuotes(current=>({...current,...cached}));
+    void (async()=>{
+      if(!missing.length)return;
+      try{
+        const response=await fetch(`/api/earnings-quotes?symbols=${encodeURIComponent(missing.join(','))}`,{signal:AbortSignal.timeout(60000)});
+        if(!response.ok)throw new Error('Quotes unavailable');
+        const quotes=await response.json() as DayQuote[];
+        const results=Object.fromEntries(missing.map(symbol=>[symbol,quotes.find(quote=>quote.symbol===symbol)||null]));
+        for(const [symbol,quote] of Object.entries(results))if(quote)dayQuoteCache.set(symbol,{at:Date.now(),quote});
+        if(alive)setDayQuotes(current=>({...current,...results}));
+      }catch{
+        const results=Object.fromEntries(missing.map(symbol=>[symbol,null]));
+        if(alive)setDayQuotes(current=>({...current,...results}));
+      }
+    })();
+    return()=>{alive=false;};
+  },[calendarMode,selectedDayRows]);
   const prev=data?shiftWeek(data.weekStart,-1):'';
   const next=data?shiftWeek(data.weekStart,1):'';
   const canPrev=!!data&&prev>=data.minWeek;
@@ -307,7 +354,10 @@ export function EarningsCalendar(){
   </div>;
 
   return <main className="earnings-cal-page">
-    <div className="earnings-cal-head"><h1><T text="Earnings calendar"/></h1></div>
+    <div className="earnings-cal-head"><h1><T text="Earnings calendar"/></h1><div className="earnings-calendar-modes" role="group" aria-label={t('Calendar view')}>
+      <button type="button" className={calendarMode==='weekly'?'is-active':undefined} aria-pressed={calendarMode==='weekly'} onClick={()=>setCalendarMode('weekly')}><CalendarDays size={14}/>{t('Weekly')}</button>
+      <button type="button" className={calendarMode==='day'?'is-active':undefined} aria-pressed={calendarMode==='day'} onClick={()=>{setCalendarMode('day');if(!days.some(day=>day.date===selectedDay)&&days[0])setSelectedDay(days[0].date);}}><List size={14}/>{t('Day')}</button>
+    </div></div>
     {watchError&&<p className="error-banner" role="alert">{watchError}</p>}
     {staleNotice&&<p className="quote-warning" role="status">{t('Showing cached results.')} {staleNotice===UNAVAILABLE?t(UNAVAILABLE):staleNotice} <Button variant="ghost" onClick={()=>setAttempt(n=>n+1)}>{t('Retry')}</Button></p>}
 
@@ -335,15 +385,15 @@ export function EarningsCalendar(){
       <div className="earnings-week-bar">
         <p className="earnings-week-label">{range||'—'}</p>
         <div className="earnings-week-switch" role="group" aria-label={t('Week')}>
-          <button type="button" disabled={!canPrev||loading} aria-label={t('Previous week')} onClick={()=>go(prev)}>
+          <button type="button" disabled={!canPrev||loading} aria-label={t('Previous week')} onClick={()=>{if(calendarMode==='day')setSelectedDay(addDays(prev,4));go(prev);}}>
             <ChevronLeft size={16} aria-hidden="true"/>
             <span className="week-full">{t('Previous week')}</span>
             <span className="week-short">{t('Previous')}</span>
           </button>
-          <button type="button" disabled={!data||loading||onThisWeek} aria-pressed={onThisWeek} className={onThisWeek?'is-current':undefined} onClick={()=>go(data?.todayMonday||'')}>
+          <button type="button" disabled={!data||loading||onThisWeek} aria-pressed={onThisWeek} className={onThisWeek?'is-current':undefined} onClick={()=>{const weekday=new Date(today+'T12:00:00Z').getUTCDay();if(calendarMode==='day')setSelectedDay(weekday===0||weekday===6?earningsWeekMonday(today):today);go(data?.todayMonday||'');}}>
             {t('This week')}
           </button>
-          <button type="button" disabled={!canNext||loading} aria-label={t('Next week')} onClick={()=>go(next)}>
+          <button type="button" disabled={!canNext||loading} aria-label={t('Next week')} onClick={()=>{if(calendarMode==='day')setSelectedDay(next);go(next);}}>
             <span className="week-full">{t('Next week')}</span>
             <span className="week-short">{t('Next')}</span>
             <ChevronRight size={16} aria-hidden="true"/>
@@ -352,6 +402,13 @@ export function EarningsCalendar(){
       </div>
       <Button variant="outline" className="outline-button earnings-export" disabled={!rows.length} onClick={exportCsv}><Download size={15}/>{t('Export CSV')}</Button>
     </div>
+
+    {calendarMode==='day'&&<div className="earnings-selected-day-bar">
+      <button type="button" aria-label={t('Previous day')} onClick={()=>moveSelectedDay(-1)}><ChevronLeft size={17}/></button>
+      <strong>{dayFormat(selectedDay,{weekday:'long',month:'long',day:'numeric',year:'numeric'},locale)}</strong>
+      <button type="button" aria-label={t('Next day')} onClick={()=>moveSelectedDay(1)}><ChevronRight size={17}/></button>
+      <button type="button" className="earnings-day-today" onClick={()=>{const weekday=new Date(today+'T12:00:00Z').getUTCDay();const target=weekday===0||weekday===6?earningsWeekMonday(today):today;setSelectedDay(target);if(earningsWeekMonday(target)!==data?.weekStart)go(earningsWeekMonday(target));}}>{t('Today')}</button>
+    </div>}
 
     {error&&<div className="error-banner" role="alert">{error===UNAVAILABLE?t(UNAVAILABLE):error}<Button variant="ghost" onClick={()=>setAttempt(n=>n+1)}><T text="Retry"/></Button></div>}
     {emptyCoverage&&<p className="earnings-empty">{t('No earnings announcements in the available coverage for this period.')}</p>}
@@ -404,8 +461,19 @@ export function EarningsCalendar(){
           </tbody>
         </table>
       </div>
-    :
-      <div className="earnings-week" aria-live="polite">
+    :calendarMode==='day'?<section className="earnings-day-focus" aria-live="polite">
+      <header><div><strong>{dayFormat(selectedDay,{weekday:'long'},locale)}</strong><span>{dayFormat(selectedDay,{month:'long',day:'numeric'},locale)}</span></div><small>{selectedDayRows.length} {t('companies')}</small></header>
+      {!selectedDayBoard?<p className="earnings-day-note">{t('No earnings scheduled')}</p>:selectedDayBoard.status!=='ok'?<p className="earnings-day-note is-error">{t('Could not load this day.')}</p>:selectedDayRows.length?<div className="earnings-focus-list">
+        {selectedDayRows.map(row=><div className="earnings-focus-row" key={row.symbol}>
+          <button type="button" className="earnings-focus-company" onClick={e=>openRow(row,e.currentTarget)}><CompanyIcon symbol={row.symbol}/><span><strong>{row.symbol}</strong><small>{row.name}</small><em>{timing(row.when)}{row.reported?` · ${t('Reported')}`:''}</em></span></button>
+          <span className="earnings-focus-metric"><small>{t('EPS estimate')}</small><strong>{row.epsForecast?formatEps(row.epsForecast):'—'}</strong></span>
+          {(()=>{const quote=dayQuotes[row.symbol];const quoteLoaded=Object.prototype.hasOwnProperty.call(dayQuotes,row.symbol);const current=quote?price(quote.price,quote.currency):quoteLoaded?'—':t('Loading…');const change=quote?.changePercent;const changeText=change==null?(quoteLoaded?'—':t('Loading…')):`${change>0?'+':''}${change.toFixed(2)}%`;const href=stockHref(row.symbol,'/earnings'+(paramKey?'?'+paramKey:''));return <>
+            <span className="earnings-focus-metric"><small>{t('Current price')}</small><strong>{isMember?<Link className="earnings-focus-link" href={href}>{current}</Link>:current}</strong></span>
+            <span className={'earnings-focus-metric '+(change==null?'':change>=0?'up':'down')}><small>{t('Daily change')}</small><strong>{isMember?<Link className="earnings-focus-link" href={href}>{changeText}</Link>:changeText}</strong></span>
+          </>;})()}
+        </div>)}
+      </div>:<p className="earnings-day-note">{t('No earnings scheduled')}</p>}
+    </section>:<div className="earnings-week" aria-live="polite">
         {days.map(day=>{
           const isToday=day.date===today;
           const companies=filteredByDay.get(day.date)||[];

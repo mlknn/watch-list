@@ -3753,5 +3753,10 @@
   "Show less": ["Daha az göster", "Mostrar menos"],
   "Show more": ["Daha fazla göster", "Mostrar más"],
   "Collapse list": ["Listeyi daralt", "Contraer lista"],
-  "More companies": ["Daha fazla şirket", "Más empresas"]
+  "More companies": ["Daha fazla şirket", "Más empresas"],
+  "Calendar view": ["Takvim görünümü", "Vista de calendario"],
+  "Weekly": ["Haftalık", "Semanal"],
+  "Day": ["Gün", "Día"],
+  "Previous day": ["Önceki gün", "Día anterior"],
+  "Next day": ["Sonraki gün", "Día siguiente"]
 }
