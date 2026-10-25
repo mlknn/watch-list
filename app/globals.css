@@ -686,6 +686,79 @@ html.dark .earnings-today-tag{background:#14301f;color:#7cffb4}
 html.dark .earnings-day header span,html.dark .earnings-day header small,html.dark .earnings-chip-text small,html.dark .earnings-chip-text em,html.dark .earnings-day-note{color:#b8ccc0}
 html.dark .earnings-reported{background:#15241e;color:#cfe2d6}
 html.dark .earnings-day-note.is-error{color:#ff9aa4}
+/* Earnings calendar refresh: compact company tiles, with timing kept inline. */
+.earnings-cal-page{max-width:1560px;padding:28px 32px 76px}
+.earnings-cal-head h1{font-size:clamp(30px,3vw,40px);font-weight:700;letter-spacing:-1.1px}
+.earnings-summary>div{border-radius:12px}
+.earnings-toolbar{border:0;margin:8px 0 14px;padding:14px 16px;border-radius:16px;background:#f7f8f7}
+.earnings-week{gap:0;border:1px solid #e1e5e3;border-radius:16px;overflow:hidden;background:#fff}
+.earnings-day{border:0;border-right:1px solid #e5e8e6;border-radius:0;background:transparent;min-height:100%}
+.earnings-day:last-child{border-right:0}
+.earnings-day.is-today{border-color:#e5e8e6;box-shadow:none}
+.earnings-day header,.earnings-day.is-today header{position:static;padding:14px 14px 12px;background:#fff;border-bottom:1px solid #edf0ee;box-shadow:none}
+.earnings-day header strong{font-size:14px;letter-spacing:0;text-transform:none}
+.earnings-day header span{font-size:13px;color:#65716b}
+.earnings-day header small{font-size:12px;color:#78827d}
+.earnings-today-tag{border-radius:999px;padding:2px 7px;background:#edf6f0;color:#168149;font-size:10px}
+.earnings-day-list{padding:10px;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;align-content:start}
+.earnings-day-list li{min-width:0}
+.earnings-chip{height:100%;min-height:88px;flex-direction:column;justify-content:center;gap:5px;padding:9px 5px;border:1px solid #edf0ee;border-radius:12px;background:#fff;text-align:center}
+.earnings-chip:hover{background:#f8faf8;border-color:#d9e3dc}
+.earnings-chip .company-icon{width:42px;height:42px;flex-basis:42px;border-radius:10px}
+.earnings-chip-text{width:100%;text-align:center;gap:2px}
+.earnings-chip-text strong{justify-content:center;font-size:13px}
+.earnings-chip-text small{font-size:10px}
+.earnings-chip-text em{font-size:10px;white-space:normal;line-height:1.25}
+.earnings-more-tile{color:#168149;border-style:dashed;font-weight:600}
+.earnings-more-count{display:grid;place-items:center;width:42px;height:42px;border-radius:10px;background:#f1f5f2;font-size:16px;font-variant-numeric:tabular-nums}
+html.dark .earnings-more-tile{color:#7cffb4}
+html.dark .earnings-more-count{background:#20372a}
+/* Keep the earnings controls compact so the calendar stays in view. */
+.earnings-cal-page{padding-top:18px}
+.earnings-cal-head{display:flex;align-items:baseline;gap:12px;margin:0 0 10px}
+.earnings-cal-head h1{font-size:24px;font-weight:650;letter-spacing:-.5px}
+.earnings-cal-head details{font-size:12px}
+.earnings-cal-head details summary{cursor:pointer;color:#68756e}
+.earnings-cal-head .intro,.earnings-cal-head .earnings-meta{font-size:12px;margin:6px 0 0}
+.earnings-summary{gap:8px;margin-bottom:10px}
+.earnings-summary>div{padding:7px 10px;border-radius:9px}
+.earnings-summary dt{font-size:11px}
+.earnings-summary dd{margin-top:0;font-size:17px}
+.earnings-tools{gap:8px;margin-bottom:8px}
+.earnings-search{flex:1 1 220px}
+.earnings-search input{height:34px;font-size:13px}
+.earnings-filter-row{gap:7px}
+.earnings-filter{gap:2px;font-size:10px}
+.earnings-filter select{height:34px;padding:0 8px;font-size:12px}
+.earnings-watch-toggle{height:34px;gap:5px;font-size:12px}
+.earnings-view-switch button{height:34px;padding:0 9px;font-size:12px;gap:5px}
+.earnings-toolbar{padding:8px 10px;margin:0 0 10px;border-radius:12px}
+.earnings-week-label{font-size:13px}
+.earnings-week-switch{border-radius:9px}
+.earnings-week-switch button{min-height:34px;padding:0 10px;font-size:12px}
+.earnings-export{height:34px;font-size:12px}
+.earnings-chips{gap:5px;margin-bottom:7px;font-size:11px}
+.earnings-chip-filter,.earnings-clear{padding:3px 8px;font-size:11px}
+@media(max-width:960px){
+  .earnings-cal-head{align-items:flex-start;flex-direction:column;gap:4px}
+  .earnings-summary{gap:6px;margin-bottom:8px}
+  .earnings-summary>div{padding:6px 8px}
+  .earnings-summary dd{font-size:15px}
+  .earnings-filter{font-size:11px}
+  .earnings-tools{gap:7px}
+}
+@media(max-width:640px){
+  .earnings-summary{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .earnings-summary>div{padding:5px 6px}
+  .earnings-summary dt{font-size:9px}
+  .earnings-summary dd{font-size:14px}
+}
+html.dark .earnings-toolbar{background:#141f1a}
+html.dark .earnings-week{background:#141f1a;border-color:#2a4438}
+html.dark .earnings-day{background:transparent;border-color:#2a4438}
+html.dark .earnings-day header,html.dark .earnings-day.is-today header{background:#141f1a;border-color:#2a4438}
+html.dark .earnings-chip{background:#141f1a;border-color:#2a4438}
+html.dark .earnings-chip:hover{background:#12301f}
 
 @media(max-width:1100px){
   .home-sample-body{grid-template-columns:minmax(0,1fr)}

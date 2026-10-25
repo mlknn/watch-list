@@ -13,7 +13,7 @@ import {readGuestState} from '@/lib/guest-watchlist.mjs';
 import {addDays,earningsWeekMonday,todayInMarket} from '@/lib/next-earnings.mjs';
 import {weeksToPrefetch} from '@/lib/earnings-week-prefetch.mjs';
 import type {AccountState} from '@/lib/watchlist';
-import {earningsCsv,epsSurprise,filterEarningsRows,formatCap,formatEps,formatSurprise,sortEarningsRows,summaryCounts,weekRangeLabel} from '@/lib/earnings-compare.mjs';
+import {earningsCsv,epsSurprise,filterEarningsRows,formatCap,formatEps,formatSurprise,sortEarningsRows,weekRangeLabel} from '@/lib/earnings-compare.mjs';
 import {stockHref} from '@/lib/safe-return.mjs';
 
 type Company={symbol:string;name:string;when:string;reported:boolean;eps:string;epsForecast:string;marketCap?:number};
@@ -95,6 +95,7 @@ export function EarningsCalendar(){
   const [watchError,setWatchError]=useState('');
   const [staleNotice,setStaleNotice]=useState('');
   const [selected,setSelected]=useState<Row|null>(null);
+  const [expandedDays,setExpandedDays]=useState<Set<string>>(new Set());
   const [sort,setSort]=useState<{key:SortKey;dir:'asc'|'desc'}>({key:'cap',dir:'desc'});
   const [mobileFilters,setMobileFilters]=useState(false);
   const [view,setViewState]=useState<View>(()=>{
@@ -245,8 +246,6 @@ export function EarningsCalendar(){
     status?{key:'status',label:status==='reported'?t('Reported'):t('Upcoming')}:null,
     cap?{key:'cap',label:capLabel(cap,t)}:null,
   ].filter(Boolean) as {key:string;label:string}[];
-  const summary=summaryCounts(rows,today,data?.weekStart||'',data?.weekEnd||'',watchSymbols);
-  const failedDays=days.some(day=>day.status!=='ok');
   const emptyCoverage=!loading&&!!data&&days.every(day=>day.status==='ok'&&!day.companies.length);
   const emptyWatch=!loading&&!!data&&watchOnly&&watchSymbols.size===0;
   const emptyFilters=!loading&&!!data&&!rows.length&&!emptyCoverage&&!emptyWatch;
@@ -308,25 +307,7 @@ export function EarningsCalendar(){
   </div>;
 
   return <main className="earnings-cal-page">
-    <div className="earnings-cal-head">
-      <h1><T text="Earnings calendar"/></h1>
-      <details className="earnings-more">
-        <summary>{t('Coverage and source')}</summary>
-        <p className="intro"><T text="Track upcoming announcements and compare reported results with market expectations."/></p>
-        <p className="earnings-meta">
-          {t('Source: Nasdaq')} · {t('US-listed companies of all sizes')} · {t('New York time')} · {t('Past weeks go back two quarters.')}
-          {data?` · ${t('Last successful update')} ${stampFormat(data.fetchedAt,locale)}.`:''}
-          {failedDays?` ${t('Some days in this week could not be refreshed.')}`:''}
-        </p>
-      </details>
-    </div>
-
-    <dl className="earnings-summary earnings-summary-strip">
-      <div><dt>{t('This week')}</dt><dd>{summary.week}</dd></div>
-      <div><dt>{t('Today')}</dt><dd>{summary.today}</dd></div>
-      <div><dt>{t('Reported')}</dt><dd>{summary.reported}</dd></div>
-      <div><dt>{t('In my watchlists')}</dt><dd>{summary.watch}</dd></div>
-    </dl>
+    <div className="earnings-cal-head"><h1><T text="Earnings calendar"/></h1></div>
     {watchError&&<p className="error-banner" role="alert">{watchError}</p>}
     {staleNotice&&<p className="quote-warning" role="status">{t('Showing cached results.')} {staleNotice===UNAVAILABLE?t(UNAVAILABLE):staleNotice} <Button variant="ghost" onClick={()=>setAttempt(n=>n+1)}>{t('Retry')}</Button></p>}
 
@@ -437,7 +418,7 @@ export function EarningsCalendar(){
             </header>
             {day.status!=='ok'?<p className="earnings-day-note is-error">{t('Could not load this day.')}</p>
               :companies.length?<ul className="earnings-day-list">
-                {companies.map(row=>{
+                {(expandedDays.has(day.date)?companies:companies.slice(0,10)).map(row=>{
                   const surprise=epsSurprise(row.eps,row.epsForecast);
                   return <li key={row.symbol}>
                     <button type="button" className="earnings-chip" onClick={e=>openRow(row,e.currentTarget)}>
@@ -452,6 +433,12 @@ export function EarningsCalendar(){
                     </button>
                   </li>;
                 })}
+                {companies.length>10&&<li>
+                  <button type="button" className="earnings-chip earnings-more-tile" aria-expanded={expandedDays.has(day.date)} onClick={()=>setExpandedDays(current=>{const next=new Set(current);if(next.has(day.date))next.delete(day.date);else next.add(day.date);return next;})}>
+                    <span className="earnings-more-count">{expandedDays.has(day.date)?'−':`+${companies.length-10}`}</span>
+                    <span className="earnings-chip-text"><strong>{expandedDays.has(day.date)?t('Show less'):t('Show more')}</strong><small>{expandedDays.has(day.date)?t('Collapse list'):t('More companies')}</small></span>
+                  </button>
+                </li>}
               </ul>:<p className="earnings-day-note">{t('No earnings scheduled')}</p>}
           </section>;
         })}
