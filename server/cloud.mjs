@@ -68,9 +68,9 @@ export async function ownerList(db,userId,listId) {
   return list;
 }
 const inFlight=new Map();
-export async function cachedQuote(db,symbol) {
+export async function cachedQuote(db,symbol,forceRefresh=false) {
   const saved=dbResult(await db.from('wl_quotes').select('*').eq('symbol',symbol).maybeSingle());
-  if(saved&&Date.now()-Date.parse(saved.fetched_at)<60_000) return saved;
+  if(!forceRefresh&&saved&&Date.now()-Date.parse(saved.fetched_at)<60_000) return saved;
   if(inFlight.has(symbol)) return inFlight.get(symbol);
   const operation=(async()=>{
     let row;
@@ -93,7 +93,7 @@ export function stockView(stock,cached) {
   const dayChangePercent=comparable&&Number.isFinite(fresh.changePercent)?fresh.changePercent:previousClose?((current.price-previousClose)/previousClose)*100:null;
   return {quantity:stock.quantity===null||stock.quantity===undefined?null:Number(stock.quantity),costPerShare:stock.cost_per_share===null||stock.cost_per_share===undefined?null:Number(stock.cost_per_share),acquiredAt:stock.acquired_at||null,notes:stock.notes||'',id:stock.id,symbol:stock.symbol,companyName:base.companyName,currency:base.currency,exchange:base.exchange,addedAt:stock.added_at,addedPrice:base.price,initialQuoteTime:base.quoteTime,currentPrice:current.price,previousClose,dayChangePercent,quoteTime:current.quoteTime,checkedAt:current.checkedAt,quoteError:cached?.error || (fresh&&!comparable?'Latest quote could not be compared. Starting quote is shown.':null)};
 }
-export async function listViews(db,lists,refresh=false,loadQuote=cachedQuote) {
+export async function listViews(db,lists,refresh=false,loadQuote=cachedQuote,forceRefresh=false) {
   if(!lists.length)return [];
   const stocks=dbResult(await db.from('wl_stocks').select('*').in('watchlist_id',lists.map(l=>l.id)).order('added_at').order('id'));
   const symbols=[...new Set(stocks.map(s=>s.symbol))];
@@ -102,16 +102,16 @@ export async function listViews(db,lists,refresh=false,loadQuote=cachedQuote) {
     const saved=dbResult(await db.from('wl_quotes').select('*').in('symbol',symbols));
     for(const row of saved)lookup.set(row.symbol,row);
     // Initial reads only use saved prices. Provider calls belong to the separate refresh request.
-    const needs=refresh?symbols.filter(symbol=>quoteNeedsRefresh(lookup.get(symbol))):[];
+    const needs=refresh?symbols.filter(symbol=>forceRefresh||quoteNeedsRefresh(lookup.get(symbol))):[];
     let i=0;
-    await Promise.all(Array.from({length:Math.min(4,needs.length)},async()=>{while(i<needs.length){const symbol=needs[i++];try{lookup.set(symbol,await loadQuote(db,symbol));}catch{/* Preserve baseline when provider is unavailable. */}}}));
+    await Promise.all(Array.from({length:Math.min(4,needs.length)},async()=>{while(i<needs.length){const symbol=needs[i++];try{lookup.set(symbol,await loadQuote(db,symbol,forceRefresh));}catch{/* Preserve baseline when provider is unavailable. */}}}));
   }
   return lists.map(l=>({id:l.id,name:l.name,mode:l.mode||'basic',createdAt:l.created_at,shareToken:l.share_token,role:'owner',stocks:stocks.filter(s=>s.watchlist_id===l.id).map(s=>stockView(s,lookup.get(s.symbol)))}));
 }
-export async function accountState(db,user,refresh=false) {
+export async function accountState(db,user,refresh=false,forceRefresh=false) {
   const profile=dbResult(await db.from('wl_profiles').select('*').eq('id',user.id).single());
   const lists=dbResult(await db.from('wl_watchlists').select('*').eq('owner_id',user.id).order('created_at').order('id'));
-  return {version:2,updatedAt:new Date().toISOString(),user:{id:user.id,name:profile.display_name,email:user.email,analytics:canViewAnalytics(user.email),local:localMode(),country:profile.country_code,hasBilling:!!profile.stripe_customer_id},plan:planFor(user),watchlists:await listViews(db,lists,refresh)};
+  return {version:2,updatedAt:new Date().toISOString(),user:{id:user.id,name:profile.display_name,email:user.email,analytics:canViewAnalytics(user.email),local:localMode(),country:profile.country_code,hasBilling:!!profile.stripe_customer_id},plan:planFor(user),watchlists:await listViews(db,lists,refresh,cachedQuote,forceRefresh)};
 }
 export async function importGuestLists(db,user,lists){
   if(!Array.isArray(lists))throw new AppError('Invalid request.');
