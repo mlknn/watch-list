@@ -1263,6 +1263,32 @@ html.dark .earnings-meta,html.dark .earnings-summary dt,html.dark .earnings-coun
 .home-discover li{justify-content:space-between;padding:8px 0;border-bottom:1px solid #eef2f8;font-size:14px}
 .home-discover li span{min-width:0;flex:1}
 .home-discover time{font-variant-numeric:tabular-nums;font-size:13px;color:#5b6a80;white-space:nowrap}
+.home-discover-member .home-panel{position:relative;overflow:hidden;background:linear-gradient(145deg,#fff 35%,#f7f9ff 100%)}
+.home-discover-member .home-panel::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:linear-gradient(180deg,#4e73f5,#43b88a);opacity:.8}
+.member-pulse-summary{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;padding:13px 14px;margin:2px 0 7px;border:1px solid #e7ecf6;border-radius:13px;background:rgba(255,255,255,.8)}
+.member-pulse-average>span{display:flex;align-items:center;gap:6px;color:#6b7a91;font-size:12px}
+.member-pulse-average>span svg{color:#4b69df}
+.member-pulse-average>strong{display:block;margin-top:3px;font-size:27px;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.member-pulse-balance{display:grid;grid-template-columns:auto auto;align-items:center;gap:4px 7px;text-align:right;font-size:12px;font-weight:650}
+.member-pulse-balance>i{width:4px;height:4px;border-radius:50%;background:#a7b2c4}
+.member-pulse-balance>small{grid-column:1/-1;color:#6b7a91;font-size:11px;font-weight:500}
+.member-pulse-balance .up,.member-mover-change.up{color:#14845b}
+.member-pulse-balance .down,.member-mover-change.down{color:#b44450}
+.home-discover .member-movers,.home-discover .member-followed-earnings{display:grid;gap:0}
+.home-discover .member-movers li,.home-discover .member-followed-earnings li{min-height:49px;padding:8px 2px}
+.member-movers li>span:nth-child(2),.member-followed-earnings li>span:nth-child(2){min-width:0;flex:1}
+.member-movers li small,.member-followed-earnings li small{max-width:200px}
+.member-mover-change{display:inline-flex;align-items:center;gap:2px;font-size:13px;font-variant-numeric:tabular-nums;font-weight:650;white-space:nowrap}
+.member-mover-change.flat{color:#6b7a91}
+.member-earnings-date{text-align:right;white-space:nowrap}
+.member-earnings-date time{display:block;color:#25324a;font-weight:650}
+.member-earnings-date small{margin-top:2px!important;color:#6b7a91;font-size:11px!important}
+.member-no-earnings{display:flex;align-items:center;gap:9px;min-height:116px;padding:14px;color:#6b7a91;font-size:13px;line-height:1.5}
+.member-no-earnings svg{flex:0 0 auto;color:#4b69df}
+html.dark .home-discover-member .home-panel{background:linear-gradient(145deg,#141f1a 35%,#18241e 100%)}
+html.dark .member-pulse-summary{background:rgba(16,26,22,.8);border-color:#2a4438}
+html.dark .member-pulse-balance>small,html.dark .member-earnings-date small,html.dark .member-no-earnings{color:#b8ccc0}
+html.dark .member-earnings-date time{color:#eef7f0}
 .home-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:0 0 48px;padding:8px 0}
 .home-steps article{min-width:0}
 .home-steps svg{color:#365bd8}
