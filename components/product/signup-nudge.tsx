@@ -10,7 +10,7 @@ import {Dialog,DialogContent,DialogDescription,DialogTitle} from '@/components/u
 import {authClient,config,signedIn,type Config} from '@/lib/auth-client';
 
 const ACTIVE_TIME_KEY='watchlist:signup-active-time';
-const WAIT_MS=15_000;
+const WAIT_MS=12_000;
 const REQUIRE_AFTER_MS=120_000;
 
 function promptCopy(path:string){

@@ -108,9 +108,10 @@ export async function listViews(db,lists,refresh=false,loadQuote=cachedQuote,for
   }
   return lists.map(l=>({id:l.id,name:l.name,mode:l.mode||'basic',createdAt:l.created_at,shareToken:l.share_token,role:'owner',stocks:stocks.filter(s=>s.watchlist_id===l.id).map(s=>stockView(s,lookup.get(s.symbol)))}));
 }
-export async function accountState(db,user,refresh=false,forceRefresh=false) {
+/** @param {string|null} [watchlistId] */
+export async function accountState(db,user,refresh=false,forceRefresh=false,watchlistId=null) {
   const profile=dbResult(await db.from('wl_profiles').select('*').eq('id',user.id).single());
-  const lists=dbResult(await db.from('wl_watchlists').select('*').eq('owner_id',user.id).order('created_at').order('id'));
+  const lists=watchlistId?[await ownerList(db,user.id,watchlistId)]:dbResult(await db.from('wl_watchlists').select('*').eq('owner_id',user.id).order('created_at').order('id'));
   return {version:2,updatedAt:new Date().toISOString(),user:{id:user.id,name:profile.display_name,email:user.email,analytics:canViewAnalytics(user.email),local:localMode(),country:profile.country_code,hasBilling:!!profile.stripe_customer_id},plan:planFor(user),watchlists:await listViews(db,lists,refresh,cachedQuote,forceRefresh)};
 }
 export async function importGuestLists(db,user,lists){

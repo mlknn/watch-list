@@ -1,12 +1,14 @@
 'use client';
 import {T,useT} from '@/components/product/language';
-import {Bookmark,ChartLine,CirclePlus} from 'lucide-react';
-import {useEffect,useState} from 'react';
+import {Bookmark,ChartLine,CirclePlus,ArrowDownRight,ArrowUpRight,ShieldCheck,ScanSearch,RefreshCw,LoaderCircle} from 'lucide-react';
+import {useCallback,useEffect,useRef,useState} from 'react';
 import {ExampleWatchlistPreview,SamplePortfolio,useShowcase} from '@/components/product/showcase';
 import {HomeDiscovery} from '@/components/product/home-tools';
 import {WatchlistWorkspace} from '@/components/product/watchlist-workspace';
 import {PublicNav,PublicFooter} from '@/components/product/nav';
 import {readGuestState} from '@/lib/guest-watchlist.mjs';
+import {type AccountState,watchlistDayChange,watchlistRefreshTime} from '@/lib/watchlist';
+import {apiJson} from '@/lib/auth-client';
 
 function guestHasStocks(){
   if(typeof window==='undefined')return false;
@@ -27,28 +29,78 @@ export function Welcome(){
   const showcase=useShowcase();
   const [returning,setReturning]=useState(false);
   const [guest,setGuest]=useState(true);
+  const [account,setAccount]=useState<AccountState|null>(null);
+  const accountRef=useRef(account);
+  accountRef.current=account;
+  const [now,setNow]=useState(Date.now());
+  const refreshing=useRef(false);
+  const [refreshingNow,setRefreshingNow]=useState(false);
+  const [refreshMessage,setRefreshMessage]=useState('');
+  const [refreshProgress,setRefreshProgress]=useState('');
+  const member=!!account&&!account.guest;
 
   useEffect(()=>{
     setReturning(guestHasStocks());
     const onReady=(event:Event)=>{
-      const detail=(event as CustomEvent<{hasStocks?:boolean;guest?:boolean}>).detail;
+      const detail=(event as CustomEvent<{hasStocks?:boolean;guest?:boolean;state?:AccountState}>).detail;
       if(typeof detail?.hasStocks==='boolean')setReturning(detail.hasStocks);
       if(typeof detail?.guest==='boolean')setGuest(detail.guest);
+      if(detail?.state)setAccount(detail.state);
     };
     window.addEventListener('watchlist:ready',onReady);
     return()=>window.removeEventListener('watchlist:ready',onReady);
   },[]);
 
-  return <><PublicNav/><main className={'welcome'+(returning?' is-returning':'')}>
+  const refreshAllQuotes=useCallback(async()=>{
+    if(!member||document.hidden||refreshing.current)return;
+    refreshing.current=true;setRefreshingNow(true);setRefreshMessage('');
+    try{
+      let latest=accountRef.current;
+      let failed=0;
+      const lists=latest?.watchlists||[];
+      for(let index=0;index<lists.length;index++){
+        const list=lists[index];
+        setRefreshProgress(`${index+1}/${lists.length}`);
+        try{
+          const fresh=await apiJson<AccountState>(`/api/watchlists?watchlistId=${encodeURIComponent(list.id)}&refresh=1&force=1`);
+          const updated=fresh.watchlists.find(item=>item.id===list.id);
+          if(updated&&latest){latest={...fresh,watchlists:latest.watchlists.map(item=>item.id===updated.id?updated:item)};accountRef.current=latest;setAccount(latest);setReturning(latest.watchlists.some(item=>item.stocks.length>0));setNow(Date.now());}
+        }catch{failed++;}
+      }
+      const errors=latest?.watchlists.flatMap(list=>list.stocks).filter(stock=>!!stock.quoteError).length||0;
+      setRefreshMessage(failed?`${failed} ${failed===1?'watchlist could':'watchlists could'} not refresh.`:errors?`${errors} ${errors===1?'price needs':'prices need'} attention.`:'');
+    }catch(e){setRefreshMessage((e as Error).message||'Could not refresh quotes.');}
+    finally{refreshing.current=false;setRefreshingNow(false);setRefreshProgress('');setNow(Date.now());}
+  },[member]);
+
+  useEffect(()=>{
+    if(!member)return;
+    void refreshAllQuotes();
+    const timer=window.setInterval(()=>void refreshAllQuotes(),60_000);
+    const clock=window.setInterval(()=>setNow(Date.now()),15_000);
+    const onVisibility=()=>{if(!document.hidden)void refreshAllQuotes();};
+    document.addEventListener('visibilitychange',onVisibility);
+    return()=>{window.clearInterval(timer);window.clearInterval(clock);document.removeEventListener('visibilitychange',onVisibility);};
+  },[member,refreshAllQuotes]);
+
+  const allStocks=account?.watchlists.flatMap(list=>list.stocks)||[];
+  const refreshIssues=allStocks.filter(stock=>!!stock.quoteError).length;
+  const overallRefresh=watchlistRefreshTime({stocks:allStocks},now);
+  return <><PublicNav/><main className={'welcome'+(returning?' is-returning':'')+(member?' is-member-home':'')}>
+    {member?<>
+      <section className="member-home-hero">
+        <div className="member-home-heading"><p className="eyebrow"><span className="hero-kicker-dot"/> {t('YOUR INVESTING SPACE')}</p><h1>{account.user.name?`${t('Welcome back')}, ${account.user.name.split(' ')[0]}.`:t('Welcome back.')}</h1><p>{t('Here’s how your watchlists are doing. Pick up where you left off or explore what’s moving.')}</p><div className="hero-actions"><a className="solid-link" href="/watchlists">{t('Open your watchlists')}</a><a className="outline-link" href="/dashboard">{t('Explore markets')}</a><a className="outline-link" href="/earnings">{t('Upcoming earnings')}</a></div></div>
+        <div className="member-home-stats"><div><span>{t('Watchlists')}</span><strong>{account.watchlists.length}</strong></div><div><span>{t('Stocks you follow')}</span><strong>{allStocks.length}</strong></div><div className="member-quote-status"><span>{t('Overall quote status')}</span><strong role="status" aria-live="polite">{refreshingNow?`${t('Refreshing all quotes…')} ${refreshProgress}`:refreshMessage|| (refreshIssues?`${refreshIssues} ${t('prices need attention')}`:overallRefresh)}</strong><button type="button" className="member-refresh-button" onClick={()=>void refreshAllQuotes()} disabled={refreshingNow}><RefreshCw size={15} className={refreshingNow?'spin':''}/>{refreshingNow?t('Refreshing…'):t('Refresh all quotes')}</button></div></div>
+      </section>
+      <section className="member-watchlists-section"><div className="member-section-heading"><div><p className="eyebrow">{t('YOUR WATCHLISTS')}</p><h2>{t('Your ideas, at a glance')}</h2></div><a href="/watchlists">{t('Manage watchlists')} <ArrowUpRight size={16}/></a></div>
+        {account.watchlists.length?<div className="member-watchlist-grid">{account.watchlists.map(list=>{const change=watchlistDayChange(list);const tone=change===null?'unknown':change>0?'up':change<0?'down':'flat';return <a className={`member-watchlist-card day-${tone}`} href="/watchlists" key={list.id}><div className="member-watchlist-card-head"><span className="member-list-icon"><ChartLine size={18}/></span><span className="member-watchlist-return"><small>{watchlistRefreshTime(list,now)}</small><strong>{change===null?'—':`${change>0?'+':''}${change.toFixed(2)}%`}</strong></span></div><h3>{list.name}</h3><p>{list.stocks.length} {t('Stocks')} · {list.mode==='advanced'?t('Holdings and cost basis'):t('Price change since added')}</p><div className="member-ticker-row">{list.stocks.slice(0,5).map(stock=>{const stockTone=stock.dayChangePercent===undefined||stock.dayChangePercent===null?'flat':stock.dayChangePercent>0?'up':stock.dayChangePercent<0?'down':'flat';return <span className={`member-ticker day-${stockTone}`} key={stock.id}>{stock.symbol}</span>;})}{list.stocks.length>5&&<span>+{list.stocks.length-5}</span>}{!list.stocks.length&&<span>{t('Ready for your next idea')}</span>}</div><span className="member-card-link">{t('View watchlist')} <ArrowUpRight size={15}/></span></a>;})}</div>:<div className="member-empty-card"><ChartLine size={23}/><div><strong>{t('Your first list is ready for an idea.')}</strong><p>{t('Add a company to start tracking its price from the day you choose it.')}</p></div><a className="solid-link" href="/watchlists">{t('Add a stock')}</a></div>}
+      </section>
+      <HomeDiscovery/>
+      <section className="member-home-footer"><span>{t('Saved to your account')}</span><a href="/account">{t('Account settings')} <ArrowUpRight size={15}/></a></section>
+    </>:<>
     <section className="home-hero">
       <div className="hero-copy">
-        <p className="eyebrow">
-          <a href="/watchlists">{t('Watchlists')}</a>
-          <span aria-hidden="true">·</span>
-          <a href="/dashboard">{t('Markets')}</a>
-          <span aria-hidden="true">·</span>
-          <a href="/earnings">{t('Earnings')}</a>
-        </p>
+        <p className="eyebrow hero-kicker"><span className="hero-kicker-dot"/> {t('A clearer view of every stock idea')}</p>
         {returning?<>
           <h1><T text="Your watchlist is ready."/></h1>
           <p><T text="Continue from the prices you already recorded, or add another company."/></p>
@@ -58,24 +110,27 @@ export function Welcome(){
             <a className="outline-link" href="/earnings"><T text="View earnings"/></a>
           </div>
         </>:<>
-          <h1><T text="Track your stock ideas from the day you add them."/></h1>
-          <p><T text="Save the stocks you want to follow, see how their prices change from your starting point, and keep markets and earnings within reach."/></p>
+          <h1><T text="Give every stock idea a real starting point."/></h1>
+          <p><T text="Track the price from the day you add a company, see what changed over time, and keep market context and earnings close at hand."/></p>
           <div className="hero-actions">
             <button type="button" className="primary-button" onClick={startWatchlist}><T text="Start your watchlist"/></button>
             <a className="outline-link" href="/dashboard"><T text="Explore markets"/></a>
             <a className="outline-link" href="/earnings"><T text="View earnings"/></a>
           </div>
-          <p className="hero-note"><T text="No account needed to start. Your guest watchlist stays on this device."/></p>
+          <p className="hero-note"><ShieldCheck size={15} aria-hidden="true"/><T text="No account needed to start. Your guest watchlist stays on this device."/></p>
         </>}
       </div>
-      {!returning&&<ExampleWatchlistPreview data={showcase.data} error={showcase.error} onRetry={showcase.retry}/>}
+      {!returning&&<div className="hero-showcase"><div className="hero-orbit hero-orbit-one"/><div className="hero-orbit hero-orbit-two"/><div className="hero-visual-label"><span><i/> {t('YOUR IDEAS, IN CONTEXT')}</span><span>{t('Live market quotes')}</span></div><ExampleWatchlistPreview data={showcase.data} error={showcase.error} onRetry={showcase.retry}/><div className="hero-insight"><span className="hero-insight-icon"><ChartLine size={17}/></span><span><strong>{t('A price worth remembering')}</strong><small>{t('Every idea keeps its day-one reference.')}</small></span><span className="hero-insight-arrow"><ArrowUpRight size={17}/></span></div><div className="hero-footnote"><ArrowDownRight size={14}/>{t('Track the journey, not just today’s quote.')}</div></div>}
     </section>
+
+    {!returning&&<section className="welcome-proof"><div><strong>01</strong><span>{t('A saved starting price')}</span></div><div><strong>02</strong><span>{t('Real price changes over time')}</span></div><div><strong>03</strong><span>{t('Markets and earnings together')}</span></div></section>}
 
     <WatchlistWorkspace compact/>
     <HomeDiscovery/>
     <section className="home-idea-lab"><div><p className="eyebrow">{t('FROM WATCHING TO LEARNING')}</p><h2>{t('More than a list of tickers')}</h2><p>{t('Bring a watchlist from another app, record a decision checkpoint, compare an idea with an ETF, and explore a hypothetical downside.')}</p></div><a className="solid-link" href="/watchlists#idea-lab">{t('Explore the idea lab')}</a></section>
 
     {!returning&&<section className="home-steps" aria-label={t('How it works')}>
+      <div className="home-steps-intro"><p className="eyebrow">{t('FROM IDEA TO INSIGHT')}</p><h2>{t('A simple way to stay close to what matters.')}</h2><p>{t('Your watchlist gives each company a place, a starting point, and a story you can follow.')}</p></div>
       <article>
         <CirclePlus size={20} aria-hidden="true"/>
         <h2><T text="Add a company"/></h2>
@@ -106,5 +161,6 @@ export function Welcome(){
       </>:<h2><T text="Your lists are saved to your account."/></h2>}
       <p><T text="Yahoo Finance · Quotes may be delayed"/> · <a href="/privacy"><T text="Privacy"/></a> · <a href="/open-source"><T text="Open source"/></a></p>
     </section>
+    </>}
   </main><PublicFooter/></>;
 }

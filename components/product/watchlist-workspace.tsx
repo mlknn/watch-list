@@ -29,12 +29,15 @@ import {parseCurrencyMismatch} from '@/lib/portfolio-currency.mjs';
 import {apiJson,config,signedIn,claimGuestWatchlists} from '@/lib/auth-client';
 import {marketChart} from '@/lib/market';
 import {applyGuestAction,ensureGuestList,writeGuestState,markSavePromptShown} from '@/lib/guest-watchlist.mjs';
-import {type AccountState,type Stock,type Watchlist,watchlistPerformance,price} from '@/lib/watchlist';
+import {type AccountState,type Stock,type Watchlist,watchlistDayChange,watchlistRefreshTime,price} from '@/lib/watchlist';
 import {CompanyIcon} from '@/components/product/company-icon';
 import {track} from '@/lib/analytics';
+import {usePathname} from 'next/navigation';
 type Action={mode?:'basic'|'advanced';quantity?:number;costPerShare?:number;acquiredAt?:string;notes?:string;action:string;listId?:string;stockId?:string;name?:string;ticker?:string};
 async function chartQuote(symbol:string){const chart=await marketChart(symbol);return {symbol:chart.symbol,companyName:chart.companyName,currency:chart.currency,exchange:chart.exchange,price:chart.quote.price,previousClose:chart.quote.previousClose,changePercent:chart.quote.changePercent,quoteTime:chart.quote.quoteTime||chart.fetchedAt,checkedAt:chart.fetchedAt};}
-export function WatchlistWorkspace({compact=false}:{compact?:boolean}){const t=useT();
+export function WatchlistWorkspace({compact=false,onStateChange}:{compact?:boolean;onStateChange?:(state:AccountState)=>void}){const t=useT();
+  const pathname=usePathname()||'';
+  const [relativeNow,setRelativeNow]=useState(Date.now());
   const [position,setPosition]=useState<PositionDraft>(emptyPosition),[editing,setEditing]=useState<Stock|null>(null),[editDraft,setEditDraft]=useState<PositionDraft>(emptyPosition);
   const [state,setState]=useState<AccountState|null>(null),[activeId,setActiveId]=useState(''),[ticker,setTicker]=useState(''),[error,setError]=useState(''),[actionBusy,setBusy]=useState(''),[viewRefreshing,setViewRefreshing]=useState(false),[notice,setNotice]=useState(''),[dialog,setDialog]=useState<'create'|'rename'|'share'|null>(null),[name,setName]=useState(''),[deletion,setDeletion]=useState<{listId:string;stockId?:string;label:string}|null>(null),[configured,setConfigured]=useState<boolean|null>(null),[saveOpen,setSaveOpen]=useState(false);
   const [batchBusy,setBatchBusy]=useState(false),[labOpen,setLabOpen]=useState(false);
@@ -44,7 +47,7 @@ export function WatchlistWorkspace({compact=false}:{compact?:boolean}){const t=u
   const lock=useRef(false),refreshing=useRef(false),generation=useRef(0),stateRef=useRef<AccountState|null>(null),inputRef=useRef<HTMLInputElement>(null),quantityRef=useRef<HTMLInputElement>(null);
 
   const apply=useCallback((data:AccountState)=>{if(stateRef.current&&Date.parse(data.updatedAt)<Date.parse(stateRef.current.updatedAt))return;stateRef.current=data;setState(data);setActiveId(current=>data.watchlists.some((list:Watchlist)=>list.id===current)?current:data.watchlists[0]?.id||'');},[]);
-  const load=useCallback(async()=>{try{await config();setConfigured(true);if(await signedIn()){let claimed=null as AccountState|null;try{claimed=await claimGuestWatchlists();}catch(e){setError((e as Error).message);}apply(claimed||await apiJson<AccountState>('/api/watchlists'));if(claimed)setError('');return;}apply(ensureGuestList(window.localStorage));setError('');}catch(e){setError((e as Error).message);}},[apply]);
+  const load=useCallback(async()=>{try{await config();setConfigured(true);if(await signedIn()){let claimed=null as AccountState|null;try{claimed=await claimGuestWatchlists();}catch(e){setError((e as Error).message);}if(claimed){apply(claimed);setError('');return;}apply(await apiJson<AccountState>('/api/watchlists'));return;}apply(ensureGuestList(window.localStorage));setError('');}catch(e){setError((e as Error).message);}},[apply]);
   const act=useCallback(async(input:Action,automatic=false,forceRefresh=false):Promise<AccountState|null>=>{
     if(automatic){if(lock.current||refreshing.current||!stateRef.current)return null;refreshing.current=true;if(input.action==='refresh')setViewRefreshing(true);}
     else{if(lock.current)throw new Error('An update is already in progress.');lock.current=true;generation.current+=1;setBusy(input.action);setError('');setNotice('');}
@@ -55,12 +58,13 @@ export function WatchlistWorkspace({compact=false}:{compact?:boolean}){const t=u
         let quote:unknown;
         if(input.action==='addStock')quote=await chartQuote(input.ticker||'');
         if(input.action==='refresh'){
-          const symbols=[...new Set(stateRef.current.watchlists.flatMap(list=>list.stocks.map(stock=>stock.symbol)))];
-          const rows=await Promise.all(symbols.map(async symbol=>{
-            try{return [symbol,await chartQuote(symbol)] as const;}
-            catch{return [symbol,null] as const;}
-          }));
-          quote=Object.fromEntries(rows.filter((row):row is readonly[string,Awaited<ReturnType<typeof chartQuote>>]=>row[1]!==null));
+          const quotes:Record<string,Awaited<ReturnType<typeof chartQuote>>>= {};
+          for(const list of stateRef.current.watchlists){
+            for(const stock of list.stocks){
+              try{quotes[stock.symbol]=await chartQuote(stock.symbol);}catch{/* Preserve the previous quote when a provider call fails. */}
+            }
+          }
+          quote=quotes;
         }
         const firstStock=!stateRef.current.watchlists.some(list=>list.stocks.length);
         const data=writeGuestState(applyGuestAction(stateRef.current,input,quote),window.localStorage);
@@ -69,7 +73,25 @@ export function WatchlistWorkspace({compact=false}:{compact?:boolean}){const t=u
         if(input.action==='createList'||(input.action==='addStock'&&firstStock))track('watchlist_created');
         return data;
       }
-      const data=input.action==='refresh'?await apiJson<AccountState>(forceRefresh?'/api/watchlists?refresh=1&force=1':'/api/watchlists?refresh=1'):await apiJson<AccountState>('/api/watchlists',input);
+      if(input.action==='refresh'){
+        let data=stateRef.current;
+        let failed=0;
+        const lists=data?.watchlists||[];
+        for(const list of lists){
+          if(automatic&&token!==generation.current)return null;
+          try{
+            const suffix=forceRefresh?'&force=1':'';
+            const part=await apiJson<AccountState>(`/api/watchlists?watchlistId=${encodeURIComponent(list.id)}&refresh=1${suffix}`);
+            const updated=part.watchlists.find(item=>item.id===list.id);
+            if(!updated||!data){failed++;continue;}
+            data={...part,watchlists:data.watchlists.map(item=>item.id===updated.id?updated:item)};
+            apply(data);
+          }catch{failed++;}
+        }
+        if(failed&&!automatic)setError(`${failed} ${failed===1?'watchlist could':'watchlists could'} not be refreshed.`);
+        return data;
+      }
+      const data=await apiJson<AccountState>('/api/watchlists',input);
       if(automatic&&token!==generation.current)return null;
       apply(data);
       if(input.action==='createList')track('watchlist_created');
@@ -77,8 +99,16 @@ export function WatchlistWorkspace({compact=false}:{compact?:boolean}){const t=u
     }catch(e){if(!automatic){setError((e as Error).message);throw e;}return null;}
     finally{if(automatic){refreshing.current=false;setViewRefreshing(false);}else{lock.current=false;setBusy('');}}
   },[apply]);
-  useEffect(()=>{void load().finally(()=>{if(!document.hidden&&stateRef.current)void act({action:'refresh'},true,true);});const refresh=()=>{if(!document.hidden&&stateRef.current)void act({action:'refresh'},true);};const onPageShow=()=>{if(!document.hidden&&stateRef.current)void act({action:'refresh'},true,true);};const timer=setInterval(refresh,60000);document.addEventListener('visibilitychange',refresh);window.addEventListener('pageshow',onPageShow);return()=>{clearInterval(timer);document.removeEventListener('visibilitychange',refresh);window.removeEventListener('pageshow',onPageShow);};},[load,act]);
+  useEffect(()=>{void load().finally(()=>{if(!compact&&!document.hidden&&stateRef.current)void act({action:'refresh'},true,true);});const refresh=()=>{if(!compact&&!document.hidden&&stateRef.current)void act({action:'refresh'},true);};const onPageShow=()=>{if(!compact&&!document.hidden&&stateRef.current)void act({action:'refresh'},true,true);};const timer=setInterval(refresh,60000);document.addEventListener('visibilitychange',refresh);window.addEventListener('pageshow',onPageShow);return()=>{clearInterval(timer);document.removeEventListener('visibilitychange',refresh);window.removeEventListener('pageshow',onPageShow);};},[load,act,compact]);
+  const lastWatchlistsPath=useRef(false);
+  useEffect(()=>{
+    const entering=pathname==='/watchlists'&&!lastWatchlistsPath.current;
+    lastWatchlistsPath.current=pathname==='/watchlists';
+    if(entering&&!compact&&stateRef.current&&!document.hidden)void act({action:'refresh'},true,true);
+  },[pathname,act,compact]);
+  useEffect(()=>{if(state)onStateChange?.(state);},[state,onStateChange]);
   useEffect(()=>{setCanShare(typeof navigator!=='undefined'&&typeof navigator.share==='function');},[]);
+  useEffect(()=>{const timer=window.setInterval(()=>setRelativeNow(Date.now()),15_000);return()=>window.clearInterval(timer);},[]);
   const canRegisterTools=!!state&&!state.guest;
   useEffect(()=>{
     if(!canRegisterTools)return;
@@ -88,7 +118,7 @@ export function WatchlistWorkspace({compact=false}:{compact?:boolean}){const t=u
     register({name:'read_watchlists',description:'Read this signed-in user’s saved watchlists and prices.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:true},execute:()=>stateRef.current});
     register({name:'add_stock_to_watchlist',description:'Add a stock to a watchlist owned by the signed-in user, within their plan limits.',inputSchema:{type:'object',properties:{listId:{type:'string'},ticker:{type:'string'},quantity:{type:'number',exclusiveMinimum:0}},required:['listId','ticker','quantity'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:true},execute:async input=>{const value=input as {listId?:unknown;ticker?:unknown;quantity?:unknown};if(!value||typeof value.listId!=='string'||typeof value.ticker!=='string'||typeof value.quantity!=='number'||!Number.isFinite(value.quantity)||value.quantity<=0)throw new Error('Provide listId, ticker, and a positive quantity.');const result=await act({action:'addStock',listId:value.listId,ticker:value.ticker,quantity:value.quantity});setActiveId(value.listId);return result?.watchlists.find(l=>l.id===value.listId);}});return()=>lifecycle.abort();
   },[act,canRegisterTools]);
-  const active=state?.watchlists.find(l=>l.id===activeId)||state?.watchlists[0];const canEdit=!!state?.guest||active?.role==='owner';const stale=active?.stocks.filter(s=>s.quoteError).length||0;
+  const active=state?.watchlists.find(l=>l.id===activeId)||state?.watchlists[0];const canEdit=!!state?.guest||active?.role==='owner';const stale=active?.stocks.filter(s=>s.quoteError).length||0;const totalStale=state?.watchlists.flatMap(list=>list.stocks).filter(stock=>!!stock.quoteError).length||0;
   const marketError=parseCurrencyMismatch(error);
   const shareUrl=active?.shareToken&&typeof window!=='undefined'?`${window.location.origin}/share/${active.shareToken}`:'';
   const addLimited=!!state&&!!active&&active.stocks.length>=state.plan.maxStocks;
@@ -118,7 +148,7 @@ export function WatchlistWorkspace({compact=false}:{compact?:boolean}){const t=u
   const setup=state?.guest&&active?<WatchlistSetup list={active} busy={!!busy} onSearch={()=>{inputRef.current?.focus();inputRef.current?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});}} onRename={()=>{setName(active.name);setError('');setDialog('rename');}} onSave={()=>setSaveOpen(true)}/>:null;
   useEffect(()=>{
     if(!state)return;
-    window.dispatchEvent(new CustomEvent('watchlist:ready',{detail:{hasStocks:state.watchlists.some(list=>list.stocks.length>0),guest:!!state.guest}}));
+    window.dispatchEvent(new CustomEvent('watchlist:ready',{detail:{hasStocks:state.watchlists.some(list=>list.stocks.length>0),guest:!!state.guest,state}}));
   },[state]);
   const draftQuantity=Number(position.quantity);
   const draftPrice=position.cost.trim()?Number(position.cost):addQuote?.price;
@@ -137,15 +167,15 @@ export function WatchlistWorkspace({compact=false}:{compact?:boolean}){const t=u
   </>:<p role="status">{t("Opening your watchlists…")}</p>}
 </section>:<><header className="topbar"><div className="public-nav-main"><Brand/><ProductNav/></div><div className="account-nav"><ThemeToggle/>{state?.guest?<><a href="/login"><T text="Log in"/></a><button type="button" className="solid-link" onClick={()=>setSaveOpen(true)}><T text="Save watchlist"/></button></>:<><a href="/account"><T text="Account"/></a>{state?.user.analytics&&<a href="/insights">Analytics</a>}<span className="save-state">{busy?<LoaderCircle size={15} className="spin"/>:<Check size={15}/>} {busy?t("Updating…"):state?t("Saved to your account"):t("Connecting…")}</span></>}</div></header>
   <main className={'workspace'+(member?' is-member':'')}>{!member&&state&&<div className="page-heading dashboard-heading"><div className="dashboard-heading-copy"><p className="eyebrow">{t("YOUR INVESTING SPACE")}</p><h1><T text="My watchlists"/></h1><p className="intro"><T text="Keep your ideas close. Follow how they grow."/></p><div className="workspace-summary"><span><strong>{state.watchlists.length}</strong> / {state.plan.maxLists} {t("Watchlists")}</span><span>{t("Stocks")} · {state.plan.maxStocks} {t("per list")}</span></div></div><div className="heading-actions"><Button className="primary-button" disabled={!state||!!busy} onClick={()=>{setName('');setError('');if(state.watchlists.length>=1){setLimitPrompt(true);setSaveOpen(true);}else setDialog('create');}}><Plus/><T text="New watchlist"/></Button></div></div>}
-  {member&&<WatchlistRail lists={state.watchlists} activeId={active?.id||''} maxLists={state.plan.maxLists} busy={!!busy} onSelect={id=>{if(busy)return;setActiveId(id);abandonAdd();setError('');}} onCreate={()=>{setName('');setError('');setDialog('create');}}/>}
+  {member&&<WatchlistRail lists={state.watchlists} activeId={active?.id||''} maxLists={state.plan.maxLists} busy={!!busy} now={relativeNow} onSelect={id=>{if(busy)return;setActiveId(id);abandonAdd();setError('');}} onCreate={()=>{setName('');setError('');setDialog('create');}}/>}
   {configured===false?<div className="watch-card"><Empty className="empty-watchlist"><LockKeyhole size={32}/><EmptyTitle className="empty-title">Your account workspace is almost ready</EmptyTitle><EmptyDescription>Account setup is still in progress. Once connected, sign in to create private lists and share them with friends.</EmptyDescription><a className="solid-link" href="/">Back to welcome</a></Empty></div>:<>
   {error&&!marketError&&!dialog&&!addQuote&&!deletion&&!editing&&<div role="alert" className="error-banner"><AlertCircle size={18}/>{error}<Button variant="ghost" onClick={()=>void load()}>{t("Retry")}</Button></div>}
   <span className="sr-only" role="status">{notice}</span>
   {state?.user.local&&!state.guest&&<p className="local-workspace-note">Saved on this Mac · Private workspace</p>}
-  {state&&active?<section id="active-watchlist" className="watch-card"><div className="card-heading"><div><div className="list-title"><h2>{active.name}</h2><span className="owner-label">{active.mode==='advanced'?t("Advanced")+' · ':''}{canEdit?t("Owner"):t("Viewer")}</span>{canEdit&&<><button className="icon-button" aria-label="Rename watchlist" disabled={!!busy} onClick={()=>{setName(active.name);setError('');setDialog('rename');}}><Pencil size={14}/></button>{state.watchlists.length>1&&<button className="icon-button" aria-label="Delete watchlist" disabled={!!busy} onClick={()=>{setError('');setDeletion({listId:active.id,label:active.name});}}><Trash2 size={14}/></button>}</>}</div><p>{active.mode==='advanced'?t("Track your holdings, cost basis, and the bigger picture."):t("Track performance from the day you add a stock.")}</p></div><div className="card-tools">{state.guest&&<span className="save-state">{busy?<LoaderCircle size={15} className="spin"/>:<Check size={15}/>} {busy?t("Updating…"):t("Saved on this device")}</span>}<span className="refresh-state" role="status" aria-live="polite">{(viewRefreshing||busy==='refresh')?<LoaderCircle size={13} className="spin" aria-hidden="true"/>:<span className={`status-dot ${stale?'warning-dot':''}`}/> }{viewRefreshing||busy==='refresh'?t("Refreshing…"):t("Refreshes every 60s")}</span>{!!active.stocks.length&&<Button variant="outline" disabled={!!busy} onClick={()=>void openShare()}><Link2/><T text="Share"/></Button>}</div></div>
+  {state&&active?<section id="active-watchlist" className="watch-card"><div className="card-heading"><div><div className="list-title"><h2>{active.name}</h2><span className="owner-label">{active.mode==='advanced'?t("Advanced")+' · ':''}{canEdit?t("Owner"):t("Viewer")}</span>{canEdit&&<><button className="icon-button" aria-label="Rename watchlist" disabled={!!busy} onClick={()=>{setName(active.name);setError('');setDialog('rename');}}><Pencil size={14}/></button>{state.watchlists.length>1&&<button className="icon-button" aria-label="Delete watchlist" disabled={!!busy} onClick={()=>{setError('');setDeletion({listId:active.id,label:active.name});}}><Trash2 size={14}/></button>}</>}</div><p>{active.mode==='advanced'?t("Track your holdings, cost basis, and the bigger picture."):t("Track performance from the day you add a stock.")}</p></div><div className="card-tools">{state.guest&&<span className="save-state">{busy?<LoaderCircle size={15} className="spin"/>:<Check size={15}/>} {busy?t("Updating…"):t("Saved on this device")}</span>}<span className="refresh-state" role="status" aria-live="polite">{(viewRefreshing||busy==='refresh')?<LoaderCircle size={13} className="spin" aria-hidden="true"/>:<span className={`status-dot ${totalStale?'warning-dot':''}`}/> }{viewRefreshing||busy==='refresh'?t("Refreshing all quotes…"):totalStale?`${totalStale} ${t("prices need attention")} · ${watchlistRefreshTime({stocks:state.watchlists.flatMap(list=>list.stocks)},relativeNow)}`:watchlistRefreshTime({stocks:state.watchlists.flatMap(list=>list.stocks)},relativeNow)}</span>{!!active.stocks.length&&<Button variant="outline" disabled={!!busy} onClick={()=>void openShare()}><Link2/><T text="Share"/></Button>}</div></div>
   {setup}
   {member&&<WatchlistBoard list={active}/>}
-  <div className="watchlist-compose-row">{canEdit&&<form className={`add-bar ${active.mode==='advanced'?'advanced-add-bar':''}`} onSubmit={addStock}><StockSearch value={ticker} onChange={setTicker} onPick={symbol=>{void openAddModal(symbol);}} inputRef={inputRef} currency={active.stocks[0]?.currency}/><Button type="submit" className="primary-button" disabled={!!busy||!ticker.trim()||addLimited}>{busy==='quote'||busy==='addStock'?<LoaderCircle className="spin"/>:<Plus/>}{busy==='quote'?t("Loading…"):busy==='addStock'?t("Adding…"):t("Add stock")}</Button><Button type="button" variant="outline" className="refresh-button" disabled={!!busy} onClick={()=>void act({action:'refresh'}).catch(()=>{})}><RefreshCw className={busy==='refresh'?'spin':''}/><T text="Refresh"/></Button></form>}{!member&&!!active.stocks.length&&<WatchlistSummary list={active}/>}</div>
+  <div className="watchlist-compose-row">{canEdit&&<form className={`add-bar ${active.mode==='advanced'?'advanced-add-bar':''}`} onSubmit={addStock}><StockSearch value={ticker} onChange={setTicker} onPick={symbol=>{void openAddModal(symbol);}} inputRef={inputRef} currency={active.stocks[0]?.currency}/><Button type="submit" className="primary-button" disabled={!!busy||!ticker.trim()||addLimited}>{busy==='quote'||busy==='addStock'?<LoaderCircle className="spin"/>:<Plus/>}{busy==='quote'?t("Loading…"):busy==='addStock'?t("Adding…"):t("Add stock")}</Button><Button type="button" variant="outline" className="refresh-button" disabled={!!busy} onClick={()=>void act({action:'refresh'},false,true).catch(()=>{})}><RefreshCw className={busy==='refresh'?'spin':''}/><T text="Refresh"/></Button></form>}{!member&&!!active.stocks.length&&<WatchlistSummary list={active}/>}</div>
   {marketError&&<MarketLockBanner message={error} onDismiss={()=>setError('')}/>}
   {addLimited&&<div className="quote-warning">This list can hold up to {state.plan.maxStocks} stocks. Remove one to add another.</div>}{stale>0&&<div className="quote-warning" role="status">{stale} quotes could not be refreshed. Last known prices are shown.</div>}
 
@@ -166,7 +196,7 @@ export function WatchlistWorkspace({compact=false}:{compact?:boolean}){const t=u
   <SaveAccountPrompt key={saveOpen?"open":"closed"} reason={limitPrompt?"list-limit":undefined} open={saveOpen} listName={active?.name} stocks={active?.stocks} onOpenChange={v=>{setSaveOpen(v);if(!v)setLimitPrompt(false);if(!v&&state?.guest)apply(markSavePromptShown(state,window.localStorage));}}/>
   </>;
 }
-function WatchlistRail({lists,activeId,maxLists,busy,onSelect,onCreate}:{lists:Watchlist[];activeId:string;maxLists:number|null;busy:boolean;onSelect:(id:string)=>void;onCreate:()=>void}){
+function WatchlistRail({lists,activeId,maxLists,busy,now,onSelect,onCreate}:{lists:Watchlist[];activeId:string;maxLists:number|null;busy:boolean;now:number;onSelect:(id:string)=>void;onCreate:()=>void}){
   const t=useT();
   return <aside className="watchlist-rail">
     <div className="watchlist-rail-head">
@@ -176,14 +206,15 @@ function WatchlistRail({lists,activeId,maxLists,busy,onSelect,onCreate}:{lists:W
     </div>
     <ul className="watchlist-rail-list">
       {lists.map(list=>{
-        const change=watchlistPerformance(list);
+        const change=watchlistDayChange(list);
+        const tone=change===null?'unknown':change>0?'up':change<0?'down':'flat';
         return <li key={list.id}>
-          <button type="button" className={list.id===activeId?'is-active':undefined} aria-current={list.id===activeId?'true':undefined} onClick={()=>onSelect(list.id)}>
+          <button type="button" className={`day-${tone}${list.id===activeId?' is-active':''}`} aria-current={list.id===activeId?'true':undefined} onClick={()=>onSelect(list.id)}>
             <span className="watchlist-rail-copy">
               <span className="watchlist-rail-name">{list.name}</span>
               <span className="watchlist-rail-count">{list.stocks.length} {t("Stocks")}</span>
             </span>
-            <span className={'watchlist-rail-change'+(change===null?'':change>=0?' up':' down')} aria-label={t("Since created")}>{change===null?'—':`${change>=0?'+':''}${change.toFixed(1)}%`}</span>
+            <span className={'watchlist-rail-change'+(change===null?'':change>0?' up':change<0?' down':' flat')} aria-label={t("Average change")}>{change===null?'—':`${change>0?'+':''}${change.toFixed(2)}%`}<small>{watchlistRefreshTime(list,now)}</small></span>
           </button>
         </li>;
       })}
