@@ -496,7 +496,8 @@ export function EarningsCalendar(){
                       <CompanyIcon symbol={row.symbol}/>
                       <span className="earnings-chip-text">
                         <strong>{row.symbol}{watchSymbols.has(row.symbol)&&<Star size={11} aria-label={t('On a watchlist')}/>}</strong>
-                        <span className="earnings-chip-details"><small>{row.name}</small><em>{row.reported
+                        <small className="earnings-company-name">{row.name}</small>
+                        <span className="earnings-chip-details"><em>{row.reported
                           ?`${t('Actual')} ${row.eps?formatEps(row.eps):'—'} · ${t('Estimate')} ${row.epsForecast?formatEps(row.epsForecast):'—'}${surprise.difference===null?'':` · ${formatSurprise(surprise)}`}`
                           :`${timing(row.when)}${row.epsForecast?` · ${t('Estimate')} ${formatEps(row.epsForecast)}`:''}`}</em></span>
                       </span>
