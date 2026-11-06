@@ -711,17 +711,11 @@ html.dark .earnings-day-note.is-error{color:#ff9aa4}
 .earnings-chip-details{position:absolute;z-index:5;left:50%;bottom:calc(100% - 3px);display:none;width:max-content;max-width:min(240px,80vw);padding:9px 11px;border:1px solid #dce5df;border-radius:10px;background:#fff;box-shadow:0 8px 24px rgba(30,50,38,.14);text-align:left;transform:translateX(-50%)}
 .earnings-chip-details small,.earnings-chip-details em{display:block;font-size:11px;white-space:normal;line-height:1.35}
 .earnings-chip:hover .earnings-chip-details,.earnings-chip:focus-visible .earnings-chip-details{display:grid}
-.earnings-day.has-earnings{background:#f1f8f3}
-.earnings-day.has-earnings header,.earnings-day.has-earnings.is-today header{background:#e5f3e9}
-.earnings-day.has-earnings .earnings-chip{background:rgba(255,255,255,.84)}
 html.dark .earnings-chip-details{background:#17271e;border-color:#355541}
-html.dark .earnings-day.has-earnings{background:#172b20}
-html.dark .earnings-day.has-earnings header,html.dark .earnings-day.has-earnings.is-today header{background:#1c3928}
 @media(max-width:680px){
   .earnings-chip{position:relative;min-height:68px;padding:8px 4px}
   .earnings-chip-text small,.earnings-chip-text em{display:none}
   .earnings-chip-text strong{flex-wrap:wrap}
-  .earnings-day.has-earnings{background:#f1f8f3}
 }
 .earnings-more-tile{color:#168149;border-style:dashed;font-weight:600}
 .earnings-more-count{display:grid;place-items:center;width:42px;height:42px;border-radius:10px;background:#f1f5f2;font-size:16px;font-variant-numeric:tabular-nums}
@@ -2009,6 +2003,32 @@ html.dark .earnings-month-tabs button[aria-pressed=true],html.dark .earnings-com
 .earnings-cal-page .earnings-more-count{width:26px;height:26px;font-size:12px}
 .earnings-cal-page .earnings-more-tile .earnings-chip-text{width:auto;text-align:left}
 .earnings-cal-page .earnings-more-tile .earnings-chip-text strong{font-size:11px}
+
+/* Highlight only the current weekday (or Monday when the market week is closed). */
+.earnings-day.is-focus-day{background:#f1f8f3}
+.earnings-day.is-focus-day header{background:#e5f3e9;border-bottom-color:#9adcbd}
+html.dark .earnings-day.is-focus-day{background:#172b20}
+html.dark .earnings-day.is-focus-day header{background:#1c3928}
+@media(max-width:760px){
+  .earnings-cal-page{padding:12px 10px 48px}
+  .earnings-cal-head{gap:7px}
+  .earnings-cal-head h1{font-size:25px}
+  .earnings-tools{align-items:center}
+  .earnings-search{flex:1 0 100%;min-width:0}
+  .earnings-filters-trigger{flex:1;min-height:34px}
+  .earnings-view-switch{margin-left:auto}
+  .earnings-week{grid-template-columns:minmax(0,1fr)}
+  .earnings-week .earnings-day-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  .earnings-week .earnings-chip{min-height:58px;height:auto;padding:7px 3px}
+  .earnings-week .earnings-chip .company-icon{width:32px;height:32px;flex-basis:32px}
+  .member-home-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .member-home-stats>div:last-child{grid-column:1/-1}
+  .member-quote-status>strong{overflow-wrap:anywhere}
+  .member-watchlist-grid{grid-template-columns:minmax(0,1fr)}
+  .member-watchlist-card{min-width:0;padding:16px;min-height:0}
+  .member-ticker-row{row-gap:5px}
+  .member-card-footer{align-items:flex-end}
+}
 
 .add-quote-total{display:block;margin-top:7px;font-size:12px;line-height:1.5;color:#596b82;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 html.dark .add-quote-total{color:#d5e6db}

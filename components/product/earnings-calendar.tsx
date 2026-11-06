@@ -111,6 +111,8 @@ export function EarningsCalendar(){
   });
   const triggerRef=useRef<HTMLButtonElement|null>(null);
   const today=useMemo(()=>todayInMarket(),[]);
+  const focusDate=useMemo(()=>{const weekday=new Date(today+'T12:00:00Z').getUTCDay();return weekday===6?addDays(today,2):weekday===0?addDays(today,1):today;},[today]);
+  const focusWeek=useMemo(()=>earningsWeekMonday(focusDate),[focusDate]);
   const [selectedDay,setSelectedDay]=useState(()=>{
     const current=todayInMarket();
     const weekday=new Date(current+'T12:00:00Z').getUTCDay();
@@ -155,7 +157,7 @@ export function EarningsCalendar(){
 
   useEffect(()=>{
     let alive=true;
-    const monday=week||earningsWeekMonday(today);
+    const monday=week||focusWeek;
     const hit=cachedWeek(week)||cachedWeek(monday);
     if(hit){setData(hit);setLoading(false);setError('');setStaleNotice('');warmAround(monday,{minWeek:hit.minWeek,maxWeek:hit.maxWeek});}
     else{setData(null);setLoading(true);setError('');setStaleNotice('');}
@@ -168,7 +170,7 @@ export function EarningsCalendar(){
       warmAround(result.weekStart,{minWeek:result.minWeek,maxWeek:result.maxWeek});
     }).catch(e=>{if(!alive)return;if(hit){setStaleNotice(e.message||UNAVAILABLE);setLoading(false);return;}setError(e.message||UNAVAILABLE);setLoading(false);});
     return()=>{alive=false;};
-  },[week,attempt,today]);
+  },[week,attempt,today,focusWeek]);
 
   const writeUrl=(patch:Record<string,string|null>,mode:'push'|'replace'='push')=>{
     const next=new URLSearchParams(params.toString());
@@ -186,8 +188,8 @@ export function EarningsCalendar(){
   const go=useCallback((next:string)=>{
     if(!data||next<data.minWeek||next>data.maxWeek)return;
     if(!cachedWeek(next))void pullWeek(next).catch(()=>{});
-    replace({week:next===data.todayMonday?null:next});
-  },[data,params,calendarMode]);
+    replace({week:next===focusWeek?null:next});
+  },[data,params,calendarMode,focusWeek]);
 
   const setView=(next:View)=>{
     setViewState(next);
@@ -284,7 +286,7 @@ export function EarningsCalendar(){
   const next=data?shiftWeek(data.weekStart,1):'';
   const canPrev=!!data&&prev>=data.minWeek;
   const canNext=!!data&&next<=data.maxWeek;
-  const onThisWeek=!!data&&data.weekStart===data.todayMonday;
+  const onThisWeek=!!data&&data.weekStart===focusWeek;
   const range=data?weekRangeLabel(data.weekStart,data.weekEnd):'';
   const chips=[
     query?{key:'q',label:`“${query}”`}:null,
@@ -390,7 +392,7 @@ export function EarningsCalendar(){
             <span className="week-full">{t('Previous week')}</span>
             <span className="week-short">{t('Previous')}</span>
           </button>
-          <button type="button" disabled={!data||loading||onThisWeek} aria-pressed={onThisWeek} className={onThisWeek?'is-current':undefined} onClick={()=>{const weekday=new Date(today+'T12:00:00Z').getUTCDay();if(calendarMode==='day')setSelectedDay(weekday===0||weekday===6?earningsWeekMonday(today):today);go(data?.todayMonday||'');}}>
+          <button type="button" disabled={!data||loading||onThisWeek} aria-pressed={onThisWeek} className={onThisWeek?'is-current':undefined} onClick={()=>{if(calendarMode==='day')setSelectedDay(focusDate);go(focusWeek);}}>
             {t('This week')}
           </button>
           <button type="button" disabled={!canNext||loading} aria-label={t('Next week')} onClick={()=>{if(calendarMode==='day')setSelectedDay(next);go(next);}}>
@@ -476,12 +478,13 @@ export function EarningsCalendar(){
     </section>:<div className="earnings-week" aria-live="polite">
         {days.map(day=>{
           const isToday=day.date===today;
+          const isFocusDay=day.date===focusDate;
           const companies=filteredByDay.get(day.date)||[];
-          return <section id={'earnings-'+day.date} key={day.date} className={'earnings-day'+(companies.length?' has-earnings':'')+(isToday?' is-today':'')+(day.date<today?' is-past':'')}>
+          return <section id={'earnings-'+day.date} key={day.date} className={'earnings-day'+(isFocusDay?' is-focus-day':'')+(isToday?' is-today':'')+(day.date<today?' is-past':'')}>
             <header>
               <strong>{dayFormat(day.date,{weekday:'short'},locale)}</strong>
               <span>{dayFormat(day.date,{month:'short',day:'numeric'},locale)}</span>
-              {isToday&&<em className="earnings-today-tag">{t('Today')}</em>}
+              {isFocusDay&&<em className="earnings-today-tag">{isToday?t('Today'):t('Next week')}</em>}
               <small>{companies.length}</small>
             </header>
             {day.status!=='ok'?<p className="earnings-day-note is-error">{t('Could not load this day.')}</p>
