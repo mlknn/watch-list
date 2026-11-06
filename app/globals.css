@@ -1050,6 +1050,7 @@ html.dark .market-page.is-crypto .market-table{background:#10182a;border-color:#
 .watchlist-rail-head{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #eef2f8}
 .watchlist-rail-head h1{font-size:22px;letter-spacing:-.6px;margin:4px 0}
 .watchlist-rail-head p{margin:0;font-size:12px;color:#6b7a91}
+.watchlist-rail-head .watchlist-rail-instruction{margin-top:6px;font-size:11px;line-height:1.4}
 .watchlist-rail-list{list-style:none;margin:0;padding:0;display:grid;gap:4px}
 .watchlist-rail-list button{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 10px;border:0;border-radius:10px;background:transparent;text-align:left;cursor:pointer;color:inherit}
 .watchlist-rail-list button:hover,.watchlist-rail-list button.is-active{background:#eef3ff}
@@ -1190,7 +1191,7 @@ html.dark .tool-preview-head{color:#9ab0a3}
 .earnings-detail dd{margin:0;font-weight:650}
 .earnings-compare{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .earnings-detail-note{font-size:12px;color:#6b7a91;line-height:1.5}
-.earnings-detail-sheet{width:min(480px,100vw);max-width:480px}
+.earnings-detail-sheet{position:fixed!important;inset:0 0 0 auto!important;width:min(480px,100vw);max-width:480px;height:100dvh!important;max-height:100dvh;overflow-y:auto;overscroll-behavior:contain}
 .earnings-filter-drawer{padding-bottom:20px}
 .earnings-filter-sheet{display:grid;gap:12px;padding:0 16px}
 .earnings-filter-actions{display:flex;gap:8px;padding:16px}
@@ -1736,7 +1737,9 @@ html.dark .member-empty-card>div{color:#e5f3e9}
 .watchlist-rail-list button.day-up:not(.is-active){background:#f1fbf5}
 .watchlist-rail-list button.day-down:not(.is-active){background:#fff3f3}
 .watchlist-rail-list button.day-flat:not(.is-active){background:#f6f8fb}
-.watchlist-rail-change small{display:block;margin-top:2px;text-align:right;font-size:9px;font-weight:500;color:#718097}
+.watchlist-rail-change small{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;column-gap:3px;row-gap:1px;margin-top:2px;text-align:right;font-size:9px;font-weight:500;color:#718097}
+.watchlist-refresh-time svg{flex:none;color:#14845b}
+.watchlist-refresh-label{flex-basis:100%;font-size:8px;line-height:1.1}
 .watchlist-rail-list button.day-up .watchlist-rail-change{color:#14845b}
 .watchlist-rail-list button.day-down .watchlist-rail-change{color:#b44450}
 .watchlist-rail-list button.day-flat .watchlist-rail-change{color:#64748b}

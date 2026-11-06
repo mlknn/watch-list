@@ -204,6 +204,7 @@ function WatchlistRail({lists,activeId,maxLists,busy,now,onSelect,onCreate}:{lis
       <p className="eyebrow">{t("MY WATCHLISTS")}</p>
       <h1><T text="My watchlists"/></h1>
       <p>{lists.length} / {maxLists??'∞'}</p>
+      <p className="watchlist-rail-instruction"><T text="Click or select a watchlist to see details."/></p>
     </div>
     <ul className="watchlist-rail-list">
       {lists.map(list=>{
@@ -215,7 +216,7 @@ function WatchlistRail({lists,activeId,maxLists,busy,now,onSelect,onCreate}:{lis
               <span className="watchlist-rail-name">{list.name}</span>
               <span className="watchlist-rail-count">{list.stocks.length} {t("Stocks")}</span>
             </span>
-            <span className={'watchlist-rail-change'+(change===null?'':change>0?' up':change<0?' down':' flat')} aria-label={t("Average change")}>{change===null?'—':`${change>0?'+':''}${change.toFixed(2)}%`}<small>{watchlistRefreshTime(list,now)}</small></span>
+            <span className={'watchlist-rail-change'+(change===null?'':change>0?' up':change<0?' down':' flat')} aria-label={t("Average change")}>{change===null?'—':`${change>0?'+':''}${change.toFixed(2)}%`}<small className="watchlist-refresh-time" title={watchlistRefreshTime(list,now)}><Check size={11} aria-hidden="true"/><span>{watchlistRefreshTime(list,now).replace(/^Refreshed\s*/, '')}</span><span className="watchlist-refresh-label"><T text="Refreshed"/></span></small></span>
           </button>
         </li>;
       })}
