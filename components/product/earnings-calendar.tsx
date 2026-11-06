@@ -107,7 +107,7 @@ export function EarningsCalendar(){
   const [mobileFilters,setMobileFilters]=useState(false);
   const [view,setViewState]=useState<View>(()=>{
     const url=params.get('view');
-    return url==='table'||url==='calendar'?url:'calendar';
+    return url==='calendar'?'calendar':'table';
   });
   const triggerRef=useRef<HTMLButtonElement|null>(null);
   const today=useMemo(()=>todayInMarket(),[]);
@@ -353,7 +353,7 @@ export function EarningsCalendar(){
     </label>
   </div>;
 
-  return <main className="earnings-cal-page">
+  return <main className={'earnings-cal-page'+(view==='table'?' is-table-view':'')}>
     <div className="earnings-cal-head"><h1><T text="Earnings calendar"/></h1><div className="earnings-calendar-modes" role="group" aria-label={t('Calendar view')}>
       <button type="button" className={calendarMode==='weekly'?'is-active':undefined} aria-pressed={calendarMode==='weekly'} onClick={()=>setCalendarMode('weekly')}><CalendarDays size={14}/>{t('Weekly')}</button>
       <button type="button" className={calendarMode==='day'?'is-active':undefined} aria-pressed={calendarMode==='day'} onClick={()=>{setCalendarMode('day');if(!days.some(day=>day.date===selectedDay)&&days[0])setSelectedDay(days[0].date);}}><List size={14}/>{t('Day')}</button>
@@ -486,13 +486,13 @@ export function EarningsCalendar(){
             </header>
             {day.status!=='ok'?<p className="earnings-day-note is-error">{t('Could not load this day.')}</p>
               :companies.length?<ul className="earnings-day-list">
-                {(expandedDays.has(day.date)?companies:companies.slice(0,10)).map(row=>{
+                {(expandedDays.has(day.date)?companies:companies.slice(0,30)).map(row=>{
                   const surprise=epsSurprise(row.eps,row.epsForecast);
                   return <li key={row.symbol}>
                     <button type="button" className="earnings-chip" onClick={e=>openRow(row,e.currentTarget)}>
                       <CompanyIcon symbol={row.symbol}/>
                       <span className="earnings-chip-text">
-                        <strong>{row.symbol}{row.reported&&<i className="earnings-reported">{t('Reported')}</i>}{watchSymbols.has(row.symbol)&&<Star size={11} aria-label={t('On a watchlist')}/>}</strong>
+                        <strong>{row.symbol}{watchSymbols.has(row.symbol)&&<Star size={11} aria-label={t('On a watchlist')}/>}</strong>
                         <span className="earnings-chip-details"><small>{row.name}</small><em>{row.reported
                           ?`${t('Actual')} ${row.eps?formatEps(row.eps):'—'} · ${t('Estimate')} ${row.epsForecast?formatEps(row.epsForecast):'—'}${surprise.difference===null?'':` · ${formatSurprise(surprise)}`}`
                           :`${timing(row.when)}${row.epsForecast?` · ${t('Estimate')} ${formatEps(row.epsForecast)}`:''}`}</em></span>
@@ -500,10 +500,10 @@ export function EarningsCalendar(){
                     </button>
                   </li>;
                 })}
-                {companies.length>10&&<li>
+                {companies.length>30&&<li>
                   <button type="button" className="earnings-chip earnings-more-tile" aria-expanded={expandedDays.has(day.date)} onClick={()=>setExpandedDays(current=>{const next=new Set(current);if(next.has(day.date))next.delete(day.date);else next.add(day.date);return next;})}>
-                    <span className="earnings-more-count">{expandedDays.has(day.date)?'−':`+${companies.length-10}`}</span>
-                    <span className="earnings-chip-text"><strong>{expandedDays.has(day.date)?t('Show less'):t('Show more')}</strong><small>{expandedDays.has(day.date)?t('Collapse list'):t('More companies')}</small></span>
+                    <span className="earnings-more-count">{expandedDays.has(day.date)?'−':`+${companies.length-30}`}</span>
+                    <span className="earnings-chip-text"><strong>{expandedDays.has(day.date)?t('Show less'):t('Show more')}</strong></span>
                   </button>
                 </li>}
               </ul>:<p className="earnings-day-note">{t('No earnings scheduled')}</p>}

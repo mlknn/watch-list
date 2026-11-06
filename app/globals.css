@@ -1982,6 +1982,21 @@ html.dark .earnings-month-tabs button[aria-pressed=true],html.dark .earnings-com
 .earnings-weekday{font-size:10px}
 }
 
+/* Keep the table as the primary earnings view and make filters unobtrusive. */
+.earnings-cal-page.is-table-view .earnings-calendar-modes{display:none}
+.earnings-cal-page .earnings-tools{gap:7px;margin-bottom:7px}
+.earnings-cal-page .earnings-search{flex-basis:220px;min-width:180px}
+.earnings-cal-page .earnings-search input{height:32px;font-size:12px}
+.earnings-cal-page .earnings-filter-row{gap:6px}
+.earnings-cal-page .earnings-filter{gap:2px;font-size:10px}
+.earnings-cal-page .earnings-filter select{height:32px;padding:0 8px;font-size:11px}
+.earnings-cal-page .earnings-watch-toggle{height:32px;gap:5px;font-size:11px}
+.earnings-cal-page .earnings-view-switch button{height:32px;padding:0 9px;font-size:11px}
+.earnings-cal-page .earnings-more-tile{min-height:40px;height:40px;flex-direction:row;gap:7px;padding:5px 8px}
+.earnings-cal-page .earnings-more-count{width:26px;height:26px;font-size:12px}
+.earnings-cal-page .earnings-more-tile .earnings-chip-text{width:auto;text-align:left}
+.earnings-cal-page .earnings-more-tile .earnings-chip-text strong{font-size:11px}
+
 .add-quote-total{display:block;margin-top:7px;font-size:12px;line-height:1.5;color:#596b82;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 html.dark .add-quote-total{color:#d5e6db}
 .add-quote-price{min-width:0}
