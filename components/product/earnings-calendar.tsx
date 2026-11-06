@@ -477,7 +477,7 @@ export function EarningsCalendar(){
         {days.map(day=>{
           const isToday=day.date===today;
           const companies=filteredByDay.get(day.date)||[];
-          return <section id={'earnings-'+day.date} key={day.date} className={'earnings-day'+(isToday?' is-today':'')+(day.date<today?' is-past':'')}>
+          return <section id={'earnings-'+day.date} key={day.date} className={'earnings-day'+(companies.length?' has-earnings':'')+(isToday?' is-today':'')+(day.date<today?' is-past':'')}>
             <header>
               <strong>{dayFormat(day.date,{weekday:'short'},locale)}</strong>
               <span>{dayFormat(day.date,{month:'short',day:'numeric'},locale)}</span>
@@ -493,10 +493,9 @@ export function EarningsCalendar(){
                       <CompanyIcon symbol={row.symbol}/>
                       <span className="earnings-chip-text">
                         <strong>{row.symbol}{row.reported&&<i className="earnings-reported">{t('Reported')}</i>}{watchSymbols.has(row.symbol)&&<Star size={11} aria-label={t('On a watchlist')}/>}</strong>
-                        <small>{row.name}</small>
-                        <em>{row.reported
+                        <span className="earnings-chip-details"><small>{row.name}</small><em>{row.reported
                           ?`${t('Actual')} ${row.eps?formatEps(row.eps):'—'} · ${t('Estimate')} ${row.epsForecast?formatEps(row.epsForecast):'—'}${surprise.difference===null?'':` · ${formatSurprise(surprise)}`}`
-                          :`${timing(row.when)}${row.epsForecast?` · ${t('Estimate')} ${formatEps(row.epsForecast)}`:''}`}</em>
+                          :`${timing(row.when)}${row.epsForecast?` · ${t('Estimate')} ${formatEps(row.epsForecast)}`:''}`}</em></span>
                       </span>
                     </button>
                   </li>;
