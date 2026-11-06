@@ -1725,8 +1725,16 @@ html.dark .member-empty-card>div{color:#e5f3e9}
 .member-watchlist-card.day-flat{background:linear-gradient(145deg,#f6f8fb,#fff 78%)}
 .member-watchlist-card.day-unknown{background:#fff}
 .member-watchlist-return{display:grid;justify-items:end;gap:3px;color:#50617a}
-.member-watchlist-return small{font-size:9px;color:#75849a;font-weight:550;letter-spacing:.02em}
+.member-watchlist-return small{font-size:10px;color:#75849a;font-weight:550;letter-spacing:.02em}
 .member-watchlist-return strong{font-size:13px}
+.member-watchlist-overall{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;color:#718099;font-size:11px}
+.member-watchlist-overall strong{font-size:12px;font-variant-numeric:tabular-nums;color:#566982}
+.member-watchlist-overall strong.up{color:#14845b}
+.member-watchlist-overall strong.down{color:#b44450}
+.member-watchlist-overall strong.flat{color:#64748b}
+.member-card-footer{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-top:auto;padding-top:14px}
+.member-card-footer .member-card-link{margin-top:0;padding-top:0}
+.member-card-refresh{color:#8793a5;font-size:9px;font-weight:500}
 .member-watchlist-card.day-up .member-watchlist-return strong,.member-ticker.day-up,.watchlist-rail-list button.day-up .watchlist-rail-change{color:#14845b}
 .member-watchlist-card.day-down .member-watchlist-return strong,.member-ticker.day-down,.watchlist-rail-list button.day-down .watchlist-rail-change{color:#b44450}
 .member-watchlist-card.day-flat .member-watchlist-return strong,.member-ticker.day-flat,.watchlist-rail-list button.day-flat .watchlist-rail-change{color:#64748b}
@@ -1748,6 +1756,11 @@ html.dark .member-watchlist-card.day-down{background:linear-gradient(145deg,#351
 html.dark .member-watchlist-card.day-flat{background:linear-gradient(145deg,#1c2822,#141f1a 80%)}
 html.dark .member-watchlist-card.day-unknown{background:#141f1a}
 html.dark .member-watchlist-return,html.dark .member-watchlist-return small{color:#b8ccc0}
+html.dark .member-watchlist-overall{color:#b8ccc0}
+html.dark .member-watchlist-overall strong{color:#d1ded5}
+html.dark .member-watchlist-overall strong.up{color:#5fe3a4}
+html.dark .member-watchlist-overall strong.down{color:#ff9aa4}
+html.dark .member-card-refresh{color:#9aaca0}
 html.dark .member-watchlist-card.day-up .member-watchlist-return strong,html.dark .member-ticker.day-up,html.dark .watchlist-rail-list button.day-up .watchlist-rail-change{color:#5fe3a4}
 html.dark .member-watchlist-card.day-down .member-watchlist-return strong,html.dark .member-ticker.day-down,html.dark .watchlist-rail-list button.day-down .watchlist-rail-change{color:#ff9aa4}
 html.dark .member-watchlist-card.day-flat .member-watchlist-return strong,html.dark .member-ticker.day-flat,html.dark .watchlist-rail-list button.day-flat .watchlist-rail-change{color:#b8ccc0}
