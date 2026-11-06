@@ -5,8 +5,7 @@ const urls=[
   ['https://stockwatchlist.app/compare','weekly','0.8'],
   ['https://stockwatchlist.app/open-source','monthly','0.7'],
   ['https://stockwatchlist.app/privacy','yearly','0.5'],
-  ['https://stockwatchlist.app/signup','monthly','0.6'],
-  ['https://stockwatchlist.app/login','monthly','0.4'],
+  ['https://stockwatchlist.app/history','weekly','0.6'],
 ];
 const body=`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
