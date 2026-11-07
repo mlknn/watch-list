@@ -1,14 +1,14 @@
 'use client';
 import {useLang,useT} from '@/components/product/language';
 import {T} from '@/components/product/language';
-import {useCallback,useEffect,useMemo,useRef,useState} from 'react';
+import {useCallback,useEffect,useMemo,useState} from 'react';
 import {useRouter,useSearchParams} from 'next/navigation';
 import Link from 'next/link';
 import {CalendarDays,ChevronLeft,ChevronRight,Download,List,LoaderCircle,Search,Star,X} from 'lucide-react';
 import {CompanyIcon} from './company-icon';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
-import {Sheet,SheetContent,SheetDescription,SheetHeader,SheetTitle} from '@/components/ui/sheet';
+import {Sheet,SheetContent,SheetHeader,SheetTitle} from '@/components/ui/sheet';
 import {HoverCard,HoverCardTrigger,HoverCardContent} from '@/components/ui/hover-card';
 import {apiJson,signedIn} from '@/lib/auth-client';
 import {readGuestState} from '@/lib/guest-watchlist.mjs';
@@ -35,10 +35,6 @@ function shiftWeek(monday:string,delta:number){
 }
 const localeOf=(lang:string)=>lang==='tr'?'tr-TR':lang==='es'?'es-ES':'en-US';
 const dayFormat=(iso:string,options:Intl.DateTimeFormatOptions,locale='en-US')=>new Date(iso+'T12:00:00Z').toLocaleDateString(locale,{...options,timeZone:'UTC'});
-const stampFormat=(iso:string,locale='en-US')=>{
-  const date=new Date(iso);
-  return Number.isFinite(date.getTime())?date.toLocaleString(locale,{timeZone:'America/New_York',month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}):'';
-};
 const UNAVAILABLE='The earnings calendar is temporarily unavailable.';
 const VIEW_KEY='earnings:view';
 const weekStore=new Map<string,Board>();
@@ -101,7 +97,6 @@ export function EarningsCalendar(){
   const [dayQuotes,setDayQuotes]=useState<Record<string,DayQuote|null>>({});
   const [watchError,setWatchError]=useState('');
   const [staleNotice,setStaleNotice]=useState('');
-  const [selected,setSelected]=useState<Row|null>(null);
   const [expandedDays,setExpandedDays]=useState<Set<string>>(new Set());
   const [calendarMode,setCalendarMode]=useState<'weekly'|'day'>('weekly');
   const [sort,setSort]=useState<{key:SortKey;dir:'asc'|'desc'}>({key:'cap',dir:'desc'});
@@ -110,7 +105,6 @@ export function EarningsCalendar(){
     const url=params.get('view');
     return url==='calendar'?'calendar':'table';
   });
-  const triggerRef=useRef<HTMLButtonElement|null>(null);
   const today=useMemo(()=>todayInMarket(),[]);
   const focusDate=useMemo(()=>{const weekday=new Date(today+'T12:00:00Z').getUTCDay();return weekday===6?addDays(today,2):weekday===0?addDays(today,1):today;},[today]);
   const focusWeek=useMemo(()=>earningsWeekMonday(focusDate),[focusDate]);
@@ -231,7 +225,6 @@ export function EarningsCalendar(){
     :when==='amc'?t('After close')
     :when==='during'?t('During market hours')
     :t('Time not supplied');
-  const toneLabel=(tone:string)=>tone==='above'?t('Above estimate'):tone==='below'?t('Below estimate'):tone==='inline'?t('In line'):'';
 
   const rows=useMemo(()=>{
     const all=(data?.days||[]).flatMap(day=>day.companies.map(company=>({...company,date:day.date,dayStatus:day.status})));
@@ -300,14 +293,7 @@ export function EarningsCalendar(){
   const emptyWatch=!loading&&!!data&&watchOnly&&watchSymbols.size===0;
   const emptyFilters=!loading&&!!data&&!rows.length&&!emptyCoverage&&!emptyWatch;
 
-  function openRow(row:Row,el:HTMLButtonElement|null){
-    triggerRef.current=el;
-    setSelected(row);
-  }
-  function closePanel(){
-    setSelected(null);
-    triggerRef.current?.focus();
-  }
+  function openRow(row:Row){router.push(stockHref(row.symbol,'/earnings'+(paramKey?'?'+paramKey:'')));}
   function exportCsv(){
     const csv=earningsCsv(sortedRows,{timezone:data?.timezone||'America/New_York',source:data?.source||'Nasdaq',fetchedAt:data?.fetchedAt||'',sessionLabel:timing});
     const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
@@ -445,7 +431,7 @@ export function EarningsCalendar(){
               const surprise=epsSurprise(row.eps,row.epsForecast);
               return <tr key={row.symbol+row.date} className={row.date===today?'is-today':undefined}>
                 <th scope="row">
-                  <button type="button" className="earnings-company-link" onClick={e=>openRow(row,e.currentTarget)}>
+                  <button type="button" className="earnings-company-link" onClick={()=>openRow(row)}>
                     <CompanyIcon symbol={row.symbol}/>
                     <span><strong>{row.symbol}</strong><small>{row.name}</small></span>
                     {watchSymbols.has(row.symbol)&&<Star size={12} aria-label={t('On a watchlist')}/>}
@@ -468,7 +454,7 @@ export function EarningsCalendar(){
       <header><div><strong>{dayFormat(selectedDay,{weekday:'long'},locale)}</strong><span>{dayFormat(selectedDay,{month:'long',day:'numeric'},locale)}</span></div><small>{selectedDayRows.length} {t('companies')}</small></header>
       {!selectedDayBoard?<p className="earnings-day-note">{t('No earnings scheduled')}</p>:selectedDayBoard.status!=='ok'?<p className="earnings-day-note is-error">{t('Could not load this day.')}</p>:selectedDayRows.length?<div className="earnings-focus-list">
         {selectedDayRows.map(row=><div className="earnings-focus-row" key={row.symbol}>
-          <button type="button" className="earnings-focus-company" onClick={e=>openRow(row,e.currentTarget)}><CompanyIcon symbol={row.symbol}/><span><strong>{row.symbol}</strong><small>{row.name}</small><em>{timing(row.when)}{row.reported?` · ${t('Reported')}`:''}</em></span></button>
+          <button type="button" className="earnings-focus-company" onClick={()=>openRow(row)}><CompanyIcon symbol={row.symbol}/><span><strong>{row.symbol}</strong><small>{row.name}</small><em>{timing(row.when)}{row.reported?` · ${t('Reported')}`:''}</em></span></button>
           <span className="earnings-focus-metric"><small>{t('EPS estimate')}</small><strong>{row.epsForecast?formatEps(row.epsForecast):'—'}</strong></span>
           {(()=>{const quote=dayQuotes[row.symbol];const quoteLoaded=Object.prototype.hasOwnProperty.call(dayQuotes,row.symbol);const current=quote?price(quote.price,quote.currency):quoteLoaded?'—':t('Loading…');const change=quote?.changePercent;const changeText=change==null?(quoteLoaded?'—':t('Loading…')):`${change>0?'+':''}${change.toFixed(2)}%`;const href=stockHref(row.symbol,'/earnings'+(paramKey?'?'+paramKey:''));return <>
             <span className="earnings-focus-metric"><small>{t('Current price')}</small><strong>{isMember?<Link className="earnings-focus-link" href={href}>{current}</Link>:current}</strong></span>
@@ -497,7 +483,7 @@ export function EarningsCalendar(){
                     :`${timing(row.when)}${row.epsForecast?` · ${t('Estimate')} ${formatEps(row.epsForecast)}`:''}`;
                   return <li key={row.symbol}>
                     <HoverCard>
-                      <HoverCardTrigger type="button" render={<button type="button"/>} className="earnings-chip" onClick={e=>openRow(row,e.currentTarget as unknown as HTMLButtonElement)}>
+                      <HoverCardTrigger type="button" render={<button type="button"/>} className="earnings-chip" onClick={()=>openRow(row)}>
                         <CompanyIcon symbol={row.symbol}/>
                         <span className="earnings-chip-text">
                           <strong>{row.symbol}{watchSymbols.has(row.symbol)&&<Star size={11} aria-label={t('On a watchlist')}/>}</strong>
@@ -508,7 +494,7 @@ export function EarningsCalendar(){
                       <HoverCardContent className="earnings-stock-preview" side="top" align="center" sideOffset={8}>
                         <div className="earnings-preview-heading"><CompanyIcon symbol={row.symbol}/><span><strong>{row.symbol}</strong><small>{row.name}</small></span></div>
                         <dl><div><dt>{t('Announcement date')}</dt><dd>{dayFormat(row.date,{weekday:'short',month:'short',day:'numeric'},locale)}</dd></div><div><dt>{t('Announcement time')}</dt><dd>{timing(row.when)}</dd></div><div><dt>{row.reported?t('EPS comparison'):t('EPS estimate')}</dt><dd>{detail}</dd></div></dl>
-                        <span className="earnings-preview-hint">{t('Click for more details')}</span>
+                        <span className="earnings-preview-hint">{t('Stock details')}</span>
                       </HoverCardContent>
                     </HoverCard>
                   </li>;
@@ -524,45 +510,6 @@ export function EarningsCalendar(){
         })}
       </div>
     }
-
-    <Sheet open={!!selected} onOpenChange={open=>{if(!open)closePanel();}}>
-      <SheetContent className="earnings-detail-sheet sm:max-w-[480px]" side="right">
-        {selected&&<>
-          <SheetHeader className="earnings-detail-header">
-            <a className="earnings-detail-company" href={stockHref(selected.symbol,'/earnings'+(paramKey?'?'+paramKey:''))}>
-              <CompanyIcon symbol={selected.symbol}/>
-              <span>
-                <SheetTitle>{selected.symbol}</SheetTitle>
-                <SheetDescription>{selected.name}</SheetDescription>
-              </span>
-            </a>
-          </SheetHeader>
-          <div className="earnings-detail">
-            <a className="solid-link earnings-detail-action" href={stockHref(selected.symbol,'/earnings'+(paramKey?'?'+paramKey:''))}>{t('Stock details')}</a>
-            <p>{watchSymbols.has(selected.symbol)?t('On a watchlist'):t('Not on a watchlist')} · <a href="/">{t('Open watchlists')}</a></p>
-            <dl>
-              <div><dt>{t('Announcement date')}</dt><dd>{dayFormat(selected.date,{weekday:'long',month:'long',day:'numeric',year:'numeric'},locale)}</dd></div>
-              <div><dt>{t('Announcement time')}</dt><dd>{timing(selected.when)} · {t('New York time')}</dd></div>
-              <div><dt>{t('Status')}</dt><dd>{selected.reported?t('Reported'):t('Upcoming')}</dd></div>
-              <div><dt>{t('Market cap')}</dt><dd>{formatCap(selected.marketCap)||'—'}</dd></div>
-            </dl>
-            <section>
-              <h3>{t('EPS comparison')}</h3>
-              <dl className="earnings-compare">
-                <div><dt>{t('Estimate')}</dt><dd>{selected.epsForecast?formatEps(selected.epsForecast):'—'}</dd></div>
-                <div><dt>{t('Actual')}</dt><dd>{selected.eps?formatEps(selected.eps):'—'}</dd></div>
-                {(()=>{const surprise=epsSurprise(selected.eps,selected.epsForecast);return <>
-                  <div><dt>{t('Difference')}</dt><dd>{surprise.difference===null?'—':formatEps(surprise.difference)}</dd></div>
-                  <div><dt>{t('Surprise %')}</dt><dd className={surprise.tone==='above'?'up':surprise.tone==='below'?'down':''}>{surprise.percent===null?(surprise.difference===null?'—':t('Percent not shown when the estimate is zero')):`${surprise.percent>0?'+':''}${surprise.percent.toFixed(1)}%`}{surprise.tone!=='neutral'?` · ${toneLabel(surprise.tone)}`:''}</dd></div>
-                </>;})()}
-              </dl>
-              <p className="earnings-detail-note">{t('Revenue, fiscal period, and company guidance are not in this Nasdaq calendar feed.')}</p>
-            </section>
-            <p className="earnings-detail-note">{t('Source: Nasdaq')} · {data?`${t('Last successful update')} ${stampFormat(data.fetchedAt,locale)}`:''}</p>
-          </div>
-        </>}
-      </SheetContent>
-    </Sheet>
 
     <Sheet open={mobileFilters} onOpenChange={setMobileFilters}>
       <SheetContent side="bottom" className="earnings-filter-drawer">
