@@ -9,6 +9,8 @@ import {PublicNav,PublicFooter} from '@/components/product/nav';
 import {readGuestState} from '@/lib/guest-watchlist.mjs';
 import {type AccountState,watchlistDayChange,watchlistPerformance,watchlistRefreshTime} from '@/lib/watchlist';
 import {apiJson} from '@/lib/auth-client';
+import {marketChart,type MarketChart} from '@/lib/market';
+import {stockHref} from '@/lib/safe-return.mjs';
 
 function guestHasStocks(){
   if(typeof window==='undefined')return false;
@@ -22,6 +24,19 @@ function startWatchlist(){
   const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   section?.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});
   window.setTimeout(()=>input?.focus({preventScroll:true}),reduce?0:280);
+}
+
+const majorMarkets=[{symbol:'^GSPC',name:'S&P 500'},{symbol:'^IXIC',name:'Nasdaq'},{symbol:'^DJI',name:'Dow Jones'}];
+function MajorMarketStatus(){
+  const [rows,setRows]=useState<{symbol:string;name:string;chart:MarketChart|null}[]>(()=>majorMarkets.map(row=>({...row,chart:null})));
+  useEffect(()=>{
+    let alive=true;
+    void Promise.all(majorMarkets.map(async row=>({ ...row,chart:await marketChart(row.symbol,'1d').catch(()=>null) }))).then(result=>{if(alive)setRows(result);});
+    return()=>{alive=false;};
+  },[]);
+  return <section className="member-market-status" aria-label="Major market status">
+    {rows.map(row=>{const change=row.chart?.quote.changePercent;const tone=change==null?'':change>0?'up':change<0?'down':'flat';return <div className="member-market-status-item" key={row.symbol}><span>{row.name}</span><strong className={tone}>{change==null?'—':`${change>0?'+':''}${change.toFixed(2)}%`}</strong><small>{row.chart?.quote.change==null?'Market quote':`${row.chart.quote.change>0?'+':''}${row.chart.quote.change.toFixed(2)} pts`}</small></div>;})}
+  </section>;
 }
 
 export function Welcome(){
@@ -93,7 +108,8 @@ export function Welcome(){
         <div className="member-home-stats"><div><span>{t('Watchlists')}</span><strong>{account.watchlists.length}</strong></div><div><span>{t('Stocks you follow')}</span><strong>{allStocks.length}</strong></div><div className="member-quote-status"><span>{t('Overall quote status')}</span><strong role="status" aria-live="polite">{refreshingNow?`${t('Refreshing all quotes…')} ${refreshProgress}`:refreshMessage|| (refreshIssues?`${refreshIssues} ${t('prices need attention')}`:overallRefresh)}</strong><button type="button" className="member-refresh-button" onClick={()=>void refreshAllQuotes()} disabled={refreshingNow}><RefreshCw size={15} className={refreshingNow?'spin':''}/>{refreshingNow?t('Refreshing…'):t('Refresh all quotes')}</button></div></div>
       </section>
       <section className="member-watchlists-section"><div className="member-section-heading"><div><p className="eyebrow">{t('YOUR WATCHLISTS')}</p><h2>{t('Your ideas, at a glance')}</h2></div><a href="/watchlists">{t('Manage watchlists')} <ArrowUpRight size={16}/></a></div>
-        {account.watchlists.length?<div className="member-watchlist-grid">{account.watchlists.map(list=>{const change=watchlistDayChange(list);const overall=watchlistPerformance(list);const tone=change===null?'unknown':change>0?'up':change<0?'down':'flat';return <a className={`member-watchlist-card day-${tone}`} href={`/watchlists?watchlistId=${encodeURIComponent(list.id)}`} key={list.id}><div className="member-watchlist-card-head"><span className="member-list-icon"><ChartLine size={18}/></span><span className="member-watchlist-return"><small>{t("Today's performance")}</small><strong>{change===null?'—':`${change>0?'+':''}${change.toFixed(2)}%`}</strong></span></div><h3>{list.name}</h3><p>{list.stocks.length} {t('Stocks')} · {list.mode==='advanced'?t('Holdings and cost basis'):t('Price change since added')}</p><div className="member-watchlist-overall"><span>{t('Overall performance')}</span><strong className={overall===null?'':overall>0?'up':overall<0?'down':'flat'}>{overall===null?'—':`${overall>0?'+':''}${overall.toFixed(2)}%`}</strong></div><div className="member-ticker-row">{list.stocks.slice(0,5).map(stock=>{const stockTone=stock.dayChangePercent===undefined||stock.dayChangePercent===null?'flat':stock.dayChangePercent>0?'up':stock.dayChangePercent<0?'down':'flat';return <span className={`member-ticker day-${stockTone}`} key={stock.id}>{stock.symbol}</span>;})}{list.stocks.length>5&&<span>+{list.stocks.length-5}</span>}{!list.stocks.length&&<span>{t('Ready for your next idea')}</span>}</div><span className="member-card-footer"><span className="member-card-link">{t('View watchlist')} <ArrowUpRight size={15}/></span><small className="member-card-refresh">{watchlistRefreshTime(list,now)}</small></span></a>;})}</div>:<div className="member-empty-card"><ChartLine size={23}/><div><strong>{t('Your first list is ready for an idea.')}</strong><p>{t('Add a company to start tracking its price from the day you choose it.')}</p></div><a className="solid-link" href="/watchlists">{t('Add a stock')}</a></div>}
+        <MajorMarketStatus/>
+        {account.watchlists.length?<div className="member-watchlist-grid">{account.watchlists.map(list=>{const change=watchlistDayChange(list);const overall=watchlistPerformance(list);const tone=change===null?'unknown':change>0?'up':change<0?'down':'flat';const watchlistHref=`/watchlists?watchlistId=${encodeURIComponent(list.id)}`;return <article className={`member-watchlist-card day-${tone}`} key={list.id}><div className="member-watchlist-card-head"><a className="member-list-icon" href={watchlistHref} aria-label={`${t('View watchlist')}: ${list.name}`}><ChartLine size={18}/></a><span className="member-watchlist-return"><small>{t("Today's performance")}</small><strong>{change===null?'—':`${change>0?'+':''}${change.toFixed(2)}%`}</strong></span></div><h3><a href={watchlistHref}>{list.name}</a></h3><p>{list.stocks.length} {t('Stocks')} · {list.mode==='advanced'?t('Holdings and cost basis'):t('Price change since added')}</p><div className="member-watchlist-overall"><span>{t('Overall performance')}</span><strong className={overall===null?'':overall>0?'up':overall<0?'down':'flat'}>{overall===null?'—':`${overall>0?'+':''}${overall.toFixed(2)}%`}</strong></div><div className="member-ticker-row">{list.stocks.slice(0,5).map(stock=>{const stockTone=stock.dayChangePercent===undefined||stock.dayChangePercent===null?'flat':stock.dayChangePercent>0?'up':stock.dayChangePercent<0?'down':'flat';return <a className={`member-ticker day-${stockTone}`} href={stockHref(stock.symbol,watchlistHref)} key={stock.id}>{stock.symbol}</a>;})}{list.stocks.length>5&&<span>+{list.stocks.length-5}</span>}{!list.stocks.length&&<span>{t('Ready for your next idea')}</span>}</div><div className="member-card-footer"><a className="member-card-link" href={watchlistHref}>{t('View watchlist')} <ArrowUpRight size={15}/></a><small className="member-card-refresh">{watchlistRefreshTime(list,now)}</small></div></article>;})}</div>:<div className="member-empty-card"><ChartLine size={23}/><div><strong>{t('Your first list is ready for an idea.')}</strong><p>{t('Add a company to start tracking its price from the day you choose it.')}</p></div><a className="solid-link" href="/watchlists">{t('Add a stock')}</a></div>}
       </section>
       <HomeDiscovery account={account}/>
       <section className="member-home-footer"><span>{t('Saved to your account')}</span><a href="/account">{t('Account settings')} <ArrowUpRight size={15}/></a></section>

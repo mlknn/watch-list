@@ -9,6 +9,7 @@ import {CompanyIcon} from './company-icon';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Sheet,SheetContent,SheetDescription,SheetHeader,SheetTitle} from '@/components/ui/sheet';
+import {HoverCard,HoverCardTrigger,HoverCardContent} from '@/components/ui/hover-card';
 import {apiJson,signedIn} from '@/lib/auth-client';
 import {readGuestState} from '@/lib/guest-watchlist.mjs';
 import {addDays,earningsWeekMonday,todayInMarket} from '@/lib/next-earnings.mjs';
@@ -491,17 +492,25 @@ export function EarningsCalendar(){
               :companies.length?<ul className="earnings-day-list">
                 {(expandedDays.has(day.date)?companies:companies.slice(0,30)).map(row=>{
                   const surprise=epsSurprise(row.eps,row.epsForecast);
+                  const detail=row.reported
+                    ?`${t('Actual')} ${row.eps?formatEps(row.eps):'—'} · ${t('Estimate')} ${row.epsForecast?formatEps(row.epsForecast):'—'}${surprise.difference===null?'':` · ${formatSurprise(surprise)}`}`
+                    :`${timing(row.when)}${row.epsForecast?` · ${t('Estimate')} ${formatEps(row.epsForecast)}`:''}`;
                   return <li key={row.symbol}>
-                    <button type="button" className="earnings-chip" onClick={e=>openRow(row,e.currentTarget)}>
-                      <CompanyIcon symbol={row.symbol}/>
-                      <span className="earnings-chip-text">
-                        <strong>{row.symbol}{watchSymbols.has(row.symbol)&&<Star size={11} aria-label={t('On a watchlist')}/>}</strong>
-                        <small className="earnings-company-name">{row.name}</small>
-                        <span className="earnings-chip-details"><em>{row.reported
-                          ?`${t('Actual')} ${row.eps?formatEps(row.eps):'—'} · ${t('Estimate')} ${row.epsForecast?formatEps(row.epsForecast):'—'}${surprise.difference===null?'':` · ${formatSurprise(surprise)}`}`
-                          :`${timing(row.when)}${row.epsForecast?` · ${t('Estimate')} ${formatEps(row.epsForecast)}`:''}`}</em></span>
-                      </span>
-                    </button>
+                    <HoverCard>
+                      <HoverCardTrigger type="button" render={<button type="button"/>} className="earnings-chip" onClick={e=>openRow(row,e.currentTarget as unknown as HTMLButtonElement)}>
+                        <CompanyIcon symbol={row.symbol}/>
+                        <span className="earnings-chip-text">
+                          <strong>{row.symbol}{watchSymbols.has(row.symbol)&&<Star size={11} aria-label={t('On a watchlist')}/>}</strong>
+                          <small className="earnings-company-name">{row.name}</small>
+                          <em>{timing(row.when)}</em>
+                        </span>
+                      </HoverCardTrigger>
+                      <HoverCardContent className="earnings-stock-preview" side="top" align="center" sideOffset={8}>
+                        <div className="earnings-preview-heading"><CompanyIcon symbol={row.symbol}/><span><strong>{row.symbol}</strong><small>{row.name}</small></span></div>
+                        <dl><div><dt>{t('Announcement date')}</dt><dd>{dayFormat(row.date,{weekday:'short',month:'short',day:'numeric'},locale)}</dd></div><div><dt>{t('Announcement time')}</dt><dd>{timing(row.when)}</dd></div><div><dt>{row.reported?t('EPS comparison'):t('EPS estimate')}</dt><dd>{detail}</dd></div></dl>
+                        <span className="earnings-preview-hint">{t('Click for more details')}</span>
+                      </HoverCardContent>
+                    </HoverCard>
                   </li>;
                 })}
                 {companies.length>30&&<li>
