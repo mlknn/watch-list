@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {addDays,earningsShareCard,isoDay,mondayOnOrBefore,nextEarningsSoon,nextEarningsTone,todayInMarket} from '../lib/next-earnings.mjs';
+import {addDays,earningsShareCard,earningsWeekCard,isoDay,mondayOnOrBefore,nextEarningsSoon,nextEarningsTone,todayInMarket} from '../lib/next-earnings.mjs';
 
 test('isoDay keeps a calendar day and drops clock noise',()=>{
   assert.equal(isoDay('2026-09-21T16:00:00.000Z'),'2026-09-21');
@@ -44,4 +44,11 @@ test('a shared earnings week link names earnings in the title and description',(
   assert.equal(home.url,'https://stockwatchlist.app/earnings');
   assert.equal(home.title,'Earnings calendar');
   assert.match(home.description,/earnings/i);
+});
+
+test('weekly share snapshot normalizes any date to its Monday and labels the date range',()=>{
+  assert.deepEqual(earningsWeekCard('2026-10-14'),{
+    monday:'2026-10-12',friday:'2026-10-16',title:'Earnings week of Oct 12, 2026',range:'October 12–16, 2026',
+  });
+  assert.equal(earningsWeekCard('bad'),null);
 });

@@ -16,13 +16,13 @@ function earningsMeta(week?:string):Metadata{
       url:card.url,
       siteName:'StockWatchlist',
       type:'website',
-      images:[{url:'/earnings/opengraph-image',width:1200,height:630,alt:card.title}],
+      images:[{url:week?`/earnings/opengraph-image?week=${encodeURIComponent(week)}`:'/earnings/opengraph-image',width:1200,height:630,alt:card.title}],
     },
     twitter:{
       card:'summary_large_image',
       title:card.title,
       description:card.description,
-      images:['/earnings/opengraph-image'],
+      images:[week?`/earnings/opengraph-image?week=${encodeURIComponent(week)}`:'/earnings/opengraph-image'],
     },
   };
 }

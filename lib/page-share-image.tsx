@@ -1,5 +1,5 @@
 import {ImageResponse} from 'next/og';
-import {compareOg,earningsOg,marketsOg,watchlistsOg} from './page-share-cards.mjs';
+import {compareOg,earningsOg,earningsWeekOg,marketsOg,watchlistsOg} from './page-share-cards.mjs';
 
 export {compareOg,earningsOg,marketsOg,watchlistsOg};
 
@@ -14,12 +14,14 @@ export function pageShareImage({
   subtitle,
   columns,
   footnote,
+  cacheControl='public, max-age=0, s-maxage=86400, stale-while-revalidate=604800',
 }:{
   alt:string;
   title:string;
   subtitle:string;
   columns:Column[];
   footnote:string;
+  cacheControl?:string;
 }){
   return new ImageResponse(
     <div
@@ -64,13 +66,16 @@ export function pageShareImage({
     </div>,
     {
       ...pageOgSize,
-      headers:{'Cache-Control':'public, max-age=0, s-maxage=86400, stale-while-revalidate=604800'},
+      headers:{'Cache-Control':cacheControl},
     },
   );
 }
 
 export const earningsOgAlt=earningsOg.alt;
 export function earningsShareImage(){return pageShareImage(earningsOg);}
+export function earningsWeekShareImage({title,rows,weekRange}:{title:string;rows:{symbol:string;label:string;date:string}[];weekRange:string}){
+  return pageShareImage({...earningsWeekOg({title,rows,weekRange}),cacheControl:'public, max-age=0, s-maxage=900, stale-while-revalidate=3600'});
+}
 export const marketsOgAlt=marketsOg.alt;
 export function marketsShareImage(){return pageShareImage(marketsOg);}
 export const watchlistsOgAlt=watchlistsOg.alt;
