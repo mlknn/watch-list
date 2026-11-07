@@ -695,6 +695,7 @@ html.dark .earnings-day-note.is-error{color:#ff9aa4}
 .earnings-toolbar{border:0;margin:8px 0 14px;padding:14px 16px;border-radius:16px;background:#f7f8f7}
 .earnings-week{gap:0;border:1px solid #e1e5e3;border-radius:16px;overflow:hidden;background:#fff}
 .earnings-day{border:0;border-right:1px solid #e5e8e6;border-radius:0;background:transparent;min-height:100%}
+.earnings-day{scroll-margin-top:16px}
 .earnings-day:last-child{border-right:0}
 .earnings-day.is-today{border-color:#e5e8e6;box-shadow:none}
 .earnings-day header,.earnings-day.is-today header{position:static;padding:14px 14px 12px;background:#fff;border-bottom:1px solid #edf0ee;box-shadow:none}
