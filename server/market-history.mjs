@@ -112,19 +112,13 @@ export async function historicalMarketHistory(range='ytd',offset=0,now=new Date(
   return {range,offset,nextOffset:offset+20<all.length?offset+20:null,total:all.length,asOf:new Date().toISOString(),startDate:date.toISOString().slice(0,10),source:'Yahoo Finance; estimated using current shares outstanding',rows:rows.map((row,index)=>({...row,rank:offset+index+1}))};
 }
 
-/** Precompute the five YTD history pages for immediate first-visit rendering. */
+/** Precompute the first YTD history page for immediate first-visit rendering. */
 export async function refreshYtdMarketHistory(now=new Date()){
   const date=startDate('ytd',now).toISOString().slice(0,10);
-  const offsets=[0,20,40,60,80];
-  let next=0;
-  await Promise.all(Array.from({length:2},async()=>{
-    while(next<offsets.length){
-      const offset=offsets[next++];
-      const data=await historicalMarketHistory('ytd',offset,now);
-      await writeEdgeHistory('ytd',offset,date,data);
-    }
-  }));
-  return {range:'ytd',startDate:date,pages:offsets.length};
+  const offset=0;
+  const data=await historicalMarketHistory('ytd',offset,now);
+  await writeEdgeHistory('ytd',offset,date,data);
+  return {range:'ytd',startDate:date,pages:1};
 }
 
 export async function cachedHistoricalMarketHistory(range='ytd',offset=0,now=new Date()){
