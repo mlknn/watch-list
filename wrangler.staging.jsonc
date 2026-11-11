@@ -7,6 +7,13 @@
     "nodejs_compat"
   ],
   "triggers": { "crons": ["0 4,5 * * *"] },
+  "ratelimits": [
+    {
+      "name": "STOCK_ROUTE_LIMITER",
+      "namespace_id": "2026111101",
+      "simple": { "limit": 60, "period": 60 }
+    }
+  ],
   "workers_dev": false,
   "preview_urls": false,
   "routes": [
