@@ -1,3 +1,5 @@
+import showcaseStocks from '@/lib/showcase-stocks.json';
+
 const urls=[
   ['https://stockwatchlist.app/','daily','1.0'],
   ['https://stockwatchlist.app/dashboard','hourly','0.9'],
@@ -6,6 +8,11 @@ const urls=[
   ['https://stockwatchlist.app/open-source','monthly','0.7'],
   ['https://stockwatchlist.app/privacy','yearly','0.5'],
   ['https://stockwatchlist.app/history','weekly','0.6'],
+  ...showcaseStocks.map(({symbol})=>[
+    `https://stockwatchlist.app/stocks/${encodeURIComponent(symbol)}`,
+    'weekly',
+    '0.6',
+  ]),
 ];
 const body=`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

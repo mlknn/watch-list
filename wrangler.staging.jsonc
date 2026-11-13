@@ -11,7 +11,7 @@
     {
       "name": "STOCK_ROUTE_LIMITER",
       "namespace_id": "2026111101",
-      "simple": { "limit": 60, "period": 60 }
+      "simple": { "limit": 1500, "period": 60 }
     }
   ],
   "workers_dev": false,
