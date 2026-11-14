@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {quoteFromChart} from '../server/quotes.mjs';
+import {normalizeTicker,quoteFromChart} from '../server/quotes.mjs';
 
 test('quote uses the live regular-session price and today’s change versus prior close',()=>{
   const quote=quoteFromChart({
@@ -48,6 +48,14 @@ test('quote falls back to chart previous close when regular previous close is mi
   },'TSLA');
   assert.equal(quote.previousClose,378.9);
   assert.equal(Math.round(quote.changePercent*1000)/1000,0.158);
+});
+
+test('AMP-style stock paths and other junk are not treated as tickers',()=>{
+  assert.equal(normalizeTicker('META'),'META');
+  assert.equal(normalizeTicker('BRK-B'),'BRK-B');
+  assert.equal(normalizeTicker('BTC-USD'),'BTC-USD');
+  assert.throws(()=>normalizeTicker('META:1R929GG:9A419C:HL0SNQ'),/ticker/);
+  assert.throws(()=>normalizeTicker('META?IR29GG'),/ticker/);
 });
 
 test('market quotes retain provider volume and 52-week range for comparison',()=>{

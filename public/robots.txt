@@ -23,8 +23,10 @@ Allow: /compare
 Allow: /open-source
 
 User-agent: GPTBot
-Allow: /
 Allow: /llms.txt
+Allow: /privacy
+Disallow: /stocks/
+Disallow: /dashboard
 Disallow: /watchlists
 Disallow: /account
 Disallow: /api/
@@ -44,22 +46,28 @@ Disallow: /account
 Disallow: /api/
 
 User-agent: ClaudeBot
-Allow: /
 Allow: /llms.txt
+Allow: /privacy
+Disallow: /stocks/
+Disallow: /dashboard
 Disallow: /watchlists
 Disallow: /account
 Disallow: /api/
 
 User-agent: anthropic-ai
-Allow: /
 Allow: /llms.txt
+Allow: /privacy
+Disallow: /stocks/
+Disallow: /dashboard
 Disallow: /watchlists
 Disallow: /account
 Disallow: /api/
 
 User-agent: Google-Extended
-Allow: /
 Allow: /llms.txt
+Allow: /privacy
+Disallow: /stocks/
+Disallow: /dashboard
 Disallow: /watchlists
 Disallow: /account
 Disallow: /api/
@@ -72,8 +80,10 @@ Disallow: /account
 Disallow: /api/
 
 User-agent: Applebot-Extended
-Allow: /
 Allow: /llms.txt
+Allow: /privacy
+Disallow: /stocks/
+Disallow: /dashboard
 Disallow: /watchlists
 Disallow: /account
 Disallow: /api/

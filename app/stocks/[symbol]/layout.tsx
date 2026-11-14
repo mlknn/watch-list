@@ -1,10 +1,11 @@
 import type {Metadata} from 'next';
-import {getQuote} from '@/server/quotes.mjs';
+import {notFound} from 'next/navigation';
+import {getQuote,normalizeTicker} from '@/server/quotes.mjs';
 
 export async function generateMetadata({params}:{params:Promise<{symbol:string}>}):Promise<Metadata>{
   const {symbol:raw}=await params;
-  const symbol=decodeURIComponent(raw||'').toUpperCase();
-  if(!/^[A-Z0-9^][A-Z0-9.^=-]{0,24}$/.test(symbol))return {title:'Stock details | StockWatchlist'};
+  let symbol='';
+  try{symbol=normalizeTicker(decodeURIComponent(raw||''));}catch{notFound();}
   let name=symbol;
   try{
     const quote=await getQuote(symbol);
