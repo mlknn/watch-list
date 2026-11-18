@@ -1,3 +1,4 @@
+import {withOrderTotals} from '../lib/position-orders.mjs';
 import {localMode,localDatabase,exportLocalData} from './local-db.mjs';
 import {localUser} from './local-auth.mjs';
 import { createClient } from '@supabase/supabase-js';
@@ -91,7 +92,7 @@ export function stockView(stock,cached) {
   const current=comparable?fresh:base;
   const previousClose=comparable&&Number.isFinite(fresh.previousClose)&&fresh.previousClose>0?fresh.previousClose:null;
   const dayChangePercent=comparable&&Number.isFinite(fresh.changePercent)?fresh.changePercent:previousClose?((current.price-previousClose)/previousClose)*100:null;
-  return {quantity:stock.quantity===null||stock.quantity===undefined?null:Number(stock.quantity),costPerShare:stock.cost_per_share===null||stock.cost_per_share===undefined?null:Number(stock.cost_per_share),acquiredAt:stock.acquired_at||null,notes:stock.notes||'',id:stock.id,symbol:stock.symbol,companyName:base.companyName,currency:base.currency,exchange:base.exchange,addedAt:stock.added_at,addedPrice:base.price,initialQuoteTime:base.quoteTime,currentPrice:current.price,previousClose,dayChangePercent,quoteTime:current.quoteTime,checkedAt:current.checkedAt,quoteError:cached?.error || (fresh&&!comparable?'Latest quote could not be compared. Starting quote is shown.':null)};
+  return withOrderTotals({orders:stock.orders,quantity:stock.quantity===null||stock.quantity===undefined?null:Number(stock.quantity),costPerShare:stock.cost_per_share===null||stock.cost_per_share===undefined?null:Number(stock.cost_per_share),acquiredAt:stock.acquired_at||null,notes:stock.notes||'',id:stock.id,symbol:stock.symbol,companyName:base.companyName,currency:base.currency,exchange:base.exchange,addedAt:stock.added_at,addedPrice:base.price,initialQuoteTime:base.quoteTime,currentPrice:current.price,previousClose,dayChangePercent,quoteTime:current.quoteTime,checkedAt:current.checkedAt,quoteError:cached?.error || (fresh&&!comparable?'Latest quote could not be compared. Starting quote is shown.':null)});
 }
 export async function listViews(db,lists,refresh=false,loadQuote=cachedQuote,forceRefresh=false) {
   if(!lists.length)return [];
@@ -138,7 +139,10 @@ export async function importGuestLists(db,user,lists){
       try{
         const symbol=normalizeTicker(stock.symbol);
         if(list.stocks.some(item=>item.symbol===symbol))continue;
-        state=await accountAction(db,user,{action:'addStock',listId:target.id,ticker:symbol,quantity:stock.quantity,costPerShare:stock.costPerShare,acquiredAt:stock.acquiredAt,notes:stock.notes||''});
+        const orders=Array.isArray(stock.orders)&&stock.orders.length?stock.orders:[stock];
+        for(const order of orders){
+          state=await accountAction(db,user,{action:'addStock',listId:target.id,ticker:symbol,quantity:order.quantity,costPerShare:order.costPerShare,acquiredAt:order.acquiredAt,notes:order.notes||''});
+        }
       }catch{/* Keep remaining guest stocks if one ticker cannot be quoted. */}
     }
   }
@@ -148,7 +152,7 @@ export async function accountAction(db,user,input) {
   if(!input||typeof input!=='object'||Array.isArray(input))throw new AppError('Invalid request.');
   if(input.action==='refresh')return accountState(db,user,true);
   if(input.action==='importGuest')return importGuestLists(db,user,input.lists);
-  const allowed=['createList','renameList','deleteList','addStock','removeStock','shareList','revokeShare','convertList','initializePosition'];
+  const allowed=['createList','renameList','deleteList','addStock','removeStock','shareList','revokeShare','convertList','initializePosition','addOrder'];
   if(!allowed.includes(input.action))throw new AppError('Unknown action.');
   // Hosted identity comes from requireUser/getUser, never from the request body.
   // This account has no list-count quota; other accounts retain the locked RPC check.

@@ -3816,5 +3816,17 @@
   "down": ["düşüşte", "a la baja"],
   "prices need attention": ["fiyatın güncellenmesi gerekiyor", "precios requieren atención"],
   "stocks followed": ["takip edilen hisse", "acciones seguidas"],
-  "up": ["yükselişte", "al alza"]
+  "up": ["yükselişte", "al alza"],
+  "Add order": [
+    "Alım ekle",
+    "Añadir compra"
+  ],
+  "Average cost": [
+    "Ortalama maliyet",
+    "Costo promedio"
+  ],
+  "Each purchase is saved as an order. You can add more orders later.": [
+    "Her alım ayrı kaydedilir. Daha sonra yeni alımlar ekleyebilirsiniz.",
+    "Cada compra se guarda por separado. Puedes añadir más compras después."
+  ]
 }

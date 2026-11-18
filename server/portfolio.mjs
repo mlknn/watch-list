@@ -1,3 +1,4 @@
+import {positionOrders} from '../lib/position-orders.mjs';
 import {getChart,CHART_RANGES} from './charts.mjs';
 import {AppError} from './quotes.mjs';
 import {PORTFOLIO_CURRENCIES,listCurrency,tradingTimezone} from '../lib/portfolio-currency.mjs';
@@ -9,17 +10,18 @@ export function portfolioTotals(stocks){
  return {cost,value,gain:value-cost,gainPercent:cost?(value-cost)/cost*100:null,positions:holdings.length,incomplete:stocks.length-holdings.length,currency};
 }
 export function aggregatePortfolio(stocks,charts,now=Date.now()){
- const holdings=stocks.filter(s=>s.quantity>0&&s.costPerShare>0);
+ const originals=stocks.filter(s=>s.quantity>0&&s.costPerShare>0);
+ const holdings=originals.flatMap((stock,i)=>positionOrders(stock).map(order=>({...stock,...order,chartIndex:i})));
  if(!holdings.length)return [];
  const start=Math.min(...holdings.map(s=>Date.parse(s.acquiredAt))),times=[...new Set(charts.flatMap(c=>c.points.map(p=>p.time)))].filter(t=>t>=start&&t<=now).sort((a,b)=>a-b);
  if(start>=Math.min(...charts.flatMap(c=>c.points.map(p=>p.time))))times.unshift(start);
- times.push(now);
+ times.push(...holdings.map(s=>Date.parse(s.acquiredAt)).filter(t=>t<=now),now);
  const indices=holdings.map(()=>-1),result=[];
- for(const time of new Set(times)){
+ for(const time of [...new Set(times)].sort((a,b)=>a-b)){
   let value=0,cost=0,complete=true;
   holdings.forEach((s,i)=>{
    if(time<Date.parse(s.acquiredAt))return;
-   cost+=s.quantity*s.costPerShare;const points=charts[i].points;
+   cost+=s.quantity*s.costPerShare;const points=charts[s.chartIndex].points;
    while(indices[i]+1<points.length&&points[indices[i]+1].time<=time)indices[i]++;
    let price=indices[i]>=0?points[indices[i]].price:null;
    if(time===now)price=s.currentPrice;
