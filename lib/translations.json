@@ -3828,5 +3828,6 @@
   "Each purchase is saved as an order. You can add more orders later.": [
     "Her alım ayrı kaydedilir. Daha sonra yeni alımlar ekleyebilirsiniz.",
     "Cada compra se guarda por separado. Puedes añadir más compras después."
-  ]
+  ],
+  "Order added.": ["Alım eklendi.", "Compra añadida."]
 }

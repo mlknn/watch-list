@@ -2141,3 +2141,15 @@ html.dark .signup-nudge-benefit{background:#17241d;color:#b8ccc0}
 .stock-orders li { padding: 8px 12px; border-left: 2px solid var(--border); }
 .stock-orders li p { margin: 4px 0 0; overflow-wrap: anywhere; }
 .icon-button.add-order-button { width: auto; min-width: 44px; height: auto; min-height: 32px; padding: 6px 8px; gap: 5px; white-space: nowrap; font-size: 12px; }
+
+/* Keep purchase forms usable on phones and short landscape viewports. */
+.position-dialog { max-height: calc(100dvh - 32px); overflow-y: auto; overscroll-behavior: contain; }
+.position-dialog [data-slot=dialog-title] { padding-right: 28px; }
+.stock-orders { overflow-wrap: anywhere; }
+@media (max-width: 760px) {
+  .position-dialog .position-fields input { min-height: 44px; font-size: 16px; }
+  .position-dialog .position-fields label { grid-template-rows: auto minmax(44px, auto); }
+  .position-dialog .note-toggle, .position-dialog .dialog-submit, .mobile-stock-footer .add-order-button { min-height: 44px; }
+  .position-dialog .note-toggle { padding-block: 10px; }
+  .mobile-stock-footer { flex-wrap: wrap; }
+}
