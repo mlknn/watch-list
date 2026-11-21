@@ -17,14 +17,25 @@ function createdLabel(value?:string){
 
 export function SharedWatchlist({token}:{token:string}){
   const t=useT();
-  const [list,setList]=useState<Watchlist|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[unavailable,setUnavailable]=useState(false),[stale,setStale]=useState(false);
+  const [list,setList]=useState<Watchlist|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[unavailable,setUnavailable]=useState(false),[stale,setStale]=useState(false),[retrying,setRetrying]=useState(false);
   const listRef=useRef<Watchlist|null>(null);
   useEffect(()=>{
     let alive=true;let running=false;
+    let retryTimer:ReturnType<typeof setTimeout>|undefined;
+    const controller=new AbortController();
+    listRef.current=null;setList(null);setError('');setUnavailable(false);setStale(false);setRetrying(false);
     async function load(){
-      if(running)return;running=true;setBusy(true);
+      if(!alive||running||retryTimer!==undefined)return;running=true;setBusy(true);setRetrying(false);
       try{
-        const response=await fetch('/api/share/'+encodeURIComponent(token),{cache:'no-store'});
+        const response=await fetch('/api/share/'+encodeURIComponent(token),{cache:'no-store',signal:controller.signal});
+        if(response.status===429){
+          await response.body?.cancel();
+          if(alive){
+            setError('');setRetrying(true);
+            retryTimer=setTimeout(()=>{retryTimer=undefined;void load();},5000);
+          }
+          return;
+        }
         const result=await response.json() as Watchlist&{error?:string};
         if(!response.ok){
           if(response.status===404){
@@ -43,7 +54,7 @@ export function SharedWatchlist({token}:{token:string}){
     const timer=setInterval(refresh,60000);
     document.addEventListener('visibilitychange',refresh);
     document.addEventListener('watchlist-shared-refresh',refresh);
-    return()=>{alive=false;clearInterval(timer);document.removeEventListener('visibilitychange',refresh);document.removeEventListener('watchlist-shared-refresh',refresh);};
+    return()=>{alive=false;controller.abort();clearTimeout(retryTimer);clearInterval(timer);document.removeEventListener('visibilitychange',refresh);document.removeEventListener('watchlist-shared-refresh',refresh);};
   },[token,t]);
   const created=createdLabel(list?.createdAt);
   return <><PublicNav/><main className="workspace shared-workspace">
@@ -54,6 +65,7 @@ export function SharedWatchlist({token}:{token:string}){
         <p className="intro"><LockKeyhole size={14}/> {t("Read-only · The owner controls this watchlist")}{created?` · ${created}`:''}</p>
       </div>
     </div>
+    {retrying&&<p className="quote-warning" role="status">{t("Too many requests. Retrying in 5 seconds…")}</p>}
     {error&&<p className="error-banner" role="alert">{error}{!unavailable&&<Button variant="ghost" onClick={()=>document.dispatchEvent(new Event('watchlist-shared-refresh'))}>{t('Retry')}</Button>}</p>}
     {unavailable&&<p><a className="solid-link" href="/">{t('Go home')}</a> · <a className="outline-link" href="/dashboard">{t('Browse markets')}</a></p>}
     {stale&&list&&<p className="quote-warning" role="status">{t('Showing last loaded values after a refresh failed.')}</p>}
@@ -61,10 +73,10 @@ export function SharedWatchlist({token}:{token:string}){
       <div className="card-heading">
         <span className="refresh-state"><Eye size={16}/>{list.stocks.length} {t('stocks')} · {t('Refreshes every 60s')}</span>
         <PerformanceButton list={list} version={JSON.stringify(list.stocks)} shareToken={token}/>
-        <Button variant="outline" disabled={busy} onClick={()=>document.dispatchEvent(new Event('watchlist-shared-refresh'))}><RefreshCw className={busy?'spin':''}/><T text="Refresh"/></Button>
+        <Button variant="outline" disabled={busy||retrying} onClick={()=>document.dispatchEvent(new Event('watchlist-shared-refresh'))}><RefreshCw className={busy?'spin':''}/><T text="Refresh"/></Button>
       </div>
       {list.stocks.length?<><WatchlistBoard list={list}/><div className="watchlist-analytics-layout"><div className="watchlist-table-pane"><StocksTable stocks={list.stocks} advanced={list.mode==='advanced'}/></div><aside className="watchlist-chart-pane"><Portfolio list={list} version={JSON.stringify(list.stocks)} shareToken={token}/></aside></div></>:<div className="shared-empty">{t('This watchlist doesn’t have any stocks yet. Check back for the owner’s next idea.')}</div>}
-    </section>: !error&&<p role="status">{t("Opening the shared watchlist…")}</p>}
+    </section>: !error&&!retrying&&<p role="status">{t("Opening the shared watchlist…")}</p>}
     <footer className="workspace-footer"><span>{t('Yahoo Finance · Quotes may be delayed')}</span><span>{t('Change since added uses the recorded starting price.')}</span></footer>
   </main><PublicFooter/></>;
 }
