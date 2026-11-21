@@ -1,6 +1,5 @@
 'use client';
 import {T,useT} from '@/components/product/language';
-import {WatchlistAllocation} from '@/components/product/watchlist-allocation';
 import {type Watchlist,price,watchlistPerformance} from '@/lib/watchlist';
 
 function totals(list:Watchlist){
@@ -42,6 +41,6 @@ export function WatchlistBoard({list}:{list:Watchlist}){
    </dl>
    {!complete&&<p>{supported?t("Add missing purchase quantities to see complete totals."):t("This list mixed currencies. Keep one currency per list.")}</p>}
   </div>
-  <WatchlistAllocation list={list} compact/>
+
  </section>;
 }

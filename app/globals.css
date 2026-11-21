@@ -2153,3 +2153,57 @@ html.dark .signup-nudge-benefit{background:#17241d;color:#b8ccc0}
   .position-dialog .note-toggle { padding-block: 10px; }
   .mobile-stock-footer { flex-wrap: wrap; }
 }
+
+/* Dense watchlist workspace: list navigation above the holdings. */
+.workspace.is-member{grid-template-columns:minmax(0,1fr);gap:12px;padding-top:16px}
+.workspace.is-member>.watch-card,.workspace.is-member>.watchlist-invite-row,.workspace.is-member>.empty-watchlist{grid-column:1}
+.workspace.is-member .watchlist-rail{position:static;grid-column:1;grid-row:auto;padding:12px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px}
+.workspace.is-member .watchlist-rail-head{display:flex;align-items:baseline;gap:10px;border:0;margin:0;padding:0}
+.workspace.is-member .watchlist-rail-head h1{font-size:18px;margin:0}
+.workspace.is-member .watchlist-rail-head .eyebrow,.workspace.is-member .watchlist-rail-instruction{display:none}
+.workspace.is-member .watchlist-rail-new{grid-column:2;grid-row:1;width:auto;height:32px;margin:0;font-size:12px}
+.workspace.is-member .watchlist-rail-list{grid-column:1/-1;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:6px}
+.workspace.is-member .watchlist-rail-list button{padding:8px 10px;min-height:50px;height:100%;border:1px solid transparent}
+.workspace.is-member .watchlist-rail-list button.is-active{border-color:#7797e8}
+.workspace.is-member .watchlist-refresh-time{display:none}
+.workspace.is-member .card-heading{padding:14px 18px;gap:10px}
+.workspace.is-member .card-heading h2{font-size:20px}
+.workspace.is-member .card-heading>div>p{display:none}
+.workspace.is-member .watchlist-board{display:block;margin:0 18px 10px;padding:12px 14px;border-radius:10px}
+.workspace.is-member .watchlist-board-main{display:flex;align-items:center;flex-wrap:wrap;gap:14px 30px}
+.workspace.is-member .watchlist-board-hero strong{font-size:24px;letter-spacing:-.5px}
+.workspace.is-member .watchlist-board-hero span{margin-bottom:3px}
+.workspace.is-member .watchlist-board-hero em{font-size:12px;margin-top:4px}
+.workspace.is-member .watchlist-board dl{flex:1;gap:16px;min-width:260px}
+.workspace.is-member .watchlist-board dt{margin-bottom:3px}
+.workspace.is-member .watchlist-board dd{font-size:14px}
+.workspace.is-member .watchlist-board-main>p{flex-basis:100%;font-size:12px;margin:0}
+.workspace.is-member .table-controls{padding:8px 18px}
+.workspace.is-member .stock-table th{padding:8px 10px;font-size:10px;min-height:0}
+.workspace.is-member .stock-table td{padding:9px 10px;font-size:12px}
+.workspace.is-member .stock-table th:first-child,.workspace.is-member .stock-table td:first-child{padding-left:18px}
+.workspace.is-member .company-cell{gap:8px}
+.workspace.is-member .company-cell strong{font-size:13px}
+.workspace.is-member .stock-table .price-value{font-size:13px}
+.stock-table .allocation-column{width:58px;white-space:nowrap;font-size:11px}
+.stock-orders{padding:3px 0;font-size:11px;line-height:1.5}
+.stock-orders-heading{font-size:11px;color:#718097;margin-bottom:3px}
+.stock-orders ol{display:flex;flex-wrap:wrap;gap:3px 16px;list-style:none;margin:0;padding:0}
+.stock-orders li{padding:2px 0;border:0;max-width:100%}
+.stock-orders li p{margin:0}
+.order-weight{font-size:10px;color:#718097;margin-left:4px}
+.workspace.is-member .stock-table .stock-orders-row td{padding-top:0;padding-bottom:6px}
+@media(max-width:700px){
+ .workspace.is-member .watchlist-rail-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .workspace.is-member .watchlist-rail-name{font-size:12px;white-space:normal;overflow-wrap:anywhere}
+ .workspace.is-member .watchlist-rail-head h1{font-size:16px}
+ .workspace.is-member .watchlist-rail-new{padding-inline:8px}
+ .workspace.is-member .watchlist-board{margin-inline:12px;padding:10px}
+ .workspace.is-member .watchlist-board dl{min-width:0;flex-basis:100%;gap:8px}
+ .workspace.is-member .watchlist-board dd{font-size:12px}
+ .workspace.is-member .mobile-stock-card{padding:12px}
+ .workspace.is-member .mobile-stock-values{gap:8px;margin-block:10px}
+ .stock-orders ol{display:grid;gap:3px}
+ .stock-orders li{overflow-wrap:anywhere}
+}
+html.dark .stock-orders-heading,html.dark .order-weight{color:#b8ccc0}
