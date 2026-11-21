@@ -1,3 +1,4 @@
+import {databaseFetch} from './database-fetch.mjs';
 import {withOrderTotals} from '../lib/position-orders.mjs';
 import {localMode,localDatabase,exportLocalData} from './local-db.mjs';
 import {localUser} from './local-auth.mjs';
@@ -31,7 +32,7 @@ export const origin = () => (process.env.APP_URL || 'http://127.0.0.1:4317').rep
 export function database() {
   if(localMode())return localDatabase();
   if (!authConfigured()) throw new AppError('Accounts are not connected yet. Please try again after setup is complete.',503);
-  return createClient(process.env.SUPABASE_URL,process.env.SUPABASE_SERVICE_ROLE_KEY,{auth:{persistSession:false,autoRefreshToken:false}});
+  return createClient(process.env.SUPABASE_URL,process.env.SUPABASE_SERVICE_ROLE_KEY,{auth:{persistSession:false,autoRefreshToken:false},global:{fetch:databaseFetch()}});
 }
 export function dbResult(result) {
   if (result.error) {
