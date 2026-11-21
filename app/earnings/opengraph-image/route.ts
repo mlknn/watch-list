@@ -1,13 +1,13 @@
-import {earningsOgAlt,earningsShareImage,earningsWeekShareImage,pageOgSize} from '@/lib/page-share-image';
+import {earningsShareImage,earningsWeekShareImage} from '@/lib/page-share-image';
 import {earningsWeek} from '@/server/earnings-calendar.mjs';
 import {earningsWeekCard} from '@/lib/next-earnings.mjs';
 
-export const alt=earningsOgAlt;
-export const size=pageOgSize;
-export const contentType='image/png';
+export const dynamic='force-dynamic';
 
-export default async function Image({searchParams}:{searchParams:Promise<{week?:string}>}){
-  const {week}=await searchParams;
+// Metadata image functions receive params, not searchParams. Use a route
+// handler so dated share links can read the query string from the request.
+export async function GET(request:Request){
+  const week=new URL(request.url).searchParams.get('week');
   const card=earningsWeekCard(week||'');
   if(!card)return earningsShareImage();
   let rows:{symbol:string;label:string;date:string}[]=[];
